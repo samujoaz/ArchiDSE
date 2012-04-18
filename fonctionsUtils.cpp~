@@ -282,18 +282,17 @@ void Affiche_COMPONENTCPU(COMPONENTCPU A)
   while(tmp!=NULL)
   {
    cout<<endl;
-   //cout<<"composant N°"<<i<<":"<<endl;
    cout<<"cpu_"<<tmp->CPU_->indice_CPU<<": "<<tmp->CPU_->name_cpu<<endl;
    cout<<"\tstart_frequency: "<<tmp->CPU_->start_frequency<<endl;
    cout<<"\tworking_frequency: "<<tmp->CPU_->work_frequency<<endl;
    cout<<"\tend_frequency: "<<tmp->CPU_->end_frequency<<endl;
    cout<<"\tdmips: "<<tmp->CPU_->dmips<<endl;
    cout<<"\tpipeline: "<<tmp->CPU_->pipeline<<endl;
-   cout<<"cache L1"<<endl;
+   cout<<"cache L1";
    cout<<"\ttaille: "<<tmp->L1_->taille<<endl;
    cout<<"\tassociativity: "<<tmp->L1_->associativity<<endl;
    cout<<"\tnb byte per line: "<<tmp->L1_->bpl<<endl;
-   cout<<"cache L2"<<endl;
+   cout<<"cache L2";
    cout<<"\ttaille: "<<tmp->L2_->taille<<endl;
    cout<<"\tassociativity: "<<tmp->L2_->associativity<<endl;
    cout<<"\tnb byte per line: "<<tmp->L2_->bpl<<endl;
@@ -310,18 +309,17 @@ void Affiche_COMPONENTDSP(COMPONENTDSP A)
   while(tmp!=NULL)
   {
    cout<<endl;
-   //cout<<"composant N°"<<i<<":"<<endl;
    cout<<"dsp_"<<tmp->DSP_->indice_DSP<<": "<<endl;
    cout<<"\tstart_frequency: "<<tmp->DSP_->start_frequency<<endl;
    cout<<"\tworking_frequency: "<<tmp->DSP_->work_frequency<<endl;
    cout<<"\tend_frequency: "<<tmp->DSP_->end_frequency<<endl;
    cout<<"\tdmips: "<<tmp->DSP_->dmips<<endl;
    cout<<"\tpipeline: "<<tmp->DSP_->pipeline<<endl;
-   cout<<"cache L1"<<endl;
+   cout<<"cache L1";
    cout<<"\ttaille: "<<tmp->L1_->taille<<endl;
    cout<<"\tassociativity: "<<tmp->L1_->associativity<<endl;
    cout<<"\tnb byte per line: "<<tmp->L1_->bpl<<endl;
-   cout<<"cache L2"<<endl;
+   cout<<"cache L2";
    cout<<"\ttaille: "<<tmp->L2_->taille<<endl;
    cout<<"\tassociativity: "<<tmp->L2_->associativity<<endl;
    cout<<"\tnb byte per line: "<<tmp->L2_->bpl<<endl;

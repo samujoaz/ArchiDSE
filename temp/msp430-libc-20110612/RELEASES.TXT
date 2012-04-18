@@ -1,0 +1,123 @@
+20110612:
+ - d2ae0e8 [2011-06-12 13:28:13 -0500] Provide crude README and rename licenses to be more visible
+ - 6d152e3 [2011-06-12 13:27:37 -0500] Remove outdated documentation and unvalidated tests
+ - 4e02cc4 [2011-06-12 13:22:32 -0500] SF 3312831 libc Makefile fails to install
+ - 1861e19 [2011-06-12 11:57:42 -0500] SF 3315457 ensure version number information available in libc/mcu
+ - a683991 [2011-06-12 11:34:05 -0500] SF 3315471 remove _init_section__ function
+ - f1b6b8a [2011-06-12 10:57:46 -0500] Check-in partially working _init_section__ prior to deleting this module
+ - aadb5cf [2011-06-12 10:56:10 -0500] SF 3289529 msp430-libc misdeclares linker-provided symbols
+ - a84a6d8 [2011-06-12 09:54:17 -0500] Do not introduce fake high bits in addresses
+ - fba84e1 [2011-06-12 09:15:55 -0500] Rename sys/unistd.h to sys/crtld.h
+ - 19bb070 [2011-06-12 09:08:53 -0500] Convert to GNU coding standard
+ - 1997fe6 [2011-06-11 16:17:00 -0500] Replace last GPL implementation, now GPL-free
+ - 9c12003 [2011-06-11 16:06:17 -0500] Update license summary
+ - 10fddc3 [2011-06-11 16:03:22 -0500] Implement remaining printf variants
+ - 052cd90 [2011-06-11 14:30:36 -0500] Refine label names to be more accurate
+ - 8e7fea5 [2011-06-11 14:23:00 -0500] Complete handling of width-as-argument
+ - 4e94bb6 [2011-06-11 14:02:22 -0500] Correct placement of hex alternate form prefix with right alignment
+ - c47c505 [2011-06-11 13:56:15 -0500] Correct output of %#x for zero value
+ - 82aa3a2 [2011-06-11 12:51:14 -0500] Convert to GNU standard style
+ - 4b8c30e [2011-06-11 12:34:11 -0500] Support sign flag characters
+ - bd4ea46 [2011-06-11 12:30:29 -0500] Eliminate union for flags
+ - 50e11fa [2011-06-11 12:02:00 -0500] Explicitly allow %08s to zero-pad a string
+ - a7e227c [2011-06-11 11:44:29 -0500] Rename flag in preparation for sign support
+ - c3a00cc [2011-06-11 11:40:02 -0500] Left-justify overrides zero padding
+ - 07ca923 [2011-06-11 11:35:09 -0500] Use more accurate name for flag
+ - 05fbfe3 [2011-06-11 10:52:31 -0500] Clean up unsupported conversion characters
+ - a26b601 [2011-06-11 10:24:08 -0500] Refine description of unsupported conversions
+ - bf9d507 [2011-06-11 10:19:10 -0500] Document %s and %p handling of null pointer
+ - ab83867 [2011-06-11 07:47:49 -0500] Cleanroom implementation of printf wrapper
+ - 09a0b03 [2011-06-11 07:28:53 -0500] Remove old printf wrappers for new clean non-GPL-tagged implementation
+ - 3d12468 [2011-06-11 07:21:34 -0500] Remove unused file
+ - 19e9c4e [2011-06-11 07:21:22 -0500] Use standard copyright/license header
+ - d7ee87b [2011-06-11 07:13:08 -0500] GPL-free printf from Chris Liechti
+ - b1e9d52 [2011-06-04 17:52:06 -0500] Convert from email to name (inferred from AVR sources)
+ - 435abb8 [2011-06-04 14:29:40 -0500] Remove outdated licenses analysis files
+ - 3a2523c [2011-06-04 14:29:04 -0500] Update record
+ - c9ebeaa [2011-06-04 14:24:26 -0500] Document best-guess at creator for one-line and other unmarked files
+ - 3cfb4ce [2011-06-04 10:12:41 -0500] Remove files that are not build into any library
+ - 7f7ab84 [2011-06-04 10:06:40 -0500] Add single-file license summary
+ - a147b5b [2011-06-04 09:53:45 -0500] Record origin of source, no copyright information found
+ - e91a7f7 [2011-06-04 09:05:13 -0500] From git://mspgcc.git.sourceforge.net/gitroot/mspgcc/historical d81646da36:
+ - ab6afc8 [2011-05-28 13:15:02 -0500] Copyright cleanup: stdlib/*toa.c
+ - fdc4068 [2011-05-28 13:09:40 -0500] Copyright cleanup: misc/*
+ - 58b3385 [2011-05-28 12:49:15 -0500] Copyright cleanup: include/*
+ - 96d23f4 [2011-05-28 11:42:07 -0500] Copyright cleanup: include/ctype.h
+ - 2043a25 [2011-05-28 11:28:47 -0500] Copyright cleanup: BSD4 -> BSD3
+ - 1156682 [2011-05-28 10:53:14 -0500] Libc copyright inspection
+ - 7602ada [2011-04-23 10:23:26 -0500] Correct INT64_MIN
+ - 5d24003 [2011-04-21 09:26:11 -0500] SF 3136664 uniarch separate legacy
+ - f101430 [2011-04-11 19:01:45 -0500] SF 3284858 Strtoul always returns ULONG_MAX
+ - 8dc8c66 [2011-04-11 18:43:00 -0500] Remove multiple copies of strto*l.c
+ - 49c25e0 [2011-04-03 13:05:45 -0500] Restore optimization flags lost in override commit of 20090127
+ - f400caa [2011-03-31 08:38:28 -0500] SF 3261356: inttypes.h moved
+ - da1479f [2011-03-14 20:30:13 -0500] SF 3194910: UINTx_MAX/MIN overflow
+ - fc20237 [2011-03-14 06:39:44 -0500] Remove outdated documentation
+ - 0f3cf90 [2011-03-01 13:06:01 -0600] Remove crt0 and msp430mcu pieces
+ - 89c2395 [2011-03-01 13:04:39 -0600] Disable 430x stuff
+ - b7b76ef [2011-03-01 13:04:06 -0600] Remove files incorporated into msp430mcu
+ - e4b213d [2011-03-01 13:03:51 -0600] Remove file obsoleted by gcc crt0 material
+ - 44bebb4 [2011-03-01 11:43:22 -0600] Remove specs, part of msp430mcu not this package
+ - 5f7e21e [2011-01-15 12:17:53 -0600] Include equals when detecting user override
+ - 13bdfd0 [2010-12-23 13:04:54 -0600] Use individual files per spec, to simplify references in gcc spec
+ - 0c6d9e3 [2010-12-23 11:42:10 -0600] Install gcc spec file for supported devices
+ - 70aab76 [2010-12-22 12:20:38 -0600] Switch to new include file standard
+ - 0f9c60e [2010-12-22 12:18:27 -0600] Remove legacy headers, not supported in uniarch
+ - f747f1d [2010-08-28 19:34:19 -0500] Remove crt0 functions now in gcc
+
+20110213-ti:
+ - 3caf81a [2011-02-13 16:58:34 -0600] Update release information
+ - 671655d [2011-02-06 07:29:56 -0600] Use RESET vector to determine size of vector table
+
+20110130-ti:
+ - 26ab188 [2011-01-30 12:58:21 -0600] Update release information
+ - 25a12e9 [2011-01-30 12:55:34 -0600] Add support for msp430f550x
+ - 135a229 [2011-01-30 12:52:48 -0600] Add support for msp430f471x3
+ - 2759891 [2011-01-30 12:38:49 -0600] SF 3114711.4 Correct linkage for global register/function declarations
+ - 74e6d0a [2011-01-30 09:46:15 -0600] SF 3114711.2: Defined clang-specific _BI[CS]_SR_IRQ macros
+ - 81de67e [2011-01-30 11:00:36 -0600] Accommodate certain assumptions about directory creation
+
+20101114-ti:
+ - a641319 [2010-11-14 10:40:14 -0600] Update version numbers
+ - 958fa37 [2010-11-14 10:14:28 -0600] SF 3109143: Support value-line MSP430G22x1 devices
+
+20101113-ti:
+ - 65ecde7 [2010-11-13 10:15:39 -0600] Update release history/number
+ - 644cc2d [2010-11-08 00:17:18 -0600] SF 3103015: Bug in strtol, implies ldiv bug
+ - 34ce4a0 [2010-11-06 12:45:32 -0500] SF 3094472: Apply munge.py script
+ - 16fa4d2 [2010-11-06 12:36:33 -0500] Support SF 3094467: TI headers define assembler-incompatible constants
+ - 2c6807d [2010-11-06 11:33:34 -0500] SF 3094467: iomacros.h requires #define __MSP430_TI_HEADERS__
+
+20101006-ti:
+ - 9ddac0d [2010-10-06 14:58:44 -0500] Update release history
+ - 4f9a595 [2010-09-09 12:43:24 -0500] Provide macros for extended instructions that do not depend on 20-bit addresses
+ - fcf9225 [2010-10-06 13:48:57 -0500] SF 3082367: multilib misbuilds libc for msp1
+ - 8a45d75 [2010-09-23 11:19:37 -0500] Incorporate new TI release.
+
+20100829-ti:
+ - 73986ca [2010-08-29 13:34:20 -0500] Update release history
+ - 24c385a [2010-08-29 13:32:18 -0500] SF 3055519: add support for 55xx chips
+
+20100815-ti
+ - 5278dc2 Fix C++/header-id modifications for files that use upper-case chip identifiers
+ - 8edaf13 Temporarily unconditionally define macros for CPUX.
+ - 60022af Re-generate derived headers from munge.sed and 53243ef857
+ - 7bd9f39 Fix 3036130; comment the converter script
+
+20100815
+ - e46e0d6 SF 3006833: missing string.h prototypes
+ - 7d17d09 SF 3043392: msp430xG439 does not include compa.h
+ - b7d9fd8 SF 3037713: remove extra underscores from preprocessor symbol
+
+20100726
+ - [3034079] ldiv msp430x bug (FIXED)
+ - [3023493] eliminate preprocessor warning (FIXED)
+ - [2987362] setjmp implementation is somehow wrong (WORKSFORME)
+
+20100624
+ - [2938909] errors when stdlib.h or ctype.h included in multiple object
+   files
+ - [2986826] wrong label for longjmp resulting in unresolvable symbol
+ - [2996580] SFR access optimized away
+ - [3017255] DMA headers bugged
+ - [3021042] support byteswap.h and endian.h

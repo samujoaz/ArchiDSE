@@ -282,7 +282,6 @@ void Affiche_COMPONENTCPU(COMPONENTCPU A)
   while(tmp!=NULL)
   {
    cout<<endl;
-   //cout<<"composant N°"<<i<<":"<<endl;
    cout<<"cpu_"<<tmp->CPU_->indice_CPU<<": "<<tmp->CPU_->name_cpu<<endl;
    cout<<"\tstart_frequency: "<<tmp->CPU_->start_frequency<<endl;
    cout<<"\tworking_frequency: "<<tmp->CPU_->work_frequency<<endl;
@@ -310,7 +309,6 @@ void Affiche_COMPONENTDSP(COMPONENTDSP A)
   while(tmp!=NULL)
   {
    cout<<endl;
-   //cout<<"composant N°"<<i<<":"<<endl;
    cout<<"dsp_"<<tmp->DSP_->indice_DSP<<": "<<endl;
    cout<<"\tstart_frequency: "<<tmp->DSP_->start_frequency<<endl;
    cout<<"\tworking_frequency: "<<tmp->DSP_->work_frequency<<endl;

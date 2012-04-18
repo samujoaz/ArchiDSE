@@ -8,16 +8,27 @@
 #include <sstream>
 
 #include "fonctionsUtils.h"
+// // #include "generatefile.h"
+
 using namespace std;
 
-void CreateFile(char *output,string input,float TBC)
+void GenerateCpuFile(char *output,string input, COMPONENTCPU C)
 {
   ofstream outputfile(output);/// ios::app pour rajouter en fin du fichier ce qu'on veut ecrire 
   ///si on ne veut pas ecraser le fichier dans le cas où il existe déjà
-  string line;
+  string line,mot;
   size_t pos;
+  float TBC=0.0;
+  float T_RWDATA;	//temps passé à lire et écrire des datas
+  float T_Inst;  	//temps passé dans les instructions (ms)
+  float T_Total; 	//temps total
+  float T_OneDATA;  	//ms pour lire ou écrire une data
+  float MissPred;	//MissPred
+  float Pen_L1;  	//penalité pour un miss L1
+  float Pen_L2;  	//penalité pour un miss L2
   ostringstream oss;
-  oss<<TBC;
+  bool sortie=true;
+  uint Nb_instr, load, store, instrL1,R_L1_Miss,W_L1_Miss,instrL2,R_L2_Miss,W_L2_Miss;
   if(outputfile)
   {
     ifstream inputfile(input.c_str());
@@ -25,17 +36,131 @@ void CreateFile(char *output,string input,float TBC)
     {
       while(getline(inputfile,line)) 
       {
-	
 	  pos=line.find("TBC");
-	  if(pos<=line.size()) line.replace(pos,3, oss.str());
+	  if (pos!=-1)
+	  {/// on  va se repositionner au debut de la ligne
+	    inputfile.seekg(-line.size(),ios::cur);
+	   while(inputfile>>mot && sortie) 
+	    {
+		if((mot.compare("TBC"))==0)
+		{
+		  while(mot!="[" && sortie) inputfile>>mot;
+		  while(mot!="]")
+		  {
+		    inputfile>>Nb_instr;// nombre di'nstruction
+		    inputfile>>load; // nombre de D-Read
+		    inputfile>>store;// nombre de D-Write
+		    inputfile>>instrL1;//
+		    inputfile>>R_L1_Miss;
+		    inputfile>>W_L1_Miss;
+		    inputfile>>instrL2;
+		    inputfile>>R_L2_Miss;
+		    inputfile>>W_L2_Miss;
+		    
+		    T_OneDATA=1.0/(C->CPU_->work_frequency*1000.0);
+		    Pen_L1=10.0/(C->CPU_->work_frequency*1000.0);
+		    Pen_L2=100.0/(C->CPU_->work_frequency*1000.0);
+		    
+		    T_Inst=Nb_instr/(C->CPU_->work_frequency*C->CPU_->dmips*1000.0)+instrL1*Pen_L1+instrL2*Pen_L2;
+		    T_RWDATA=(store+load)*(T_OneDATA)+(R_L2_Miss*Pen_L2+W_L2_Miss*Pen_L2)+(R_L1_Miss*Pen_L1+W_L1_Miss*Pen_L1);
+		    MissPred=(77066983.0/(1500*5.0))*C->CPU_->pipeline*T_OneDATA;
+		    T_Total=MissPred+T_RWDATA+T_Inst;
+		    inputfile>>mot;
+		     oss<<T_Total;
+		    cout<<"T_Total: "<<T_Total<<endl;
+		  }
+		  if(pos<=line.size()){ line.replace(pos,3, oss.str());}
+		  oss.str(""); oss.clear();
+		  sortie=false;
+		}
+	    }
+	    inputfile.seekg(-3*mot.size()+2,ios::cur);	    
+	    sortie=true;
+	  }	  
 	  outputfile<<line<<endl;
-	 // cout<<line<<endl;
       }
+    
     }
-    else cout<<"ERREUR: Impossible d'ouvrir le fichier:"<<input<<endl;
+    else {cout<<"ERREUR: Impossible d'ouvrir le fichier:"<<input<<endl;exit(0);}
   }
-  else cout<<"ERREUR: Impossible d'ouvrir le fichier:"<<output<<endl; 
+  else {cout<<"ERREUR: Impossible d'ouvrir le fichier:"<<output<<endl;exit(0);} 
 }
+
+
+void GenerateDspFile(char *output,string input, COMPONENTDSP C)
+{
+  ofstream outputfile(output);/// ios::app pour rajouter en fin du fichier ce qu'on veut ecrire 
+  ///si on ne veut pas ecraser le fichier dans le cas où il existe déjà
+  string line,mot;
+  size_t pos;
+  float T_RWDATA;	//temps passé à lire et écrire des datas
+  float T_Inst;  	//temps passé dans les instructions (ms)
+  float T_Total; 	//temps total
+  float T_OneDATA;  	//ms pour lire ou écrire une data
+  float MissPred;	//MissPred
+  float Pen_L1;  	//penalité pour un miss L1
+  float Pen_L2;  	//penalité pour un miss L2
+  ostringstream oss;
+  bool sortie=true;
+  uint Nb_instr, load, store, instrL1,R_L1_Miss,W_L1_Miss,instrL2,R_L2_Miss,W_L2_Miss;
+  if(outputfile)
+  {
+    ifstream inputfile(input.c_str());
+    if(inputfile)
+    {
+      while(getline(inputfile,line)) 
+      {
+	  pos=line.find("TBC");
+	  if (pos!=-1)
+	  {/// on  va se repositionner au debut de la ligne
+	    inputfile.seekg(-line.size(),ios::cur);
+	   while(inputfile>>mot && sortie) 
+	    {
+		if((mot.compare("TBC"))==0)
+		{
+		  while(mot!="[" && sortie) inputfile>>mot;
+		  while(mot!="]")
+		  {
+		    inputfile>>Nb_instr;// nombre di'nstruction
+		    inputfile>>load; // nombre de D-Read
+		    inputfile>>store;// nombre de D-Write
+		    inputfile>>instrL1;//
+		    inputfile>>R_L1_Miss;
+		    inputfile>>W_L1_Miss;
+		    inputfile>>instrL2;
+		    inputfile>>R_L2_Miss;
+		    inputfile>>W_L2_Miss;
+		    
+		    T_OneDATA=1.0/(C->DSP_->work_frequency*1000.0);
+		    Pen_L1=10.0/(C->DSP_->work_frequency*1000.0);
+		    Pen_L2=100.0/(C->DSP_->work_frequency*1000.0);
+		    
+		    T_Inst=Nb_instr/(C->DSP_->work_frequency*C->DSP_->dmips*1000.0)+instrL1*Pen_L1+instrL2*Pen_L2;
+		    T_RWDATA=(store+load)*(T_OneDATA)+(R_L2_Miss*Pen_L2+W_L2_Miss*Pen_L2)+(R_L1_Miss*Pen_L1+W_L1_Miss*Pen_L1);
+		    MissPred=(77066983.0/(1500*5.0))*C->DSP_->pipeline*T_OneDATA;
+		    T_Total=MissPred+T_RWDATA+T_Inst;
+		    inputfile>>mot;
+		     oss<<T_Total;
+		    cout<<"T_Total: "<<T_Total<<endl;
+		  }
+		  if(pos<=line.size()){ line.replace(pos,3, oss.str());}
+		  oss.str(""); oss.clear();
+		  sortie=false;
+		}
+	    }
+	    inputfile.seekg(-3*mot.size()+2,ios::cur);	    
+	    sortie=true;
+	  }	  
+	  outputfile<<line<<endl;
+      }
+    
+    }
+    else {cout<<"ERREUR: Impossible d'ouvrir le fichier:"<<input<<endl;exit(0);}
+  }
+  else {cout<<"ERREUR: Impossible d'ouvrir le fichier:"<<output<<endl;exit(0);} 
+}
+
+
 
 int main(int argc, char *argv[])
 {
@@ -99,62 +224,45 @@ int main(int argc, char *argv[])
 	      tmp = line.substr(0,line.size()-1);
 	      if(tmp =="CPU")
 	      {
-		//cout<<"connnection cpu_";
 		indice_cpu=atoi(line.substr(tmp.size(),line.size()).c_str());
-		//cout<<indice_cpu;
 		listing_file>>line;
 		listing_file>>line;
 		tmp=line.substr(0,line.size()-1);
 		if(tmp=="L1_")
 		{
-		  //cout<<" to cacheL1_";
-		  
 		  indice_cacheL1=atoi(line.substr(tmp.size(),line.size()).c_str());
-// 		  cacheL1_tmp=AccessToCACHE(MesCacheL1,indice_cacheL1);
-// 		  cpu_tmp=AccessToCPU(MonCpu,indice_cpu);
 		  MesComposantsCPU = ADD_COMPONENTCPU(MesComposantsCPU,AccessToCPU(MonCpu,indice_cpu),AccessToCACHE(MesCacheL1,indice_cacheL1),indice_cacheL1,indice_cpu,"cpu");
-		  //cout<<indice_cacheL1<<endl;   
 		}
 	      }
 	      else {
 		if(tmp =="DSP")
 		{
-		   // cout<<"connnection dsp_";
 		    indice_dsp=atoi(line.substr(tmp.size(),line.size()).c_str());
-		    //cout<<indice_dsp;
 		    listing_file>>line;
 		    listing_file>>line;
 		    tmp=line.substr(0,line.size()-1);
 		      if(tmp=="L1_")
-		      {
-			//cout<<" to cacheL1_";
-			
+		      {			
 			indice_cacheL1=atoi(line.substr(tmp.size(),line.size()).c_str());
 			MesComposantsDSP = ADD_COMPONENTDSP(MesComposantsDSP,AccessToDSP(MonDsp,indice_dsp),AccessToCACHE(MesCacheL1,indice_cacheL1),indice_cacheL1,indice_dsp,"dsp");
-			//cout<<indice_cacheL1<<endl;   
 		      }
 		}
 	      else{
 		if(tmp=="L1_")
 		{
-		  //cout<<"connection cacheL1_";
 		  indice_cacheL1=atoi(line.substr(tmp.size(),line.size()).c_str());
-// 		  cout<<indice_cacheL1;
 		  listing_file>>line;
 		  listing_file>>line;
 		  tmp=line.substr(0,line.size()-1);
 		  if(tmp=="L2_")
 		  {
-		    
-// 		      cout<<" to cacheL2_";
 		      indice_cacheL2=atoi(line.substr(tmp.size(),line.size()).c_str());
 		      cacheL1_tmp=AccessToCACHE(MesCacheL1,indice_cacheL1);
 		      cacheL2_tmp=AccessToCACHE(MesCacheL2,indice_cacheL2);
-
+		      
 		      if(GetNamelinkCache(cacheL1_tmp) =="dsp"){
 		      CompoDSP_temp=AccessToCOMPONENTDSP(MesComposantsDSP,GetLinkCacheL1DSP(MesComposantsDSP,indice_cacheL1));
 		      ADD_CACHE_L2_TO_COMPONENTDSP(CompoDSP_temp,cacheL2_tmp);
-		
 		      }
 		      else{
 			if(GetNamelinkCache(cacheL1_tmp) =="cpu"){
@@ -162,7 +270,6 @@ int main(int argc, char *argv[])
 			ADD_CACHE_L2_TO_COMPONENTCPU(CompoCPU_temp,cacheL2_tmp);
 			}
 		      }
-// 		    cout<<indice_cacheL2<<endl;
 		  }
 		}
 	      
@@ -180,7 +287,6 @@ int main(int argc, char *argv[])
 	    
 	      if(line.substr(0,9)=="component")
 	      {
-
 		if(line.substr(10,2)=="PU"){
 		  cout<<" Required format CPU :";
 		  cout<<" component PU CPUX file_name.txt freq "<<endl;
@@ -221,125 +327,34 @@ int main(int argc, char *argv[])
       }
 	
       }///end while(listing_file>>line)
-    
-//   cout<<endl;
-  }///end if(listing_file)
+    }///end if(listing_file)
   else{
     cout<<"ERREUR: Impossible d'ouvrir le fichier de la liste des architectures"<<endl;
     exit(0);
-
   }
   
   listing_file.close();
-
   nb_cpu= NB_CPU(MonCpu);
- 
   nb_dsp= NB_DSP(MonDsp);
   nb_cache= NB_CACHE(MesCacheL1);
   nb_cache= NB_CACHE(MesCacheL2);
-   
-//   cout<<"nb_cpu: "<<nb_cpu<<endl;
-//   cout<<"nb_dsp: "<<nb_dsp<<endl;
-//   cout<<"nb_cache L1: "<<nb_cache<<endl;
-//   cout<<"nb_cache L2: "<<nb_cache<<endl;
-//  
 //   Affiche_COMPONENTDSP(MesComposantsDSP);  
-/*  */Affiche_COMPONENTCPU(MesComposantsCPU);
-  /// allocations memoires
+//   Affiche_COMPONENTCPU(MesComposantsCPU);
   uint i=0;
-  float T_RWDATA_cpu[nb_cpu];	//temps passé à lire et écrire des datas
-  float T_Inst_cpu[nb_cpu];  	//temps passé dans les instructions (ms)
-  float T_Total_cpu[nb_cpu]; 	//temps total
-  float T_OneDATA_cpu[nb_cpu];  //ms pour lire ou écrire une data
-  float MissPred_cpu[nb_cpu];	//MissPred
-  float Pen_L1_cpu[nb_cpu];  	//penalité pour un miss L1
-  float Pen_L2_cpu[nb_cpu];  	//penalité pour un miss L2
   CompoCPU_temp = MesComposantsCPU;
-  while(i<nb_cpu)
+  while(i++<nb_cpu)
   {
-    T_OneDATA_cpu[i]=1.0/(CompoCPU_temp->CPU_->work_frequency*1000.0);
-    Pen_L1_cpu[i]=10.0/(CompoCPU_temp->CPU_->work_frequency*1000.0);
-    Pen_L2_cpu[i]=100.0/(CompoCPU_temp->CPU_->work_frequency*1000.0);
-    T_Inst_cpu[i]=(5086842823.0/(400*5.0))/(CompoCPU_temp->CPU_->work_frequency*CompoCPU_temp->CPU_->dmips*1000.0)+(1913.0/(400*5.0)*Pen_L1_cpu[i])+(802.0/(1500*5.0)*Pen_L2_cpu[i]);
-    T_RWDATA_cpu[i]=(587188853.0/(400*5.0)+865167484.0/(400*5.0))*(T_OneDATA_cpu[i])+(587188853.0/(400*5.0)*0.01/100.0*Pen_L2_cpu[i]+(865167484.0/(400*5.0)*0.01/100.0*Pen_L2_cpu[i]))+(587188853.0/(400*5.0)*0.1/100.0*Pen_L1_cpu[i]+865167484.0/(400*5.0)*1.2/100.0*Pen_L1_cpu[i]);
-    MissPred_cpu[i]=(77066983.0/(1500*5.0))*CompoCPU_temp->CPU_->pipeline*T_OneDATA_cpu[i];
-    T_Total_cpu[i]=MissPred_cpu[i]+T_RWDATA_cpu[i]+T_Inst_cpu[i];
-    
     sprintf(dir,"slice_cpu_%d.txt",CompoCPU_temp->CPU_->indice_CPU);
-    CreateFile(dir,"slice.txt",T_Total_cpu[i]);
-//     cout<<"T_OneDATA_cpu["<<i<<"] = "<<T_OneDATA_cpu[i]<<endl;
-//     cout<<"Pen_L1_cpu["<<i<<"] = "<<Pen_L1_cpu[i]<<endl;
-//     cout<<"Pen_L2_cpu["<<i<<"] = "<<Pen_L2_cpu[i]<<endl;
-//     cout<<"T_Inst_cpu["<<i<<"] = "<<T_Inst_cpu[i]<<endl;
-//     cout<<"T_RWDATA_cpu["<<i<<"] = "<<T_RWDATA_cpu[i]<<endl;
-//     cout<<"MissPred_cpu["<<i<<"] = "<<MissPred_cpu[i]<<endl;
-    cout<<"T_Total_cpu["<<i<<"] = "<<T_Total_cpu[i]<<endl<<endl;
-  i++;  
-  CompoCPU_temp=CompoCPU_temp->next;
-
-  }
-  
+    GenerateCpuFile(dir,"slice.txt",CompoCPU_temp);
+    CompoCPU_temp=CompoCPU_temp->next;
+  }  
   i=0;
-  
- /* if(nb_dsp>0)
-  {*/
-  float T_RWDATA_dsp[nb_dsp];	//temps passé à lire et écrire des datas
-  float T_Inst_dsp[nb_dsp];  	//temps passé dans les instructions (ms)
-  float T_Total_dsp[nb_dsp]; 	//temps total
-  float T_OneDATA_dsp[nb_dsp];  //ms pour lire ou écrire une data
-  float MissPred_dsp[nb_dsp];	//MissPred
-  float Pen_L1_dsp[nb_dsp];  	//penalité pour un miss L1
-  float Pen_L2_dsp[nb_dsp];  	//penalité pour un miss L2
-  CompoDSP_temp=MesComposantsDSP;
-  while(i<nb_dsp)
+  while(i++<nb_dsp)
   {
-    T_OneDATA_dsp[i]=1.0/(CompoDSP_temp->DSP_->work_frequency*1000.0);
-    Pen_L1_dsp[i]=10.0/(CompoDSP_temp->DSP_->work_frequency*1000.0);
-    Pen_L2_dsp[i]=100.0/(CompoDSP_temp->DSP_->work_frequency*1000.0);
-    T_Inst_dsp[i]=(5086842823.0/(400*5.0))/(CompoDSP_temp->DSP_->work_frequency*CompoDSP_temp->DSP_->dmips*1000.0)+(1913.0/(400*5.0)*Pen_L1_dsp[i])+(802.0/(1500*5.0)*Pen_L2_dsp[i]);
-    T_RWDATA_dsp[i]=(587188853.0/(400*5.0)+865167484.0/(400*5.0))*(T_OneDATA_dsp[i])+(587188853.0/(400*5.0)*0.01/100.0*Pen_L2_dsp[i]+(865167484.0/(400*5.0)*0.01/100.0*Pen_L2_dsp[i]))+(587188853.0/(400*5.0)*0.1/100.0*Pen_L1_dsp[i]+865167484.0/(400*5.0)*1.2/100.0*Pen_L1_dsp[i]);
-    MissPred_dsp[i]=(77066983.0/(1500*5.0))*CompoDSP_temp->DSP_->pipeline*T_OneDATA_dsp[i];
-    T_Total_dsp[i]=MissPred_dsp[i]+T_RWDATA_dsp[i]+T_Inst_dsp[i];
-    
     sprintf(dir, "slice_dsp_%d.txt",CompoDSP_temp->DSP_->indice_DSP);
-    CreateFile(dir,"slice.txt",T_Total_dsp[i]);
-  
-  
-//     cout<<"T_OneDATA_dsp["<<i<<"] = "<<T_OneDATA_dsp[i]<<endl;
-//     cout<<"Pen_L1_dsp["<<i<<"] = "<<Pen_L1_dsp[i]<<endl;
-//     cout<<"Pen_L2_dsp["<<i<<"] = "<<Pen_L2_dsp[i]<<endl;
-//     cout<<"T_Inst_dsp["<<i<<"] = "<<T_Inst_dsp[i]<<endl;
-//     cout<<"T_RWDATA_dsp["<<i<<"] = "<<T_RWDATA_dsp[i]<<endl;
-//     cout<<"MissPred_dsp["<<i<<"] = "<<MissPred_dsp[i]<<endl;
-//     cout<<"T_Total_dsp["<<i<<"] = "<<T_Total_dsp[i]<<endl<<endl;
-  i++;  
-  CompoDSP_temp=CompoDSP_temp->next;
-
+    GenerateDspFile(dir,"slice.txt",CompoDSP_temp);
+    CompoDSP_temp=CompoDSP_temp->next;
   }
- /* }*/
- 
- /** definition des affiliations    **/
-//  exec() X threads sur tel CPU
-
- 
-
-  
-
-/// generation de fichier
-
-//line = MesComposantsCPU->CPU_->name_cpu;
-//tmp = line.substr(0,line.size()-4);
-   
-
-// // line.erase(); 
-// line= itoa(i,line,10);
-// line = tmp + line+".txt";
- //sprintf(dir, "slice_cpu_%d.txt",i);
-//tmp = tmp+dir;
-//cout<<tmp<<endl;
-//CreateFile(dir,MesComposantsCPU->CPU_->name_cpu, float _Total_dsp[i]);float TBC
-
-  
    return 0;
 }
   

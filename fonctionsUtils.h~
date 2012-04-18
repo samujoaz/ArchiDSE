@@ -1,6 +1,6 @@
 
-#ifndef DEF_STRUCTUREARCHI
-#define DEF_STRUCTUREARCHI
+#ifndef DEF_FONCTIONUTILS
+#define DEF_FONCTIONUTILS
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -68,9 +68,9 @@ DSP ADD_DSP(DSP mon_dsp, string name,uint freq);
 CACHE ADD_CACHE(CACHE ma_cache,uint taille, uint assoc, uint bpl);
 COMPONENTCPU ADD_COMPONENTCPU(COMPONENTCPU my_component,CPU mon_cpu,CACHE ma_cache,uint indice_cache,uint indice_cpu, string link);
 COMPONENTDSP ADD_COMPONENTDSP(COMPONENTDSP my_component,DSP mon_dsp,CACHE ma_cache, uint indice_cache,uint indice_dsp, string link);
-void ADD_CACHE_L2_TO_COMPONENTCPU(COMPONENTCPU my_component,CACHE L2);//{my_component->L2_=L2;}
-void ADD_CACHE_L2_TO_COMPONENTDSP(COMPONENTDSP my_component,CACHE L2);//{my_component->L2_=L2;}
-string GetNamelinkCache(CACHE ma_cache);//{if(ma_cache!=NULL) return ma_cache->namelink;}
+void ADD_CACHE_L2_TO_COMPONENTCPU(COMPONENTCPU my_component,CACHE L2);
+void ADD_CACHE_L2_TO_COMPONENTDSP(COMPONENTDSP my_component,CACHE L2);
+string GetNamelinkCache(CACHE ma_cache);
 uint GetLinkCacheL1DSP(COMPONENTDSP my_component, uint indice);
 uint GetLinkCacheL1CPU(COMPONENTCPU my_component, uint indice);
 
@@ -81,11 +81,11 @@ COMPONENTCPU AccessToCOMPONENTCPU(COMPONENTCPU my_component, uint indice);
 COMPONENTDSP AccessToCOMPONENTDSP(COMPONENTDSP my_component, uint indice);
 
 /// nombre d'éléments
-int NB_CPU(CPU A);//{if(A == NULL) return 0; return NB_CPU(A->next)+1;}
-int NB_DSP(DSP A);//{if(A == NULL) return 0; return NB_DSP(A->next)+1;}
-int NB_CACHE(CACHE A);//{if(A == NULL) return 0;return NB_CACHE(A->next)+1; }
-int NB_COMPONENTCPU(COMPONENTCPU A);//{if(A == NULL) return 0; return NB_COMPONENTCPU(A->next)+1; }
-int NB_COMPONENTDSP(COMPONENTDSP A);//{if(A == NULL) return 0; return NB_COMPONENTDSP(A->next)+1; }
+int NB_CPU(CPU A);
+int NB_DSP(DSP A);
+int NB_CACHE(CACHE A);
+int NB_COMPONENTCPU(COMPONENTCPU A);
+int NB_COMPONENTDSP(COMPONENTDSP A);
 
 /// pour les affichages 
 void Affiche_CPU(CPU A);
