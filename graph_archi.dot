@@ -1,0 +1,33 @@
+
+digraph graph_archi {
+  overlap = scale;
+   CPU0[label="CPU0"];
+   CPU1[label="CPU1"];
+   CPU2[label="CPU2"];
+   DSP0[label="DSP0"];
+   DSP1[label="DSP1"];
+   RAM[label="RAM",style=filled,color=lightblue,shape=box];
+   L1_0[label="CACHE L1_0"];
+   L1_1[label="CACHE L1_1"];
+   L1_2[label="CACHE L1_2"];
+   L1_3[label="CACHE L1_3"];
+   L1_4[label="CACHE L1_4"];
+   L2_0[label="CACHE L2_0"];
+   L2_1[label="CACHE L2_1"];
+   L2_2[label="CACHE L2_2"];
+   CPU0 -> L1_0[color=blue];
+   L1_0 -> L2_0[color=red];
+   CPU1 -> L1_1[color=blue]; 
+   L1_1 -> L2_0[color=red];
+   CPU2 -> L1_2[color=blue];
+   L1_2 -> L2_1[color=red];
+   DSP0 -> L1_3[color=blue]; 
+   L1_3 -> L2_1[color=red];
+   DSP1 -> L1_4[color=blue];
+   L1_4 -> L2_2[color=red];
+   L2_2 -> RAM[color=brown];
+   L2_0 -> RAM[color=brown];
+   L2_1 -> RAM[color=brown];   
+}
+
+
