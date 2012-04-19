@@ -5,15 +5,13 @@
 #include <string.h>
 #include <iostream>
 #include <fstream>
-#include <sstream>
 
 #include "fonctionsUtils.h"
 #include "generatefile.h"
 
 using namespace std;
 
-
-int main(int argc, char *argv[])
+void ReadCompositionFile(char * compositionfile)
 {
  
   int nb_cpu=0, nb_cache=0, nb_dsp=0,nb_ligne=0;
@@ -25,7 +23,7 @@ int main(int argc, char *argv[])
   COMPONENTCPU MesComposantsCPU=NULL,CompoCPU_temp=NULL;
   COMPONENTDSP MesComposantsDSP=NULL,CompoDSP_temp=NULL;
 
-  ifstream listing_file("composition.txt");   
+  ifstream listing_file(compositionfile);   
  
   if(listing_file)
   {
@@ -180,7 +178,7 @@ int main(int argc, char *argv[])
       }///end while(listing_file>>line)
     }///end if(listing_file)
   else{
-    cout<<"ERREUR: Impossible d'ouvrir le fichier de la liste des architectures"<<endl;
+    cout<<"ERREUR: Impossible d'ouvrir le fichier: "<<compositionfile<<endl;
     exit(0);
   }
   
@@ -189,23 +187,43 @@ int main(int argc, char *argv[])
   nb_dsp= NB_DSP(MonDsp);
   nb_cache= NB_CACHE(MesCacheL1);
   nb_cache= NB_CACHE(MesCacheL2);
-//   Affiche_COMPONENTDSP(MesComposantsDSP);  
+//    Affiche_COMPONENTDSP(MesComposantsDSP);  
 //   Affiche_COMPONENTCPU(MesComposantsCPU);
   uint i=0;
   CompoCPU_temp = MesComposantsCPU;
-  while(i++<nb_cpu)
+  while(i<nb_cpu)
   {
     sprintf(dir,"slice_cpu_%d.txt",CompoCPU_temp->CPU_->indice_CPU);
     GenerateCpuFile(dir,"slice.txt",CompoCPU_temp);
     CompoCPU_temp=CompoCPU_temp->next;
+    i++;
   }  
   i=0;
-  while(i++<nb_dsp)
+  CompoDSP_temp = MesComposantsDSP;
+  while(i<nb_dsp)
   {
     sprintf(dir, "slice_dsp_%d.txt",CompoDSP_temp->DSP_->indice_DSP);
     GenerateDspFile(dir,"slice.txt",CompoDSP_temp);
     CompoDSP_temp=CompoDSP_temp->next;
+    i++;
   }
-   return 0;
+}
+
+
+int main (int argc,char* argv[])
+{
+
+string filename;
+
+        if (argc == 3 && strcmp(argv[1],"DSE")==0)
+	{ 
+	  ReadCompositionFile(argv[2]);
+
+        }
+        else {
+                cout<<"\noption d'execution : DSE <input>"<< "\ninput: is a txt file "<<endl;         
+        }
+        
+        return 0;
 }
   

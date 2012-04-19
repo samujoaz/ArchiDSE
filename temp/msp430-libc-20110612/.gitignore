@@ -1,7 +1,0 @@
-# Ignore these files in a msp430-libc development area
-# NOTE: Only files that should be ignored in all TinyOS development areas
-# should be listed here.  Files that are relevant to individual developers,
-# such as Emacs or vi backup files, should be listed in .git/info/exclude.
-#
-# Directories named build
-Build/
