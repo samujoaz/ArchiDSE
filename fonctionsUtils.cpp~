@@ -288,11 +288,11 @@ void Affiche_COMPONENTCPU(COMPONENTCPU A)
    cout<<"\tend_frequency: "<<tmp->CPU_->end_frequency<<endl;
    cout<<"\tdmips: "<<tmp->CPU_->dmips<<endl;
    cout<<"\tpipeline: "<<tmp->CPU_->pipeline<<endl;
-   cout<<"cache L1";
+   cout<<"cache L1"<<endl;
    cout<<"\ttaille: "<<tmp->L1_->taille<<endl;
    cout<<"\tassociativity: "<<tmp->L1_->associativity<<endl;
    cout<<"\tnb byte per line: "<<tmp->L1_->bpl<<endl;
-   cout<<"cache L2";
+   cout<<"cache L2"<<endl;
    cout<<"\ttaille: "<<tmp->L2_->taille<<endl;
    cout<<"\tassociativity: "<<tmp->L2_->associativity<<endl;
    cout<<"\tnb byte per line: "<<tmp->L2_->bpl<<endl;
@@ -315,11 +315,11 @@ void Affiche_COMPONENTDSP(COMPONENTDSP A)
    cout<<"\tend_frequency: "<<tmp->DSP_->end_frequency<<endl;
    cout<<"\tdmips: "<<tmp->DSP_->dmips<<endl;
    cout<<"\tpipeline: "<<tmp->DSP_->pipeline<<endl;
-   cout<<"cache L1";
+   cout<<"cache L1"<<endl;
    cout<<"\ttaille: "<<tmp->L1_->taille<<endl;
    cout<<"\tassociativity: "<<tmp->L1_->associativity<<endl;
    cout<<"\tnb byte per line: "<<tmp->L1_->bpl<<endl;
-   cout<<"cache L2";
+   cout<<"cache L2"<<endl;
    cout<<"\ttaille: "<<tmp->L2_->taille<<endl;
    cout<<"\tassociativity: "<<tmp->L2_->associativity<<endl;
    cout<<"\tnb byte per line: "<<tmp->L2_->bpl<<endl;

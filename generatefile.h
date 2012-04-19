@@ -11,15 +11,11 @@
 #include "fonctionsUtils.h"
 
 using namespace std;
-// 
+
 
 void GenerateCpuFile(char *output,string input, COMPONENTCPU C);
 void GenerateDspFile(char *output,string input, COMPONENTDSP C);
-void ReadCompositionFile(char * compositionfile);
-
-
-
-
-
+void GenerateCompositionFile(const char* output,const char* input,const char* newmain, const char* newslice);
+void ReadCompositionFile(char * compositionfile, char * compositionmain);
 
 #endif

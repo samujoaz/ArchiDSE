@@ -1,13 +1,4 @@
-/*#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <iostream>
-#include <fstream>
 
-
-using namespace std;
-
-*/
 #include "fonctionsUtils.h"
 /// fonctions utiles
 CPU ADD_CPU(CPU mon_cpu, string name,uint freq)
