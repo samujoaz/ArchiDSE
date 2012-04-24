@@ -64,7 +64,6 @@ typedef struct componentdsp{
 typedef componentdsp *COMPONENTDSP;
 
 
-
 CPU ADD_CPU(CPU mon_cpu, string name,uint freq);
 DSP ADD_DSP(DSP mon_dsp, string name,uint freq);
 CACHE ADD_CACHE(CACHE ma_cache,uint taille, uint assoc, uint bpl);

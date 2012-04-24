@@ -64,16 +64,6 @@ typedef struct componentdsp{
 typedef componentdsp *COMPONENTDSP;
 
 
-typedef struct cpu_dsp{
-  COMPONENTDSP Ccpu;
-  COMPONENTCPU Cdsp;
-  struct cpu_dsp *next;
-}cpu_dsp; 
-typedef cpu_dsp *CPU_DSP;
-
-//gettype(CPU_DSP C);
-
-
 
 CPU ADD_CPU(CPU mon_cpu, string name,uint freq);
 DSP ADD_DSP(DSP mon_dsp, string name,uint freq);

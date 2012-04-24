@@ -1,0 +1,7 @@
+#!/bin/sh -x
+
+/home/joffrey/bench_generator/generators/composite_generator.exe composition.txt test.cpp
+chmod 755 build.sh
+./build.sh
+dot -Tps graph_archi.dot -o graph.ps
+

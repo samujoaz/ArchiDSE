@@ -1,12 +1,18 @@
 #include "generatefile.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 
-void GenerateCpuFile(char *output,string input, COMPONENTCPU C)
+
+void GenerateCpuFile(string output,string input, COMPONENTCPU C,string S1, string S2,string S3)
 {
-  ofstream outputfile(output);/// ios::app pour rajouter en fin du fichier ce qu'on veut ecrire 
+  ofstream outputfile(output.c_str());/// ios::app pour rajouter en fin du fichier ce qu'on veut ecrire 
   ///si on ne veut pas ecraser le fichier dans le cas où il existe déjà
-  string line,mot;
+  string line,mot,indice;
+  char c[20]; 
   size_t pos;
+  //string slice1("slice_comp"), slice2("slice_behaviour"), 
+  string stringtemp;
   uint i=0;
   float T_RWDATA;	//temps passé à lire et écrire des datas
   float T_Inst;  	//temps passé dans les instructions (ms)
@@ -18,13 +24,40 @@ void GenerateCpuFile(char *output,string input, COMPONENTCPU C)
   ostringstream oss;
   bool sortie=true;
   uint Nb_instr, load, store, instrL1,R_L1_Miss,W_L1_Miss,instrL2,R_L2_Miss,W_L2_Miss;
+  sprintf(c,"_cpu_%d",C->CPU_->indice_CPU);
+  indice=c;
+
+
   if(outputfile)
   {
     ifstream inputfile(input.c_str());
     if(inputfile)
     {
       while(getline(inputfile,line)) 
-      {
+      {	  	
+	/// si besoin de remplacer une autre chaine rajouter la dans le definition de la fonction 
+	///et utiliser le if ci-dessous pour faire le remplacement. 
+		  pos=line.find(S1);
+		  if(pos<=line.size()) 
+		  {	    
+		    stringtemp =S1+indice;
+		    line.replace(pos,S1.size(),stringtemp);
+		    stringtemp.clear();
+		  }
+		   pos=line.find(S2);
+		  if(pos<=line.size()) 
+		  {	    
+		    stringtemp =S2+indice;
+		    line.replace(pos,S2.size(),stringtemp);
+		    stringtemp.clear();
+		  }
+		  pos=line.find(S3);
+		  if(pos<=line.size()) 
+		  {	    
+		    stringtemp =S3+indice;
+		    line.replace(pos,S3.size(),stringtemp);
+		    stringtemp.clear();
+		  }
 	  pos=line.find("TBC");
 	  if (pos!=-1)
 	  {/// on  va se repositionner au debut de la ligne
@@ -37,15 +70,9 @@ void GenerateCpuFile(char *output,string input, COMPONENTCPU C)
 		  while(mot!="["){inputfile>>mot; if(++i>10){cout<<--i <<" iterations no '[' found incorrect file or format in : "<<input<<endl; return;}} 
 		  while(mot!="]"&&sortie)
 		  {
-		    inputfile>>Nb_instr;// nombre di'nstruction
-		    inputfile>>load; // nombre de D-Read
-		    inputfile>>store;// nombre de D-Write
-		    inputfile>>instrL1;//
-		    inputfile>>R_L1_Miss;
-		    inputfile>>W_L1_Miss;
-		    inputfile>>instrL2;
-		    inputfile>>R_L2_Miss;
-		    inputfile>>W_L2_Miss;
+		    inputfile>>Nb_instr;	inputfile>>load;  		inputfile>>store;
+		    inputfile>>instrL1;		inputfile>>R_L1_Miss;		inputfile>>W_L1_Miss;
+		    inputfile>>instrL2;		inputfile>>R_L2_Miss;		inputfile>>W_L2_Miss;
 		    
 		    T_OneDATA=1.0/(C->CPU_->work_frequency*1000.0);
 		    Pen_L1=10.0/(C->CPU_->work_frequency*1000.0);
@@ -56,8 +83,7 @@ void GenerateCpuFile(char *output,string input, COMPONENTCPU C)
 		    MissPred=(77066983.0/(1500*5.0))*C->CPU_->pipeline*T_OneDATA;
 		    T_Total=MissPred+T_RWDATA+T_Inst;
 		    inputfile>>mot;
-		     oss<<T_Total;
-// 		    cout<<"cpu_"<<C->CPU_->indice_CPU<<" ("<<i++<<") T_Total: "<<T_Total<<endl;
+		    oss<<T_Total;
 		  }
 		  if(pos<=line.size()){ line.replace(pos,3, oss.str());}
 		  oss.str(""); oss.clear();
@@ -79,6 +105,132 @@ void GenerateCpuFile(char *output,string input, COMPONENTCPU C)
 }
 
 
+void GenerateCompCpuFile(string input,string output,string S1)
+{
+  ofstream outputfile(output.c_str());
+  string line,mot,Stmp;
+  string main("main.txt"), slice("slice.txt"),main_behaviour("main_behaviour"), carac("timing_characs");
+
+  uint i=0;
+  size_t pos;
+  string slice_n[3];
+  char c[20];
+  
+  uint Max=0,Maxtemp=0,affinity[3];
+//   string main("main.txt"), slice("slice.txt");
+//   sprintf(c,"_cpu_%d",C->CPU_->indice_CPU);
+//   indice=c;
+    if(!outputfile){cout<<"impossible de crée le fichier de sortie"<<output<<endl;exit(1);}
+
+    ifstream in1(input.c_str());
+    if(in1)
+    {
+	while(getline(in1,line)) /// première lecture
+	{	    
+	  pos=line.find(S1);
+	    if (pos!=-1)
+	    {/// on  va se repositionner au debut de la ligne
+	    /// on va récupérer les caractère: sliceX, X étant le numéro.
+	    in1.seekg(-line.size()-1,ios::cur);
+	    in1>>Stmp;//cout<<Stmp<<endl;
+	    in1>>Stmp;//cout<< Stmp<<endl;
+	    in1>>slice_n[i];
+	    in1>>Stmp;//cout<<Stmp<<endl;
+	    Stmp.clear();
+	    i++;
+	    }  
+	}	
+	Max=i;i=0;
+	ifstream in2(input.c_str());
+	
+	  while(getline(in2,line)&& (i!=Max)) /// Deuxième lecture
+	  {
+	    mot="cnx_"+slice_n[i]+".configure_affinity(";
+	    pos=line.find(mot);
+	      if (pos!=-1)
+	      {/// on va récupérer l'affinity qui est en 3ème position de la chaine de mot
+	      in2.seekg(-line.size()-1,ios::cur);
+	      in2>>Stmp;
+	      in2>>Stmp;
+	      in2>>affinity[i];
+	      in2>>Stmp;
+	      Stmp.clear();
+	      i++;
+	      }
+	  }
+
+	  i=0;
+	  ifstream in3(input.c_str());
+	  while(getline(in3,line)) /// Troisième lecture
+	  {/// on va pouvoir générer le fichier de sortie
+		pos=line.find(main);/// recherche de main.txt dans le fichier
+		if(pos!=-1) 
+		{
+		  Stmp = "main_cpu_0.txt";
+		  line.replace(pos,main.size(),Stmp);
+		  Stmp.clear();
+		  
+		}
+		
+		
+		pos=line.find(main_behaviour);/// recherche de main_behaviour dans le fichier
+		if(pos!=-1) 
+		{
+		  Stmp = main_behaviour+"_cpu_0";
+		  line.replace(pos,main_behaviour.size(),Stmp);
+		  Stmp.clear();
+		   pos=line.find(carac);
+		    if(pos!=-1) 
+		    {
+		      Stmp = carac+"_cpu_0";
+		      line.replace(pos,carac.size(),Stmp);
+		      Stmp.clear();
+		    }
+		}
+		Stmp.clear();
+		pos=line.find(slice); /// recherche de slice_behaviour sliceX dans le fichier
+		if(pos!=-1) 
+		{
+		  Stmp.clear();
+		    for(i=0;i<Max;i++)
+		    {
+		      sprintf(c,"_cpu_%d",affinity[i]);	  
+		      Stmp =Stmp+"include slice"+c+".txt\n";	 
+		    }
+		  line.replace(0,line.size(),Stmp);
+		  Stmp.clear();
+		  
+		}
+	      
+		for(i=0;i<Max; i++)
+		{Stmp.clear();
+		  mot=S1+" "+slice_n[i];
+		  pos=line.find(mot);
+		    if (pos!=-1)
+		    {
+		      sprintf(c,"_cpu_%d",affinity[i]);
+		      Stmp=S1+c;
+		      line.replace(pos,S1.size(),Stmp);
+		      Stmp.clear();
+		      pos=line.find(carac);
+		      if(pos!=-1) 
+		      {
+			Stmp = carac+c;
+			line.replace(pos,carac.size(),Stmp);
+			Stmp.clear();
+		      }
+		    }
+		    
+		}
+	      outputfile<<line<<endl;/// on ecrit dans le fichier de composition.
+	  }
+    }
+    else {cout<<"ERREUR: Impossible d'ouvrir le fichier:"<<input<<endl;exit(0);}
+//   }
+//   else {cout<<"ERREUR: Impossible d'ouvrir le fichier:"<<output<<endl;exit(0);} 
+     cout<<output<<" \thas been generate"<<endl;
+
+}
 
 
 void GenerateDspFile(const char *output,string input, COMPONENTDSP C)
@@ -161,12 +313,10 @@ void GenerateDspFile(const char *output,string input, COMPONENTDSP C)
 
 void GenerateCompositionFile(const char* output,const char* input,const char* newmain, const char* newslice, string indice)
 {
- ofstream outputfile(output);/// ios::app pour rajouter en fin du fichier ce qu'on veut ecrire 
-  ///si on ne veut pas ecraser le fichier dans le cas où il existe déjà
+ ofstream outputfile(output);
   string line;
   size_t pos;
-  char extend[20]="slice_cpu_0";
-  string main("main.txt"), slice("slice.txt"), behaviour("slice_behaviour"), carac("main_timing_characs");
+  string main("main.txt"), slice1("slice1.txt"),slice2("slice2.txt"), main_behaviour("main_behaviour"),behaviour("slice_behaviour"), carac("main_timing_characs");
   string stringtemp;
   
   if(outputfile)
@@ -177,31 +327,45 @@ void GenerateCompositionFile(const char* output,const char* input,const char* ne
       
       while(getline(inputfile,line)) 
       {
-	  pos=line.find(main);
+	  
+	
+	pos=line.find(main);
 	  if(pos<=line.size()) line.replace(pos,main.size(),newmain );
 	  else
 	  {
-	      pos=line.find(slice);
-	      if(pos<=line.size()) line.replace(pos,slice.size(),newslice);
+	      pos=line.find(slice1);
+	      if(pos<=line.size()) line.replace(pos,slice1.size(),newslice);
 	      else
 	      {
-		pos=line.find(behaviour);
-	      if(pos<=line.size()) 
-	      {	    
-		stringtemp = behaviour + indice;
-		line.replace(pos,behaviour.size(),stringtemp);
-		stringtemp.clear();
-	      }
-	      else
-	      {
-		pos=line.find(carac);
-	      if(pos<=line.size()) 
-	      {
-		stringtemp = carac + indice;
-		line.replace(pos,carac.size(),stringtemp);
-		stringtemp.clear();
-	      }
-	      }
+		    pos=line.find(behaviour);
+		  if(pos<=line.size()) 
+		  {	    
+		    stringtemp = behaviour + indice;
+		    line.replace(pos,behaviour.size(),stringtemp);
+		    stringtemp.clear();
+		  }
+		  else
+		  {
+		    pos=line.find(main_behaviour);
+		    if(pos<=line.size()) 
+		    {
+// 				      cout<< "cics"<<endl;
+
+		      stringtemp = main_behaviour + indice;
+		      line.replace(pos,main_behaviour.size(),stringtemp);
+		      stringtemp.clear();
+		    }
+		  
+		    pos=line.find(carac);
+		    if(pos<=line.size()) 
+		    {
+// 		      cout<< "cic"<<endl;
+		      stringtemp = carac + indice;
+		      line.replace(pos,carac.size(),stringtemp);
+		      stringtemp.clear();
+
+		    }
+		  }
 	      
 	      }
 	  }
@@ -412,26 +576,36 @@ void ReadCompositionFile(char * compositionfile, char * compositionmain)
   CompoCPU_temp = MesComposantsCPU;
   while(i<nb_cpu)
   {
-    sprintf(dir,"outputfile/slice_cpu_%d.txt",CompoCPU_temp->CPU_->indice_CPU);
-    GenerateCpuFile(dir,"slice.txt",CompoCPU_temp);
+    sprintf(dir,"slice_cpu_%d.txt",CompoCPU_temp->CPU_->indice_CPU);
+    GenerateCpuFile(dir,"inputfile/slice.txt",CompoCPU_temp,"_comp","_behaviour","_timing_characs");
+    if(CompoCPU_temp->CPU_->indice_CPU==0)
+       GenerateCpuFile("main_cpu_0.txt","inputfile/main.txt",CompoCPU_temp,"_comp","_behaviour","_timing_characs");
+    
+/*
     if(CompoCPU_temp->CPU_->indice_CPU==0)
     {
-      sprintf(dir,"outputfile/main_cpu_%d.txt",CompoCPU_temp->CPU_->indice_CPU);
-      GenerateCpuFile(dir,"main.txt",CompoCPU_temp);
+      string indice; 
+      sprintf(dir,"_cpu_%d",CompoCPU_temp->CPU_->indice_CPU);
+      indice = dir;
+      GenerateSliceCpuFile(dir,"inputfile/slice.txt",CompoCPU_temp);
+      sprintf(dir,"main_cpu_%d.txt",CompoCPU_temp->CPU_->indice_CPU);
+      GenerateCpuFile(dir,"inputfile/main.txt",CompoCPU_temp,indice);
+      
+      sprintf(dir,"slice_cpu_%d.txt",CompoCPU_temp->CPU_->indice_CPU);
+      sprintf(outputcomposition,"composition_cpu_%d.txt",CompoCPU_temp->CPU_->indice_CPU);
+      GenerateCompositionFile(outputcomposition,compositionmain,"main_cpu_0.txt",dir,indice);
     }
-//     sprintf(dir,"outputfile/main_cpu_%d.txt",CompoCPU_temp->CPU_->indice_CPU);
-//     GenerateCpuFile(dir,"main.txt",CompoCPU_temp);
+    else
+    {
+      
+    }
+    */
+    
+    CompoCPU_temp=CompoCPU_temp->next;
     i++; 
-
-  string indice; 
-  sprintf(dir,"_cpu_%d",CompoCPU_temp->CPU_->indice_CPU);
-  indice = dir;
-  sprintf(dir,"slice_cpu_%d.txt",CompoCPU_temp->CPU_->indice_CPU);
-  sprintf(outputcomposition,"composition_cpu_%d.txt",CompoCPU_temp->CPU_->indice_CPU);
-  GenerateCompositionFile(outputcomposition,compositionmain,"main_cpu_0.txt",dir,indice);
-  CompoCPU_temp=CompoCPU_temp->next;
-
   } 
+        GenerateCompCpuFile(compositionmain,"composition.txt","slice_behaviour");
+
 
   
   /*

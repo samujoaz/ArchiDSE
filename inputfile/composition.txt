@@ -1,13 +1,11 @@
-include main_cpu_0.txt;
-include slice_cpu_0.txt;
-include slice_cpu_1.txt;
-
+include main.txt;
+include slice.txt;
 include filter.txt
 include write_buffer.txt;
 
-component_instance main_behaviour_cpu_0 main main_timing_characs_cpu_0;
-component_instance slice_behaviour_cpu_0 slice1 slice_timing_characs_cpu_0;
-component_instance slice_behaviour_cpu_1 slice2 slice_timing_characs_cpu_1;
+component_instance main_behaviour main main_timing_characs;
+component_instance slice_behaviour slice1 slice_timing_characs;
+component_instance slice_behaviour slice2 slice_timing_characs;
 component_instance filter_behaviour filter1 filter_timing_characs;
 component_instance filter_behaviour filter2 filter_timing_characs;
 component_instance write_buffer_behaviour write_buffer write_buffer_timing_characs;

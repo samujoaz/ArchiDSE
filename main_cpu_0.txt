@@ -1,4 +1,4 @@
-component main_comp 
+component main_comp_cpu_0 
 { 
   provides Runnable input_timer;
   uses Runnable comm_slice1;
@@ -8,7 +8,7 @@ component main_comp
   uses Runnable comm_write_buffer;
 };
 
-behaviour main_behaviour of main_comp
+behaviour main_behaviour_cpu_0 of main_comp_cpu_0
 {
   _var_ { int counter; };
   _init_ { counter = 0; };
@@ -34,23 +34,23 @@ input_slice2.run
 
 };
 
-characteristics( Architecture_parameters ) main_timing_characs of main_behaviour
+characteristics( Architecture_parameters ) main_timing_characs_cpu_0 of main_behaviour_cpu_0
 {
 input_timer.run
   {
-    (1) { 0.18661 0 0 } [ 10000 1200 500 100 120 50 10 12 5 ]
+    (1) { 0.0933048 0 0 } [ 10000 1200 500 100 120 50 10 12 5 ]
 }
 
 input_slice1.run
   {
-    (1) { 0.18661  0 } [ 10000 1200 500 100 120 50 10 12 5 ]
-    (2) { 0.18661  0 } [ 10000 1200 500 100 120 50 10 12 5 ]
+    (1) { 0.0933048  0 } [ 10000 1200 500 100 120 50 10 12 5 ]
+    (2) { 0.0933048  0 } [ 10000 1200 500 100 120 50 10 12 5 ]
 }
 
 input_slice2.run
   {
-    (1) { 0.18661 0 } [ 10000 1200 500 100 120 50 10 12 5 ]
-    (2) { 0.18661 0 } [ 10000 1200 500 100 120 50 10 12 5 ]
+    (1) { 0.0933048 0 } [ 10000 1200 500 100 120 50 10 12 5 ]
+    (2) { 0.0933048 0 } [ 10000 1200 500 100 120 50 10 12 5 ]
 }
 
 
