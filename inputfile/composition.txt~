@@ -1,20 +1,14 @@
-include main_cpu_0.txt;
+include main.txt;
+include filter.txt;
+include slice.txt;
+include write_buffer.txt;
 
-include filter_cpu_0.txt;
-include filter_cpu_1.txt;
-
-include slice_cpu_0.txt;
-include slice_cpu_1.txt;
-
-include write_buffer_cpu_0.txt;
-
-
-component_instance main_behaviour_cpu_0 main main_timing_characs_cpu_0;
-component_instance slice_behaviour_cpu_0 slice1 slice_timing_characs_cpu_0;
-component_instance slice_behaviour_cpu_1 slice2 slice_timing_characs_cpu_1;
-component_instance filter_behaviour_cpu_0 filter1 filter_timing_characs_cpu_0;
-component_instance filter_behaviour_cpu_1 filter2 filter_timing_characs_cpu_1;
-component_instance write_buffer_behaviour_cpu_0 write_buffer write_buffer_timing_characs_cpu_0;
+component_instance main_behaviour main main_timing_characs;
+component_instance slice_behaviour slice1 slice_timing_characs;
+component_instance slice_behaviour slice2 slice_timing_characs;
+component_instance filter_behaviour filter1 filter_timing_characs;
+component_instance filter_behaviour filter2 filter_timing_characs;
+component_instance write_buffer_behaviour write_buffer write_buffer_timing_characs;
 
 component_instance Timer_impl t1 timer;
 configuration t1->configure_timerspec_and_sched_fifo( 0, 100000, 0, 125000000, true, 10 );
@@ -35,7 +29,7 @@ configuration cnx_filter1.configure_priority_and_sched_fifo( 7, true );
 configuration cnx_filter1.configure_affinity( 0 );
 connection( asynchronous ) cnx_filter2 slice2.output filter2.input;
 configuration cnx_filter2.configure_priority_and_sched_fifo( 6, true );
-configuration cnx_filter2.configure_affinity( 1 );
+configuration cnx_filter2.configure_affinity( 0 );
 
 connection( asynchronous ) cnx_out1 filter1.output main.input_slice1;
 configuration cnx_out1.configure_priority_and_sched_fifo( 7, true );

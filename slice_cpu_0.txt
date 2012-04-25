@@ -1,11 +1,11 @@
 
-component slice_comp
+component slice_comp_cpu_0
 {
   provides Runnable input;
   uses Runnable output;
 };
 
-behaviour slice_behaviour of slice_comp
+behaviour slice_behaviour_cpu_0 of slice_comp_cpu_0
 {
   _var_ { int counter; };
   _init_ { counter = 0; };
@@ -19,12 +19,12 @@ behaviour slice_behaviour of slice_comp
   }
 };
 
-characteristics( Architecture_parameters ) slice_timing_characs of slice_behaviour
+characteristics( Architecture_parameters ) slice_timing_characs_cpu_0 of slice_behaviour_cpu_0
 {
   input.run
   {
-    (1) { 22.8573 0 } [ 15039303 3235056 1623677 10500 6470 3247 270 1617 811 ]
-    (2) { 19.3739 0 } [ 12000000 3035056 1323677 10000 6000 3000 260 1500 800 ]
+    (1) { 11.4286 0 } [ 15039303 3235056 1623677 10500 6470 3247 270 1617 811 ]
+    (2) { 9.68694 0 } [ 12000000 3035056 1323677 10000 6000 3000 260 1500 800 ]
 }
 
 };

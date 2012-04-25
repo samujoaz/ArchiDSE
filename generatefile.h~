@@ -11,6 +11,7 @@
 using namespace std;
 // 
 
+void GenerateCpuFile(char *output,string input, COMPONENTCPU C);
 
 
 

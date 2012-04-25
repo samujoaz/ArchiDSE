@@ -1,0 +1,58 @@
+component main_comp_cpu_0 
+{ 
+  provides Runnable input_timer;
+  uses Runnable comm_slice1;
+  uses Runnable comm_slice2;
+  provides Runnable input_slice1;
+  provides Runnable input_slice2;
+  uses Runnable comm_write_buffer;
+};
+
+behaviour main_behaviour_cpu_0 of main_comp_cpu_0
+{
+  _var_ { int counter; };
+  _init_ { counter = 0; };
+  _state_ { SA };
+  _initial_state_ { SA };
+
+input_timer.run 
+  {
+    (1) 1 { comm_slice1.run } 1 { comm_slice2.run }
+  }  
+
+input_slice1.run
+  {
+    (1) SA -[ ( this_->counter < 1 )  ]-> SA 0 { none.none } ! { this_->counter++; }
+    (2) SA -[ ( this_->counter >= 1 ) ]-> SA 1 { comm_write_buffer.run } ! { this_->counter--; }
+  }
+
+input_slice2.run
+  {
+    (1) SA -[ ( this_->counter < 1 )  ]-> SA 0 { none.none } ! { this_->counter++; }
+    (2) SA -[ ( this_->counter >= 1 ) ]-> SA 1 { comm_write_buffer.run } ! { this_->counter--; }
+  }
+
+};
+
+characteristics( Architecture_parameters ) main_timing_characs_cpu_0 of main_behaviour_cpu_0
+{
+input_timer.run
+  {
+    (1) { 0.0933048 0 0 } [ 10000 1200 500 100 120 50 10 12 5 ]
+}
+
+input_slice1.run
+  {
+    (1) { 0.0933048  0 } [ 10000 1200 500 100 120 50 10 12 5 ]
+    (2) { 0.0933048  0 } [ 10000 1200 500 100 120 50 10 12 5 ]
+}
+
+input_slice2.run
+  {
+    (1) { 0.0933048 0 } [ 10000 1200 500 100 120 50 10 12 5 ]
+    (2) { 0.0933048 0 } [ 10000 1200 500 100 120 50 10 12 5 ]
+}
+
+
+};
+

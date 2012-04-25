@@ -1,0 +1,24 @@
+component PU CPU0 inputfile/cortexA9.txt 1000 
+component PU CPU1 inputfile/cortexA8.txt 100 
+component PU CPU2 inputfile/cortexA9.txt 500 
+component DSP DSP0 inputfile/dsp0.txt 500
+component DSP DSP1 inputfile/dsp0.txt 1000 
+component CACHE L1_0 16 64 4
+component CACHE L1_1 32 32 32
+component CACHE L2_0 16 32 2
+component CACHE L1_2 32 32 16 
+component CACHE L1_3 32 32 8 
+component CACHE L2_1 16 16 32 
+component CACHE L2_2 16 16 2
+component CACHE L1_4 32 16 8 
+connection CPU1 -> L1_0
+connection CPU0 -> L1_2 
+connection DSP0 -> L1_3 
+connection L1_0 -> L2_0
+connection CPU2 -> L1_1 
+connection L1_1 -> L2_0 
+connection DSP1 -> L1_4 
+connection L1_2 -> L2_1
+connection L1_3 -> L2_1
+connection L1_4 -> L2_2
+
