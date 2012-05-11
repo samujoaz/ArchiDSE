@@ -1,0 +1,132 @@
+mean CPU0: 74.7862
+mean CPU1: -nan
+mean CPU2: -nan
+*****
+mean CPU0: 98.719
+mean CPU1: -nan
+mean CPU2: -nan
+*****
+mean CPU0: 83.1311
+mean CPU1: -nan
+mean CPU2: -nan
+*****
+mean CPU0: 82.8781
+mean CPU1: -nan
+mean CPU2: 25.3956
+*****
+mean CPU0: 61.4651
+mean CPU1: -nan
+mean CPU2: 47.2235
+*****
+mean CPU0: 45.1812
+mean CPU1: -nan
+mean CPU2: 35.9183
+*****
+mean CPU0: 41.6778
+mean CPU1: -nan
+mean CPU2: 33.575
+*****
+mean CPU0: 52.9282
+mean CPU1: -nan
+mean CPU2: 41.1883
+*****
+mean CPU0: 61.367
+mean CPU1: -nan
+mean CPU2: 48.3883
+*****
+mean CPU0: 51.1722
+mean CPU1: 0.0158107
+mean CPU2: 41.0756
+*****
+mean CPU0: 57.9715
+mean CPU1: 0.0167599
+mean CPU2: 48.6889
+*****
+mean CPU0: 38.4766
+mean CPU1: 0.0146362
+mean CPU2: 35.3256
+*****
+mean CPU0: 44.884
+mean CPU1: 0.0148204
+mean CPU2: 33.5043
+*****
+mean CPU0: 57.908
+mean CPU1: 0.015587
+mean CPU2: 44.4124
+*****
+mean CPU0: 42.6779
+mean CPU1: 0.0156938
+mean CPU2: 33.5351
+*****
+mean CPU0: 44.3231
+mean CPU1: 0.0131155
+mean CPU2: 34.9199
+*****
+mean CPU0: 43.5233
+mean CPU1: 0.0132464
+mean CPU2: 34.5159
+*****
+mean CPU0: 43.6185
+mean CPU1: 0.0134555
+mean CPU2: 33.8363
+*****
+mean CPU0: 52.6323
+mean CPU1: 0.016281
+mean CPU2: 43.1392
+*****
+mean CPU0: 44.712
+mean CPU1: 0.014978
+mean CPU2: 32.1268
+*****
+mean CPU0: 49.4097
+mean CPU1: 0.0182505
+mean CPU2: 41.0984
+*****
+mean CPU0: 43.8095
+mean CPU1: 0.0169813
+mean CPU2: 32.1822
+*****
+mean CPU0: 61.7978
+mean CPU1: 0.0166247
+mean CPU2: 49.7737
+*****
+mean CPU0: 41.4919
+mean CPU1: 0.0176699
+mean CPU2: 34.3749
+*****
+mean CPU0: 40.3985
+mean CPU1: 0.014285
+mean CPU2: 32.9203
+*****
+mean CPU0: 43.0315
+mean CPU1: 0.0171321
+mean CPU2: 33.7812
+*****
+mean CPU0: 43.8444
+mean CPU1: 0.0151548
+mean CPU2: 32.9735
+*****
+mean CPU0: 58.3199
+mean CPU1: 0.0157374
+mean CPU2: 48.8348
+*****
+mean CPU0: 61.3584
+mean CPU1: 0.0140767
+mean CPU2: 47.5995
+*****
+mean CPU0: 40.6593
+mean CPU1: 0.0163474
+mean CPU2: 33.8446
+*****
+mean CPU0: 43.6319
+mean CPU1: 0.0164642
+mean CPU2: 35.2733
+*****
+mean CPU0: 44.2009
+mean CPU1: 0.0144652
+mean CPU2: 34.9225
+*****
+mean CPU0: -nan
+mean CPU1: -nan
+mean CPU2: -nan
+*****

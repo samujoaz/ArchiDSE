@@ -1,0 +1,36 @@
+mean CPU0: 20.3299
+mean CPU1: 20.5391
+mean CPU2: 36.5227
+*****
+mean CPU0: 22.2415
+mean CPU1: 19.841
+mean CPU2: 37.5557
+*****
+mean CPU0: 21.6031
+mean CPU1: 20.1559
+mean CPU2: 37.3084
+*****
+mean CPU0: 24.5849
+mean CPU1: 21.309
+mean CPU2: 39.888
+*****
+mean CPU0: 21.568
+mean CPU1: 17.0251
+mean CPU2: 33.6796
+*****
+mean CPU0: 27.7395
+mean CPU1: 26.1684
+mean CPU2: 51.5332
+*****
+mean CPU0: 21.516
+mean CPU1: 20.1294
+mean CPU2: 37.8412
+*****
+mean CPU0: 22.2968
+mean CPU1: 20.3483
+mean CPU2: 36.5267
+*****
+mean CPU0: 22.2804
+mean CPU1: 20.2663
+mean CPU2: 37.6109
+*****

@@ -1,0 +1,23 @@
+#ifndef DEF_UTILS
+#define DEF_UTILS
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include "fonctionsUtils.h"
+#include "generatefile.h"
+
+using namespace std;
+
+
+void DownFreqCpu(CPU C, uint delta);
+void UpFreqCpu(CPU C, uint delta);
+float getCpuLoad(uint indice, uint j,char * nomdudossier);
+void RegenerateCpuFile(string includeListe[], uint nb_component);
+void CopieCompositionFile(string file, string destination);
+
+
+#endif
