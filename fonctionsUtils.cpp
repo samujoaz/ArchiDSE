@@ -1,14 +1,6 @@
-/*#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <iostream>
-#include <fstream>
 
-
-using namespace std;
-
-*/
 #include "fonctionsUtils.h"
+
 /// fonctions utiles
 CPU ADD_CPU(CPU mon_cpu, string name,uint freq)
 {
@@ -206,10 +198,32 @@ uint GetLinkCacheL1CPU(COMPONENTCPU my_component,uint indice)
 }
  
 
+void SetWorkFrequencyCPU(CPU mon_cpu, uint new_freq)
+{
+ 
+  if(!(new_freq>=mon_cpu->start_frequency && new_freq<=mon_cpu->end_frequency)) 
+  {
+    cout<<" la plage frequentielle du cpu doit être compris entre :[";
+    cout<<mon_cpu->start_frequency<<","<<mon_cpu->end_frequency<<"]"<<endl; 
+    
+  }
+  else 
+  {
+    
+    mon_cpu->work_frequency = new_freq;
+    cout<<"nouvelle fréquence du cpu_"<<mon_cpu->indice_CPU<<" freq: "<<mon_cpu->work_frequency<<endl;
+  }
+}
 /// pour avoir acces au i-ème composant
 CPU AccessToCPU(CPU mon_cpu, uint indice)
 {
  for(uint i=0; i<indice && mon_cpu!=NULL;i++) mon_cpu=mon_cpu->next;
+ if(mon_cpu==NULL) return NULL;
+ else return mon_cpu;
+}
+CPU FindCPU(CPU mon_cpu, uint indice)
+{
+ while(mon_cpu->indice_CPU!=indice && mon_cpu!=NULL) mon_cpu=mon_cpu->next;
  if(mon_cpu==NULL) return NULL;
  else return mon_cpu;
 }
@@ -251,6 +265,7 @@ void Affiche_CPU(CPU A)
     cpu *tmp = A;   
     while(tmp!=NULL)
     {     
+      cout<<"cpu_"<<tmp->indice_CPU<<": "<<tmp->name_cpu<<endl;
       cout<<"start_frequency: "<<tmp->start_frequency<<endl;
       cout<<"working_frequency: "<<tmp->work_frequency<<endl;
       cout<<"end_frequency: "<<tmp->end_frequency<<endl;

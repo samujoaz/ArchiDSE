@@ -3,8 +3,10 @@ component main_comp
   provides Runnable input_timer;
   uses Runnable comm_slice1;
   uses Runnable comm_slice2;
+  uses Runnable comm_slice3;
   provides Runnable input_slice1;
   provides Runnable input_slice2;
+  provides Runnable input_slice3;
   uses Runnable comm_write_buffer;
 };
 
@@ -17,19 +19,28 @@ behaviour main_behaviour of main_comp
 
 input_timer.run 
   {
-    (1) 1 { comm_slice1.run } 1 { comm_slice2.run }
+    (1) 1 { comm_slice1.run } 1 { comm_slice2.run } 1 { comm_slice3.run }
   }  
 
 input_slice1.run
   {
-    (1) SA -[ ( this_->counter < 1 )  ]-> SA 0 { none.none } ! { this_->counter++; }
-    (2) SA -[ ( this_->counter >= 1 ) ]-> SA 1 { comm_write_buffer.run } ! { this_->counter--; }
+    (1) SA -[ ( this_->counter < 2 )  ]-> SA 0 { none.none } ! { this_->counter++; }
+    (2) SA -[ ( this_->counter >= 2 ) ]-> SA 1 { comm_write_buffer.run } ! {
+    this_->counter=0; }
   }
 
 input_slice2.run
   {
-    (1) SA -[ ( this_->counter < 1 )  ]-> SA 0 { none.none } ! { this_->counter++; }
-    (2) SA -[ ( this_->counter >= 1 ) ]-> SA 1 { comm_write_buffer.run } ! { this_->counter--; }
+    (1) SA -[ ( this_->counter < 2 )  ]-> SA 0 { none.none } ! { this_->counter++; }
+    (2) SA -[ ( this_->counter >= 2 ) ]-> SA 1 { comm_write_buffer.run } ! {
+    this_->counter=0; }
+  }
+
+input_slice3.run
+  {
+    (1) SA -[ ( this_->counter < 2 )  ]-> SA 0 { none.none } ! { this_->counter++; }
+    (2) SA -[ ( this_->counter >= 2 ) ]-> SA 1 { comm_write_buffer.run } ! {
+    this_->counter=0; }
   }
 
 };
@@ -38,7 +49,7 @@ characteristics( Architecture_parameters ) main_timing_characs of main_behaviour
 {
 input_timer.run
   {
-    (1) { TBC 0 0 } [ 10000 1200 500 100 120 50 10 12 5 ]
+    (1) { TBC 0 0 0 } [ 10000 1200 500 100 120 50 10 12 5 ]
   }
 
 input_slice1.run
@@ -48,6 +59,12 @@ input_slice1.run
   }
 
 input_slice2.run
+  {
+    (1) { TBC 0 } [ 10000 1200 500 100 120 50 10 12 5 ]
+    (2) { TBC 0 } [ 10000 1200 500 100 120 50 10 12 5 ]
+  }
+  
+input_slice3.run
   {
     (1) { TBC 0 } [ 10000 1200 500 100 120 50 10 12 5 ]
     (2) { TBC 0 } [ 10000 1200 500 100 120 50 10 12 5 ]
