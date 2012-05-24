@@ -7,6 +7,7 @@
 #include <string.h>
 #include <iostream>
 #include <fstream>
+
 using namespace std;
 
 /// structure des CPU
@@ -63,6 +64,7 @@ typedef struct componentdsp{
 }componentdsp; 
 typedef componentdsp *COMPONENTDSP;
 
+CPU FindCPU(CPU mon_cpu, uint indice);
 
 CPU ADD_CPU(CPU mon_cpu, string name,uint freq);
 DSP ADD_DSP(DSP mon_dsp, string name,uint freq);
@@ -75,12 +77,14 @@ string GetNamelinkCache(CACHE ma_cache);
 uint GetLinkCacheL1DSP(COMPONENTDSP my_component, uint indice);
 uint GetLinkCacheL1CPU(COMPONENTCPU my_component, uint indice);
 
+void DeleteCPUList(CPU mon_cpu);
+void SetWorkFrequencyCPU(CPU mon_cpu, uint new_freq);
 CPU AccessToCPU(CPU mon_cpu, uint indice);
 DSP AccessToDSP(DSP mon_dsp, uint indice);
 CACHE AccessToCACHE(CACHE ma_cache, uint indice);
 COMPONENTCPU AccessToCOMPONENTCPU(COMPONENTCPU my_component, uint indice);
 COMPONENTDSP AccessToCOMPONENTDSP(COMPONENTDSP my_component, uint indice);
-
+CPU CloneCPU(CPU mon_cpu);
 /// nombre d'éléments
 int NB_CPU(CPU A);
 int NB_DSP(DSP A);

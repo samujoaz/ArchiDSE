@@ -1,14 +1,7 @@
-/*#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <iostream>
-#include <fstream>
 
-
-using namespace std;
-
-*/
 #include "fonctionsUtils.h"
+
+
 /// fonctions utiles
 CPU ADD_CPU(CPU mon_cpu, string name,uint freq)
 {
@@ -206,10 +199,42 @@ uint GetLinkCacheL1CPU(COMPONENTCPU my_component,uint indice)
 }
  
 
+void SetWorkFrequencyCPU(CPU mon_cpu, uint new_freq)
+{
+ 
+  if(!(new_freq>=mon_cpu->start_frequency && new_freq<=mon_cpu->end_frequency)) 
+  {
+    cout<<" la plage frequentielle du cpu doit être compris entre :[";
+    cout<<mon_cpu->start_frequency<<","<<mon_cpu->end_frequency<<"]"<<endl; 
+    
+  }
+  else 
+  {
+    
+    mon_cpu->work_frequency = new_freq;
+    cout<<"nouvelle fréquence du cpu_"<<mon_cpu->indice_CPU<<" freq: "<<mon_cpu->work_frequency<<endl;
+  }
+}
 /// pour avoir acces au i-ème composant
 CPU AccessToCPU(CPU mon_cpu, uint indice)
 {
- for(uint i=0; i<indice && mon_cpu!=NULL;i++) mon_cpu=mon_cpu->next;
+  cpu *tmp_cpu = mon_cpu;
+ for(uint i=0; i<indice && tmp_cpu!=NULL;i++)
+ {
+   tmp_cpu=tmp_cpu->next;
+ }
+ if(tmp_cpu==NULL)
+ {
+   return NULL;
+ }
+ else 
+ {
+   return tmp_cpu;
+ }
+}
+CPU FindCPU(CPU mon_cpu, uint indice)
+{
+ while(mon_cpu->indice_CPU!=indice && mon_cpu!=NULL) mon_cpu=mon_cpu->next;
  if(mon_cpu==NULL) return NULL;
  else return mon_cpu;
 }
@@ -240,6 +265,18 @@ COMPONENTDSP AccessToCOMPONENTDSP(COMPONENTDSP my_component, uint indice)
  else return my_component;
 }
 
+CPU CloneCPU(CPU mon_cpu)
+{
+  cpu *clone= new cpu;
+  memcpy(&clone,&mon_cpu,sizeof(CPU));
+  return clone;
+}
+
+void DeleteCPUList(CPU mon_cpu)
+{
+ delete(mon_cpu); 
+}
+
 int NB_CPU(CPU A){if(A == NULL) return 0; return NB_CPU(A->next)+1;}
 int NB_DSP(DSP A){if(A == NULL) return 0; return NB_DSP(A->next)+1;}
 int NB_CACHE(CACHE A){if(A == NULL) return 0;return NB_CACHE(A->next)+1; }
@@ -248,9 +285,11 @@ int NB_COMPONENTDSP(COMPONENTDSP A){if(A == NULL) return 0; return NB_COMPONENTD
 
 void Affiche_CPU(CPU A)
 {
-    cpu *tmp = A;   
+    cpu *tmp = new cpu; 
+    tmp = CloneCPU(A);
     while(tmp!=NULL)
     {     
+      cout<<"cpu_"<<tmp->indice_CPU<<": "<<tmp->name_cpu<<endl;
       cout<<"start_frequency: "<<tmp->start_frequency<<endl;
       cout<<"working_frequency: "<<tmp->work_frequency<<endl;
       cout<<"end_frequency: "<<tmp->end_frequency<<endl;
@@ -258,7 +297,9 @@ void Affiche_CPU(CPU A)
       cout<<"pipeline: "<<tmp->pipeline<<endl;
       tmp=tmp->next;
       cout<<endl;
+      
     }
+    delete(tmp);
 }
 
 void Affiche_CACHE(CACHE A)
@@ -288,11 +329,11 @@ void Affiche_COMPONENTCPU(COMPONENTCPU A)
    cout<<"\tend_frequency: "<<tmp->CPU_->end_frequency<<endl;
    cout<<"\tdmips: "<<tmp->CPU_->dmips<<endl;
    cout<<"\tpipeline: "<<tmp->CPU_->pipeline<<endl;
-   cout<<"cache L1";
+   cout<<"cache L1"<<endl;
    cout<<"\ttaille: "<<tmp->L1_->taille<<endl;
    cout<<"\tassociativity: "<<tmp->L1_->associativity<<endl;
    cout<<"\tnb byte per line: "<<tmp->L1_->bpl<<endl;
-   cout<<"cache L2";
+   cout<<"cache L2"<<endl;
    cout<<"\ttaille: "<<tmp->L2_->taille<<endl;
    cout<<"\tassociativity: "<<tmp->L2_->associativity<<endl;
    cout<<"\tnb byte per line: "<<tmp->L2_->bpl<<endl;
@@ -315,11 +356,11 @@ void Affiche_COMPONENTDSP(COMPONENTDSP A)
    cout<<"\tend_frequency: "<<tmp->DSP_->end_frequency<<endl;
    cout<<"\tdmips: "<<tmp->DSP_->dmips<<endl;
    cout<<"\tpipeline: "<<tmp->DSP_->pipeline<<endl;
-   cout<<"cache L1";
+   cout<<"cache L1"<<endl;
    cout<<"\ttaille: "<<tmp->L1_->taille<<endl;
    cout<<"\tassociativity: "<<tmp->L1_->associativity<<endl;
    cout<<"\tnb byte per line: "<<tmp->L1_->bpl<<endl;
-   cout<<"cache L2";
+   cout<<"cache L2"<<endl;
    cout<<"\ttaille: "<<tmp->L2_->taille<<endl;
    cout<<"\tassociativity: "<<tmp->L2_->associativity<<endl;
    cout<<"\tnb byte per line: "<<tmp->L2_->bpl<<endl;

@@ -638,20 +638,6 @@ void ReadCompositionFile(char * compositionfile, char * compositionmain)
 
 
   
-  /*
-  i=0;
-  CompoDSP_temp = MesComposantsDSP;
-  while(i<nb_dsp)
-  {
-    sprintf(dir, "outputfile/slice_dsp_%d.txt",CompoDSP_temp->DSP_->indice_DSP);
-    GenerateDspFile(dir,"slice.txt",CompoDSP_temp);
-    if(CompoDSP_temp->DSP_->indice_DSP==0)
-    {
-      sprintf(dir, "outputfile/main_dsp_%d.txt",CompoDSP_temp->DSP_->indice_DSP);
-      GenerateDspFile(dir,"main.txt",CompoDSP_temp);
-    }
-    CompoDSP_temp=CompoDSP_temp->next;
-    i++;
-  }*/
+
 }
 

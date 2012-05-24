@@ -8,16 +8,39 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+
 #include "fonctionsUtils.h"
 
 using namespace std;
 
 
-void GenerateCpuFile(string output,string input, CPU C,string S1, string S2);
+typedef struct Liste_TBC{
+string name;
+uint affinity;
+float valeur;
+struct Liste_TBC *next;
+}Liste_TBC;
+typedef Liste_TBC *LISTE_TBC;
+
+
+
+bool TBC_estVide(LISTE_TBC L);
+void TBC_Afficher(LISTE_TBC L);
+void TBC_InitListe(LISTE_TBC *L);
+void TBC_Ajouter(LISTE_TBC *L, string name,uint affinity,float valeur);
+void TBC_Trier(LISTE_TBC *L);
+LISTE_TBC CloneListeTBC(LISTE_TBC mon_tbc);
+
+	
+
+void GenerateCpuFile(string output,string input,CPU C,string name,string S1, string S2,string S3);
 void GenerateDspFile(char *output,string input, COMPONENTDSP C);
 void GenerateCompositionFile(const char* output,const char* input,const char* newmain, const char* newslice,string indice);
-void ReadCompositionFile(char * compositionfile, char * compositionmain);
-uint  GenerateCompCpuFile(string input,string output,string includeListe[]);
-// void GenerateCompCpuFile(string input,string output,string ListeFileToGenerate[]);
+uint GenerateCompCpuFile(string input,string output,string includeListe[], string componentListe[]);
+void ReadCompositionFile(char * compositionfile);
+void ChangeAffinity(string compositionfile, string compositionfile_temp,string component,uint NewAffinity);
+int getAffinityOf(string inputfile, string componentname);
+void FindAndReplaceAffinity(string compositionfile, string compositionfile_temp,uint OldAffinity,uint NewAffinity);
+void RegenerateCpuFile(string includeListe[], string componentListe[], uint nb_component);
 
 #endif
