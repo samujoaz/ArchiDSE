@@ -5,7 +5,7 @@
 
 
 
-uint nb_fichier_include=100;
+uint TSIZE=100;
 float TableTBC[100];
 uint nbTBC=0;
 COMPONENTDSP thisComposantsDSP=NULL;
@@ -93,20 +93,29 @@ LISTE_TBC CloneListeTBC(LISTE_TBC mon_tbc)
   memcpy(&clone,&mon_tbc,sizeof(LISTE_TBC));
   return clone;
 }
-void TBC_Afficher(LISTE_TBC L){
+int toto=0;
+void TBC_Afficher(LISTE_TBC L)
+{
+  ofstream fileTBC("listeTBC.txt",ios::app);
+  fileTBC<<"liste des valeurs de TBC N°: "<<toto<<endl;
          Liste_TBC *tmp;
          if(TBC_estVide(L)){
             cout<<"!la liste est vide!" <<endl;           
          }
          else{
-           tmp = L;
+	   
+           tmp = CloneListeTBC(L);
            while(tmp != NULL){
-                cout<<"(val :"<<tmp->valeur<<") (aff :"<<tmp->affinity<<") name :"<<tmp->name<<endl; 
+                cout<<"(val :"<<tmp->valeur<<") (aff :"<<tmp->affinity<<") name :"<<tmp->name<<endl;
+		fileTBC<<"(val :"<<tmp->valeur<<") (aff :"<<tmp->affinity<<") name :"<<tmp->name<<endl;
                 tmp = tmp->next;    
            }  
            cout<<endl;
          }
-      }
+     
+       fileTBC<<"fin de la liste des valeurs de TBC N°: "<<toto++<<endl<<endl<<endl;
+
+ }
 
 
 void GenerateCpuFile(string output,string input,CPU C,string name,string S1, string S2,string S3)
@@ -131,11 +140,15 @@ void GenerateCpuFile(string output,string input,CPU C,string name,string S1, str
   uint Nb_instr, load, store, instrL1,R_L1_Miss,W_L1_Miss,instrL2,R_L2_Miss,W_L2_Miss;
   sprintf(c,"_cpu_%d",C->indice_CPU);
   indice=c;
+
   if(outputfile)
   {
     ifstream inputfile(input.c_str());
     if(inputfile)
     {
+      string ListeName[TSIZE];
+      int o =0;
+      ListeName[o++]="blabla";/// juste pour init le tableau
       while(getline(inputfile,line)) 
       {	  	
 	/// si besoin de remplacer une autre chaine rajouter la dans le definition de la fonction 
@@ -165,12 +178,23 @@ void GenerateCpuFile(string output,string input,CPU C,string name,string S1, str
 	  if (pos!=-1)
 	  {/// on  va se repositionner au debut de la ligne
 	    inputfile.seekg(-line.size(),ios::cur);
+	    
 	   while(inputfile>>mot && sortie) 
 	    {
 		if((mot.compare("TBC"))==0)
 		{
 		  i=0;
-		  while(mot!="["){inputfile>>mot; if(++i>10){cout<<--i <<" iterations no '[' found incorrect file or format in : "<<input<<endl; return;}} 
+		  while(mot!="[")
+		  {
+		    inputfile>>mot;
+		    if(++i>100){/// si au bout du 100ème caractère lu on ne trouve pas le  crochet on qui l'exécution
+		      cout<<--i <<" iterations no '[' found incorrect file or format in : "<<input<<endl; 
+		      cout<<"voir fonction : GenerateCpuFile(,,,)  exit("<<13<<")"<<endl;
+		      exit(13);
+		      
+		    }
+		    
+		  } 
 		  while(mot!="]"&&sortie)
 		  {
 		    inputfile>>Nb_instr;	inputfile>>load;  		inputfile>>store;
@@ -180,17 +204,23 @@ void GenerateCpuFile(string output,string input,CPU C,string name,string S1, str
 		    T_OneDATA=1.0/(C->work_frequency*1000.0);
 		    Pen_L1=10.0/(C->work_frequency*1000.0);
 		    Pen_L2=100.0/(C->work_frequency*1000.0);
-		    
 		    T_Inst=Nb_instr/(C->work_frequency*C->dmips*1000.0)+instrL1*Pen_L1+instrL2*Pen_L2;
 		    T_RWDATA=(store+load)*(T_OneDATA)+(R_L2_Miss*Pen_L2+W_L2_Miss*Pen_L2)+(R_L1_Miss*Pen_L1+W_L1_Miss*Pen_L1);
 		    MissPred=(77066983.0/(1500*5.0))*C->pipeline*T_OneDATA;
 		    T_Total=MissPred+T_RWDATA+T_Inst;
 		    //cout<<"TBC = "<<T_Total<<" pour  "<<input<<endl;
-		    TableTBC[nbTBC++]=T_Total;
+		    //TableTBC[nbTBC++]=T_Total;
 		    inputfile>>mot;
+		    		    
+
 		    oss<<T_Total;
-		    if(once)TBC_Ajouter(&thisTBC,name,C->indice_CPU,T_Total);
-		  }
+		    ListeName[o++]=name;
+		    if(once && notFindName(ListeName,name,o-1))
+		      { 
+		      TBC_Ajouter(&thisTBC,name,C->indice_CPU,T_Total);
+		      }
+		  }		    
+
 		  if(pos<=line.size()){ line.replace(pos,3, oss.str());}
 		  oss.str(""); oss.clear();
 		  sortie=false;
@@ -203,12 +233,22 @@ void GenerateCpuFile(string output,string input,CPU C,string name,string S1, str
       }
     inputfile.close();
     }
-    else {cout<<"ERREUR: Impossible d'ouvrir le fichier:"<<input<<endl;exit(0);}
+    else {
+      cout<<"ERREUR exit("<<11<<"): Impossible d'ouvrir le fichier:"<<input<<endl;
+      cout<<"voir fonction : GenerateCpuFile(,,,) "<<endl;
+      exit(11);
+      
+    }
     
   }
-  else {cout<<"ERREUR: Impossible d'ouvrir le fichier:"<<output<<endl;exit(0);} 
+  else {
+    cout<<"ERREUR exit("<<12<<"): Impossible d'ouvrir le fichier:"<<output<<endl;
+      cout<<"voir fonction : GenerateCpuFile(,,,) "<<endl;
+    exit(12);
+    
+  } 
  // cout<<"fichier d'entrée "<<input<<endl;
-//       cout<<output<<" \thas been generate"<<endl;
+      cout<<output<<" \thas been generate"<<endl;
 
     outputfile.close();
 
@@ -222,16 +262,19 @@ void GenerateCpuFile(string output,string input,CPU C,string name,string S1, str
 uint GenerateCompCpuFile(string input,string output,string includeListe[], string componentListe[] )
 {
   ofstream outputfile(output.c_str());
-  string line,mot,Stmp,component_type[nb_fichier_include]; string ListeFileToGenerate[nb_fichier_include];
-  string behaviour("_behaviour"), carac("_timing_characs");
-  uint i=0,j=0, fin=0, nb_include=0, nb_component=0;
-  string include("include"), S2,S3;
+  string ListeFileToGenerate[TSIZE], component_type[TSIZE],component_n[TSIZE];
+  string line,mot,Stmp,S2,S3, behaviour("_behaviour"), carac("_timing_characs");
+  uint i=0,j=0, fin=0, nb_include=0, nb_component=0,nb_affinity=0,affinity[TSIZE],count=0;
   size_t pos;
-  string component_n[100];
-  char c[100];
-  uint nb_affinity=0,affinity[100];
+  char c[TSIZE];
+   
 
-    if(!outputfile){cout<<"impossible de crée le fichier de sortie"<<output<<endl;exit(1);}
+    if(!outputfile){
+      cout<<"ERREUR exit("<<9<<") impossible de crée le fichier de sortie"<<output<<endl;
+      cout<<"voir fonction : GenerateCompCpuFile(,,,)"<<endl;
+      exit(9);
+      
+    }
     ifstream in1(input.c_str());
     if(in1)
     {
@@ -239,16 +282,16 @@ uint GenerateCompCpuFile(string input,string output,string includeListe[], strin
       /// lecture des includes pour savoir les fichiers a ouvrir
       	while(getline(in1,line) && fin<10) /// si au out de 15 itérations on ne trouve plus d'include on arrete de chercher
 	{	    
-	  pos=line.find(include);
+	  pos=line.find("include");
 	    if (pos!=-1)
-	    {/// on  va se repositionner au debut de la ligne
-	    /// on va récupérer les caractère: sliceX, X étant le numéro.
+	    {/// on  va se repositionner au debut de la ligne.
 	    in1.seekg(-line.size()-1,ios::cur);
 	    in1>>Stmp;
 	    in1>>Stmp;
-	    pos=line.find(include);
+	    pos=line.find("include");
 	    if (pos!=-1)
 	    ListeFileToGenerate[i] = Stmp.substr(0,Stmp.size()-1);
+	    
 	    Stmp.clear();
 	    i++;
 	    }
@@ -262,6 +305,7 @@ uint GenerateCompCpuFile(string input,string output,string includeListe[], strin
 	  {
 	    
 	    S2=ListeFileToGenerate[j].substr(0,ListeFileToGenerate[j].size()-4)+behaviour;
+	   // cout<<S2<<endl;
 	    ifstream in2(input.c_str());
 	      while(getline(in2,line)) 
 	      {	    
@@ -272,7 +316,7 @@ uint GenerateCompCpuFile(string input,string output,string includeListe[], strin
 		  in2.seekg(-line.size()-1,ios::cur);
 		  in2>>Stmp;//cout<<Stmp<<endl;
 		  in2>>Stmp;//cout<< Stmp<<endl;
-		  in2>>component_n[i];//cout<<"con : "<<component_n[i]<<endl;
+		  in2>>component_n[i];//cout<<"component : "<<component_n[i]<<endl;
 		  componentListe[i]=component_n[i];
 		  in2>>Stmp;//cout<<Stmp<<endl;
 		  Stmp.clear();
@@ -311,25 +355,38 @@ uint GenerateCompCpuFile(string input,string output,string includeListe[], strin
 	   ifstream in4(input.c_str());
 	  
 	      	   fin=1;
-	      while(getline(in4,line)&&fin) ///  lecture
-	      {	for(j=0;j<nb_include;j++)
+	      while(getline(in4,line)&&fin) ///  lecture des qu'on arrive au premier include
+	      {
+		string ListeName[TSIZE];
+// 		cout<<"nb_include "<<nb_include<<endl;
+		for(j=0;j<nb_include;j++)
 		{
+		 uint o=0;
+
 		    pos=line.find(ListeFileToGenerate[i]);
 		      if(pos!=-1) 
 		      {
 			for(i=j;i<nb_affinity;i++)
 			{
+			  ListeName[o++]="init";
 			  S2=ListeFileToGenerate[j].substr(0,ListeFileToGenerate[j].size()-4);
 			  S3=component_n[i].substr(0,S2.size());
-			    if(S3.compare(S2)==0)
+			    
+			    if(S3.compare(S2)==0 )
 			    {
 			      component_type[i]=S2;
 			      sprintf(c,"_cpu_%d",affinity[i]);
 			      includeListe[i]=S2+c+".txt";
-			      Stmp =Stmp+"include "+S2+c+".txt;\n";
+			      ListeName[o++]=includeListe[i];
+			      if( notFindName(ListeName,includeListe[i],o-1))
+			      {
+				Stmp =Stmp+"include "+S2+c+".txt;\n";
+				
+			      }
 			    }
 			 }
 			 fin=0;
+			 //cout<<"Stmp \n"<<Stmp<<endl;
 		      line.replace(0,line.size(),Stmp);
 		      Stmp.clear();
 		      outputfile<<line<<endl;
@@ -374,7 +431,7 @@ uint GenerateCompCpuFile(string input,string output,string includeListe[], strin
 	    }
 	    else
 	    {
-	      pos=line.find(include);
+	      pos=line.find("include");
 	      if (pos==-1)  outputfile<<line<<endl;
 	      
 	    } 
@@ -384,15 +441,18 @@ uint GenerateCompCpuFile(string input,string output,string includeListe[], strin
       //cout<<nb_include<<" include(s) dans le fichier : "<<input<<endl;
       cout<<nb_affinity<<" fichier(s) à créer."<<endl;
     }
-    else {cout<<"ERREUR: Impossible d'ouvrir le fichier:"<<input<<endl;exit(0);}
+    else {
+      cout<<"ERREUR exit("<<10<<"): Impossible d'ouvrir le fichier:"<<input<<endl;
+      cout<<"voir fonction : GenerateCompCpuFile(,,,)"<<endl;
+      exit(10);}
     
-//      cout<<output<<" \thas been generate"<<endl;
-     ifstream ii(input.c_str());
+     // cout<<output<<" \thas been generate"<<endl;
+    /* ifstream ii(input.c_str());
      ofstream o("copiecomposition.txt");
      while(getline(ii,line)) o<<line<<endl;
      
      o.close();
-     ii.close();
+     ii.close();*/
     // sleep(1.0);
      return nb_affinity;
      
@@ -473,7 +533,7 @@ void GenerateDspFile(const char *output,string input, COMPONENTDSP C)
     else {cout<<"ERREUR: Impossible d'ouvrir le fichier:"<<input<<endl;exit(0);}
   }
   else {cout<<"ERREUR: Impossible d'ouvrir le fichier:"<<output<<endl;exit(0);} 
-  cout<<output<<" \thas been generate"<<endl;
+  //cout<<output<<" \thas been generate"<<endl;
  }
 
 
@@ -481,12 +541,8 @@ void GenerateDspFile(const char *output,string input, COMPONENTDSP C)
 // void ReadCompositionFile(char * compositionfile, char * compositionmain, CPU MonCpu,DSP MonDsp,COMPONENTCPU MesComposantsCPU, COMPONENTDSP MesComposantsDSP, CACHE MesCacheL1,CACHE MesCacheL2)
 void ReadCompositionFile(char * compositionfile)
 {
- 
-//   int nb_cpu=0, nb_cache=0, nb_dsp=0;
   uint nb_ligne=0,nb_file=0;
   string line, filename,tmp; 
-//   string listeinclude[nb_fichier_include];
-//   uint indice=0;
 
   char dir[100];
   char outputcomposition[100];
@@ -618,7 +674,10 @@ void ReadCompositionFile(char * compositionfile)
 		  cout<<" file_name.txt : architecture decription texte file"<<endl;
 		  cout<<" freq: cpu working frequency"<<endl;
 		  cout<<" Example: component PU CPU0 inputfile/cortexA8.txt 200\n"<<endl;
-		  exit(0);
+		  
+		  
+		  cout<<"ERREUR exit("<<1<<") de format dans le fichier: "<<compositionfile<<"\nvoir fonction : ReadCompositionFile(,,,) "<<endl;
+		  exit(1);
 		}
 	      else
 	      {
@@ -632,7 +691,9 @@ void ReadCompositionFile(char * compositionfile)
 		    cout<<" B : cache associativity "<<endl;
 		    cout<<" C : cache nb byte/line "<<endl;
 		    cout<<" Example: component CACHE L1_2 32 32 32\n"<<endl;
-		    exit(1);
+		    
+		    cout<<"ERREUR exit("<<2<<") de format dans le fichier: "<<compositionfile<<"\nvoir fonction : ReadCompositionFile(,,,) "<<endl;
+		    exit(2);
 		  }
 		else
 		{
@@ -643,7 +704,10 @@ void ReadCompositionFile(char * compositionfile)
 		  cout<<" file_name.txt : architecture decription texte file"<<endl;
 		  cout<<" freq: dsp working frequency"<<endl;
 		  cout<<" Example: component DSP DSP1 inputfile/dsp3.txt 200\n"<<endl;
-		  exit(0);
+		  
+		  
+		  cout<<"ERREUR exit("<<3<<") de format dans le fichier: "<<compositionfile<<"\nvoir fonction : ReadCompositionFile(,,,) "<<endl;
+		  exit(3);
 		}
 		}
 	      }
@@ -657,18 +721,21 @@ void ReadCompositionFile(char * compositionfile)
 		cout<<" CY : only RAM or cache memory ,Y mean the component number"<<endl;
 		cout<<" Example: \n\tconnection L1_0 -> L2_0 (link a cache L1 to a cache L2) \n \t";
 		cout<<"connection CPU1 -> L1_1 (link a PU to a cache L2)\n"<<endl;
-		exit(2);
+		
+		
+		cout<<"ERREUR exit("<<4<<") de format dans le fichier: "<<compositionfile<<"\nvoir fonction : ReadCompositionFile(,,,) "<<endl;
+		exit(4);
 		}
 	      }
 	   }
-	  
-
+	
       }
 	
       }///end while(listing_file>>line)
     }///end if(listing_file)
   else{
-    cout<<"ERREUR: Impossible d'ouvrir le fichier: "<<compositionfile<<endl;
+    cout<<"ERREUR exit("<<0<<") : Impossible d'ouvrir le fichier: "<<compositionfile<<endl;
+    cout<<"voir fonction : ReadCompositionFile(,,,) "<<endl;
     exit(0);
   }
   
@@ -693,8 +760,9 @@ void ChangeAffinity(string compositionfile, string compositionfile_temp,string c
   ofstream outputfile(compositionfile_temp.c_str());   
   if(!outputfile)
   {
-    cout<<"impossible de crée le fichier de sortie: "<<compositionfile_temp<<endl;
-    exit(1);
+    cout<<"ERREUR exit("<<7<<")impossible de crée le fichier de sortie: "<<compositionfile_temp<<endl;
+    cout<<"voir fonction : ChangeAffinity(,,,) "<<endl;
+    exit(7);
   }
 
 
@@ -723,8 +791,9 @@ void ChangeAffinity(string compositionfile, string compositionfile_temp,string c
   }
   else 
   {
-    cout <<"no such file: "<<compositionfile<<endl; 
-    
+    cout<<"ERREUR exit("<<8<<")fichier inexistant ou ouverture impossible: "<<compositionfile<<endl;
+    cout<<"voir fonction : ChangeAffinity(,,,) "<<endl;
+    exit(8);
   }
   
     /// on ferme les  fichiers puis on fait une recopie
@@ -784,8 +853,9 @@ void FindAndReplaceAffinity(string compositionfile, string compositionfile_temp,
   ofstream outputfile(compositionfile_temp.c_str());   
   if(!outputfile)
   {
-    cout<<"impossible de crée le fichier de sortie: "<<compositionfile_temp<<endl;
-    exit(1);
+    cout<<"ERREUR exit("<<5<<")impossible de crée le fichier: "<<compositionfile_temp<<endl;
+    cout<<"voir fonction : FindAndReplaceAffinity(,,,) "<<endl;
+    exit(5);
   }
 
   ifstream readingfile(compositionfile.c_str());   
@@ -818,7 +888,9 @@ void FindAndReplaceAffinity(string compositionfile, string compositionfile_temp,
   }
   else 
   {
-    cout <<"no such file: "<<compositionfile<<endl; 
+    cout<<"ERREUR exit("<<6<<")fichier inexistant ou ouverture impossible: "<<compositionfile<<endl;
+    cout<<"voir fonction : FindAndReplaceAffinity(,,,) "<<endl;
+    exit(6);
     
   }
   
@@ -838,30 +910,45 @@ void FindAndReplaceAffinity(string compositionfile, string compositionfile_temp,
   
 }
 
-void RegenerateCpuFile(string includeListe[],string componentListe[], uint nb_component)
+void RegenerateCpuFile(CPU MesCPU, string includeListe[],string componentListe[], uint nb_component)
 {
   string tmp;
-  uint i=0,indice=0, indice_prec=20, nb_cpu=0,n=0;
-  CPU cpu_tmp=NULL,cpu_access=NULL;
-  cpu_access = CloneCPU(thisMesCPU);
-  nb_cpu=NB_CPU(cpu_access);
-  once=true;
-  while(i<nb_component)
-  {
-    //cout<<componentListe[i]<<endl;
-      tmp= includeListe[i].substr(0,includeListe[i].size()-4);
-      indice=atoi(includeListe[i].substr(tmp.size()-1,tmp.size()).c_str());
-      tmp.clear();
-      tmp= includeListe[i].substr(0,includeListe[i].size()-10);
-      tmp = "inputfile/"+tmp+".txt";
-      cpu_tmp = AccessToCPU(cpu_access,indice);
-      GenerateCpuFile(includeListe[i],tmp,cpu_tmp, componentListe[i],"_comp","_behaviour","_timing_characs");
-      tmp.clear();
-      i++;     
-  }
+  uint i=0,indice=0, j=0, nb_cpu=0,n=0;
+  CPU cpu_tmp=NULL;
+  cpu_tmp  = CloneCPU(MesCPU);
+  nb_cpu=NB_CPU(CloneCPU(MesCPU));
+  once=true;thisTBC =NULL;
+  string ListeName[TSIZE];
+  ListeName[n++]="blabla";
+  for(int j=0;j<nb_cpu;j++)
+	{  
+	  i=0;
+	   
+		while(i<nb_component)
+		{
+		    tmp= includeListe[i].substr(0,includeListe[i].size()-4);/// -4 == ".txt"
+		    
+		
+			indice=atoi(includeListe[i].substr(tmp.size()-1,tmp.size()).c_str());
+			    if(indice==j)
+			    {
+			    
+			    tmp.clear();
+			    tmp= includeListe[i].substr(0,includeListe[i].size()-10);
+			    tmp = "inputfile/"+tmp+".txt";
+			   // if(notFindName(ListeName,componentListe[i],n-1))
+			   // {
+			    GenerateCpuFile(includeListe[i],tmp,cpu_tmp, componentListe[i],"_comp","_behaviour","_timing_characs");
+			   // ListeName[n++]=componentListe[i]; 
+			    //}
+		    }
+		    tmp.clear();
+		    i++;     
+		}
+		 cpu_tmp=cpu_tmp->next;
+	}
   once=false;
-  //delete(cpu_access);
- // delete(cpu_tmp);
+
 }
 
 

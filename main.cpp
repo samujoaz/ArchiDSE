@@ -6,12 +6,14 @@
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
+#include <time.h>
 
 
 #include "fonctionsUtils.h"
 #include "generatefile.h"
 #include "utils.h"
 #include "regularisation.h"
+#define NbBoucle 2
 
 uint NbMaxCpu= 3;
 using namespace std;
@@ -20,96 +22,92 @@ extern COMPONENTDSP thisComposantsDSP;
 extern COMPONENTCPU thisComposantsCPU;
 extern CPU thisMesCPU;
 extern LISTE_TBC thisTBC;
-extern uint nb_fichier_include;
+extern uint TSIZE;
 extern float TableTBC[100];
 extern uint nbTBC;
 
 int main (int argc,char* argv[])
 {
-  uint nb_cpu,nb_component=0;
+  uint nb_cpu,nb_component=0,indice_cpu,i=0,frequence;
   uint numerodossier=0;
   char folder[100];
-  string includeListe[nb_fichier_include], componentListe[nb_fichier_include];    
+  string includeListe[TSIZE], componentListe[TSIZE],tmp;    
   TBC_InitListe(&thisTBC);/// à faire une seule fois
   cpu *cpu_tmp=NULL,*cpu_nb=NULL,*access_cpu=NULL;
+  
+   
+  time_t start,end;
+  char szInput [256];
+  double dif;
 
+  
+  
   
 
     if (argc == 5 && strcmp(argv[1],"DSE")==0)
     { 
       
+	time (&start);
+	
+  
 	ReadCompositionFile(argv[2]);
-        nb_component = GenerateCompCpuFile(argv[3],"composition.txt",includeListe,componentListe);
-	
-	cpu_tmp = CloneCPU(thisMesCPU);
-	cpu_nb = CloneCPU(thisMesCPU);
-	access_cpu =CloneCPU(thisMesCPU);
-	nb_cpu=NB_CPU(cpu_nb);	
-	RegenerateCpuFile(includeListe,componentListe,nb_component);
+/*	
+	nb_component = GenerateCompCpuFile(argv[3],"composition.txt",includeListe,componentListe);
+	for(i; i<nb_component;i++) cout<<"includeListe[i]: "<<includeListe[i]<<endl;
+	      RegenerateCpuFile(thisMesCPU,includeListe,componentListe,nb_component);  
+// */
+	//cpu_nb = CloneCPU(thisMesCPU);	
+  	nb_cpu=NB_CPU(CloneCPU(thisMesCPU));
+ 	CPU TabCPU[nb_cpu];
 	CopieCompositionFile(argv[3],"inputfile/");//copie qu'on pourra travailler dessus
-	TBC_Trier(&thisTBC);	
-	//TBC_Afficher(thisTBC);
-	for (int i=0; i<nb_cpu;i++)
-	{
-	  FindAndReplaceAffinity("inputfile/composition_copie.txt","composition_temp.txt",i,0);
+ 	
+// 	for(int o=0;o<NbBoucle;o++) 
+// 	{ TabCPU[o]=CloneCPU(thisMesCPU); 
+// 	}
+// 	
+ 	for(int o=0;o<NbBoucle;o++)
+ 	{	
+	      TabCPU[o]=CloneCPU(thisMesCPU); 
+ 	      cpu_tmp = TabCPU[o];
+	      
+	      for (int i=0; i<nb_cpu;i++)
+	      {
+		FindAndReplaceAffinity("inputfile/composition_copie.txt","composition_temp.txt",i,0);
+		UpFreqCpu(cpu_tmp,100);
+		cpu_tmp=cpu_tmp->next;
+	      }
+	
+	 //RegenerateCpuFile(TabCPU[o],includeListe,componentListe,nb_component); 
+	      numerodossier = numerodossier+ setCpuLoadLevel(TabCPU[o],nb_cpu,includeListe,componentListe,numerodossier);
+	     thisMesCPU = TabCPU[o];
+	     cout<<"fin setCpuLoadLevel : "<< o<<endl;
+// 	    cout<<"wait "<<2<<" sec..."<<endl; sleep(2);
 	}
-	numerodossier = numerodossier+ setCpuLoadLevel(cpu_tmp,nb_cpu,includeListe,componentListe,numerodossier);
-	cout<<"fin setCpuLoadLevel 1"<<endl;
 	
-// 	// sleep(3.0);
-// 	///changement de frequence des cpu
-// 	//int j=0;
-// 	for(int i=0;i<nb_cpu;i++)
-// 	{
-// 	 thisMesCPU = AccessToCPU(access_cpu,i);
-// 	 UpFreqCpu(thisMesCPU,200);
-// 	
-// // 	    while(j<nb_component)
-// // 	    {
-// // 	      string tmp;
-// // 	      int indice_cpu;
-// // 	      tmp= includeListe[j].substr(0,includeListe[j].size()-4);
-// // 	      indice_cpu=atoi(includeListe[j].substr(tmp.size()-1,tmp.size()).c_str());
-// // 	      tmp.clear();
-// // 	      tmp= includeListe[j].substr(0,includeListe[j].size()-10);
-// // 	      tmp = "inputfile/"+tmp+".txt";
-// // 		if(indice_cpu=i)
-// // 		{
-// // 		GenerateCpuFile(includeListe[j],tmp,cpu_tmp,"balbaa","_comp","_behaviour","_timing_characs");
-// // 		}
-// // 		
-// // 		else cout<<"pas besoin de créer le fichier"<<endl;
-// // 	      tmp.clear();
-// // 	      j++; 
-// // 	    } 
-// // 	    j=0;
-// 	}
-// 	sleep(3.0);
-// 	for (int i=0; i<nb_cpu;i++)
-// 	{
-// 	  FindAndReplaceAffinity("inputfile/composition_copie.txt","composition_temp.txt",i,0);
-// 	}
-// 	//nb_component = GenerateCompCpuFile("inputfile/composition_copie.txt","composition.txt",includeListe,componentListe);
-// 	RegenerateCpuFile(includeListe,componentListe,nb_component);  
-// 	
-// 	numerodossier = numerodossier+ setCpuLoadLevel(thisMesCPU,nb_cpu,includeListe,componentListe,numerodossier);
-// 	
-// 	cout<<"retour fct"<<endl;
-// 	
-// 	
+	time (&end);
+	cout<<"Elapsed time: " << int(difftime(end,start))/60 <<" min "<<int(difftime(end,start))%60<<" sec.\n";
+
 	
+/*	      
+// 	      numerodossier = numerodossier+ setCpuLoadLevel(access_cpu,nb_cpu,includeListe,componentListe,numerodossier);
+	      cout<<"fin setCpuLoadLevel 1"<<endl;
+	      
+	      ///changement de frequence des cpu
+	      access_cpu=thisMesCPU;
+
+	      thisMesCPU=access_cpu;
+	      //cpu_tmp=NULL;	
+	      //access_cpu =NULL;
+	      cout<<"retour fct"<<o<<endl;
+	      sleep(3.0);
+	      
+	}
 	
-//       REGNAME ListeName=NULL;
-//       REG_InitListe(&ListeName);
-//       REG_Ajouter(&ListeName,"coucou");
-//       REG_Ajouter(&ListeName,"main");
-//       if(REG_find(ListeName,"c"))
-// 	cout<<"trouve main"<<endl;
-//       else cout<<"rien trouvé"<<endl;
+ */
     }
     else 
     {
-        cout<<"\noption d'execution : DSE <inputArchi> <inputComposition> "<<endl;         
+        cout<<"\noption d'execution : DSE <inputArchi> <inputComposition> <ouput folder name> "<<endl;         
     }
         
         
@@ -135,14 +133,14 @@ using namespace std;
 extern COMPONENTDSP thisComposantsDSP;
 extern COMPONENTCPU thisComposantsCPU;
 extern CPU thisMesCPU;
-extern uint nb_fichier_include;
+extern uint TSIZE;
 
 int main (int argc,char* argv[])
 {
   uint i=0,nb_component=0,j=0,k=0,l=1;
   uint nb_cpu,indice_cpu;
   char carac[100],c[100];
-  string includeListe[nb_fichier_include],tmp, componentListe[nb_fichier_include];
+  string includeListe[TSIZE],tmp, componentListe[TSIZE];
   string out;
 
   CPU cpu_tmp=NULL;

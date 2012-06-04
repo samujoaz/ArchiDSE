@@ -10,6 +10,8 @@
 #include <sstream>
 
 #include "fonctionsUtils.h"
+#include "regularisation.h"
+
 
 using namespace std;
 
@@ -41,6 +43,6 @@ void ReadCompositionFile(char * compositionfile);
 void ChangeAffinity(string compositionfile, string compositionfile_temp,string component,uint NewAffinity);
 int getAffinityOf(string inputfile, string componentname);
 void FindAndReplaceAffinity(string compositionfile, string compositionfile_temp,uint OldAffinity,uint NewAffinity);
-void RegenerateCpuFile(string includeListe[], string componentListe[], uint nb_component);
+void RegenerateCpuFile(CPU MesCPU,string includeListe[], string componentListe[], uint nb_component);
 
 #endif

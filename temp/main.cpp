@@ -6,14 +6,12 @@
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
-#include <time.h>
 
 
 #include "fonctionsUtils.h"
 #include "generatefile.h"
 #include "utils.h"
 #include "regularisation.h"
-#define NbBoucle 1
 
 uint NbMaxCpu= 3;
 using namespace std;
@@ -22,80 +20,49 @@ extern COMPONENTDSP thisComposantsDSP;
 extern COMPONENTCPU thisComposantsCPU;
 extern CPU thisMesCPU;
 extern LISTE_TBC thisTBC;
-extern uint TSIZE;
+extern uint nb_fichier_include;
 extern float TableTBC[100];
 extern uint nbTBC;
 
 int main (int argc,char* argv[])
 {
-  uint nb_cpu,nb_component=0,indice_cpu,i=0,frequence;
+  uint nb_cpu,nb_component=0;
   uint numerodossier=0;
   char folder[100];
-  string includeListe[TSIZE], componentListe[TSIZE],tmp;    
+  string includeListe[nb_fichier_include], componentListe[nb_fichier_include];    
   TBC_InitListe(&thisTBC);/// à faire une seule fois
   cpu *cpu_tmp=NULL,*cpu_nb=NULL,*access_cpu=NULL;
-  
-   
-  time_t start,end;
-  char szInput [256];
-  double dif;
-
-  
   
   
 
     if (argc == 5 && strcmp(argv[1],"DSE")==0)
     { 
       
-	time (&start);
-	
-  
 	ReadCompositionFile(argv[2]);
-/*	
-	nb_component = GenerateCompCpuFile(argv[3],"composition.txt",includeListe,componentListe);
-	for(i; i<nb_component;i++) cout<<"includeListe[i]: "<<includeListe[i]<<endl;
-	      RegenerateCpuFile(thisMesCPU,includeListe,componentListe,nb_component);  
-// */
-	//cpu_nb = CloneCPU(thisMesCPU);	
-  	nb_cpu=NB_CPU(CloneCPU(thisMesCPU));
- 	CPU TabCPU[nb_cpu];
+	cpu_nb = CloneCPU(thisMesCPU);	
+ 	nb_cpu=NB_CPU(cpu_nb);
+	access_cpu = CloneCPU(thisMesCPU);
+	//CPU TabCPU[nb_cpu];
 	CopieCompositionFile(argv[3],"inputfile/");//copie qu'on pourra travailler dessus
- 	
-// 	for(int o=0;o<NbBoucle;o++) 
-// 	{ TabCPU[o]=CloneCPU(thisMesCPU); 
-// 	}
-// 	
- 	for(int o=0;o<NbBoucle;o++)
- 	{	
-	      TabCPU[o]=CloneCPU(thisMesCPU); 
- 	      cpu_tmp = TabCPU[o];
-	      
+
+	for(int o=0;o<2;o++)
+	{
+	      //cpu_tmp = CloneCPU(access_cpu);	
 	      for (int i=0; i<nb_cpu;i++)
 	      {
 		FindAndReplaceAffinity("inputfile/composition_copie.txt","composition_temp.txt",i,0);
-		UpFreqCpu(cpu_tmp,100);
-		cpu_tmp=cpu_tmp->next;
 	      }
-	
-	 //RegenerateCpuFile(TabCPU[o],includeListe,componentListe,nb_component); 
-	      numerodossier = numerodossier+ setCpuLoadLevel(TabCPU[o],nb_cpu,includeListe,componentListe,numerodossier);
-	     thisMesCPU = TabCPU[o];
-	     cout<<"fin setCpuLoadLevel : "<< o<<endl;
-// 	    cout<<"wait "<<2<<" sec..."<<endl; sleep(2);
-	}
-	
-	time (&end);
-	cout<<"Elapsed time: " << int(difftime(end,start))/60 <<" min "<<int(difftime(end,start))%60<<" sec.\n";
-		Affiche_CPU(thisMesCPU);
-
-	
-/*	      
-// 	      numerodossier = numerodossier+ setCpuLoadLevel(access_cpu,nb_cpu,includeListe,componentListe,numerodossier);
+	      cout<<"ici"<<endl;
+	      numerodossier = numerodossier+ setCpuLoadLevel(access_cpu,nb_cpu,includeListe,componentListe,numerodossier);
 	      cout<<"fin setCpuLoadLevel 1"<<endl;
 	      
 	      ///changement de frequence des cpu
 	      access_cpu=thisMesCPU;
-
+	      for(int i=0;i<nb_cpu;i++)
+	      {
+	      UpFreqCpu(thisMesCPU,100);
+	      thisMesCPU=thisMesCPU->next;
+	      }
 	      thisMesCPU=access_cpu;
 	      //cpu_tmp=NULL;	
 	      //access_cpu =NULL;
@@ -104,11 +71,11 @@ int main (int argc,char* argv[])
 	      
 	}
 	
- */
+  
     }
     else 
     {
-        cout<<"\noption d'execution : DSE <inputArchi> <inputComposition> <ouput folder name> "<<endl;         
+        cout<<"\noption d'execution : DSE <inputArchi> <inputComposition> "<<endl;         
     }
         
         
@@ -134,14 +101,14 @@ using namespace std;
 extern COMPONENTDSP thisComposantsDSP;
 extern COMPONENTCPU thisComposantsCPU;
 extern CPU thisMesCPU;
-extern uint TSIZE;
+extern uint nb_fichier_include;
 
 int main (int argc,char* argv[])
 {
   uint i=0,nb_component=0,j=0,k=0,l=1;
   uint nb_cpu,indice_cpu;
   char carac[100],c[100];
-  string includeListe[TSIZE],tmp, componentListe[TSIZE];
+  string includeListe[nb_fichier_include],tmp, componentListe[nb_fichier_include];
   string out;
 
   CPU cpu_tmp=NULL;

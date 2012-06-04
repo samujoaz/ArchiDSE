@@ -218,7 +218,8 @@ void SetWorkFrequencyCPU(CPU mon_cpu, uint new_freq)
 /// pour avoir acces au i-ème composant
 CPU AccessToCPU(CPU mon_cpu, uint indice)
 {
-  cpu *tmp_cpu = mon_cpu;
+  cpu *tmp_cpu=new cpu;
+  tmp_cpu= CloneCPU(mon_cpu);
  for(uint i=0; i<indice && tmp_cpu!=NULL;i++)
  {
    tmp_cpu=tmp_cpu->next;
@@ -299,7 +300,7 @@ void Affiche_CPU(CPU A)
       cout<<endl;
       
     }
-    delete(tmp);
+    //delete(tmp);
 }
 
 void Affiche_CACHE(CACHE A)

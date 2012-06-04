@@ -18,5 +18,6 @@ chmod 755 generate_trace_mono2.sh
 #done
 
 #gnuplot cpuloadfile$2/$1_all.gnu &
-#dot -Tps graph_archi.dot -o graph.ps
+#dot -Tps graph.dot -o graph.ps
+cp graph.dot cpuloadfile$2
 #okular graph.ps & 
