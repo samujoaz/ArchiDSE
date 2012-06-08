@@ -248,7 +248,7 @@ void GenerateCpuFile(string output,string input,CPU C,string name,string S1, str
     
   } 
  // cout<<"fichier d'entrée "<<input<<endl;
-      cout<<output<<" \thas been generate"<<endl;
+ //     cout<<output<<" \thas been generate"<<endl;
 
     outputfile.close();
 

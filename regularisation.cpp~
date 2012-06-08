@@ -203,152 +203,194 @@ uint setCpuLoadLevel(CPU MesCPU,uint nb_cpu,string includeListe[],string compone
       TBC_Trier(&thisTBC);/// parce que la frequence avait changée!
       TBC_Afficher(thisTBC);
       copieListeTBC=CloneListeTBC(thisTBC);
-
       for(i=0; i<nb_cpu;i++)
       {
+	if(cpu_tmp->work_frequency<200)
+	{
+	SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency+100);
+	AccessToCPU(cpu_access,i)->work_frequency=cpu_tmp->work_frequency;
+	}
 	frequence[i]=cpu_tmp->work_frequency;
 	cpu_tmp=cpu_tmp->next;
       }
 	numerodossier=num;
 	i=0;
-	l=0;
 	k=0;
-	getAllCpuLoad(nb_cpu,numerodossier++,NomDossierCpu,cpuload_cur,frequence);
-	CopieCompositionFile(compositionfile,NomDossierCpu); 
-	cpu_tmp = AccessToCPU(cpu_access,++l);
-// 	ListeName[i++]="main";
+
+	if(nb_cpu>NbMaxCpu+1)
+	{
+	  for(uint t=0;t<=NbMaxCpu;t++)
+	  {
+	    for(l=1;l<=NbMaxCpu && copieListeTBC !=NULL;l++)
+	    {
+	      if(nb_cpu>l)/// :d petite précaution
+	      {
+		int o=0;
+		tmp2= copieListeTBC->name;
+		ChangeAffinity(composition_copie,compositionfile_temp,tmp2,l);
+		nb_component = GenerateCompCpuFile(composition_copie,compositionfile,includeListe,componentListe);  
+		while((componentListe[o++].compare(tmp2))!=0);
+		o--;
+		component= includeListe[o].substr(0,includeListe[o].size()-10);
+		sprintf(c,"_cpu_%d.txt",l);
+		output= component+c;
+		input ="inputfile/"+component+".txt";
+		cpu_tmp = AccessToCPU(cpu_access,l);
+		GenerateCpuFile(output,input,cpu_tmp,component,"_comp","_behaviour","_timing_characs");
+		copieListeTBC=copieListeTBC->next;
+	      }
+	    }/// fin parallèle
+	  }
+	  l=1;
+	cpu_tmp = AccessToCPU(cpu_access,l);
+	}
+	
+	if(copieListeTBC==NULL)
+	{
+	  sortie = false;
+	  getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
+	  int max=nb_cpu-1;
+	  while(max>0)
+	  {
+	   
+	      for(i=1; i<nb_cpu && max>0;i++)
+	      {
+		
+		  if(cpuload_cur[i]>83.0)
+		  {
+		    if(max<nb_cpu-1)max++;
+		  cpu_tmp = AccessToCPU(cpu_access,i);
+		  if(cpu_tmp->work_frequency<400)SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency+100);
+		  else SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency+50);
+		  frequence[i]=cpu_tmp->work_frequency;
+		  AccessToCPU(cpu_access,i)->work_frequency=cpu_tmp->work_frequency;
+		  RegenerateCpuFile(cpu_access,includeListe,componentListe,nb_component);  
+		  }
+		  else if(max>1)max--;
+// 		  cout <<" cpu_"<<i<<" : "<<cpuload_cur[i]<<endl;
+// 		  cout << " max "<< max<<endl;
+// 		  sleep(1.0);
+	      }
+	       if(max>0)
+	       {
+		 getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
+		 max--;
+	       }
+	  }
+	  float MaxCpuload,MinCpuload, tabcpuload[nb_cpu-1];
+	  uint indice_cpuMax, indice_cpuMin;
+
+	  for(i=0;i<nb_cpu-1;i++)
+	  {
+	  
+	    tabcpuload[i]=cpuload_cur[i+1];
+// 	     cout <<" cpu_"<<i<<" : "<< tabcpuload[i]<<endl;
+	    
+	  }
+	  getMinMaxCpuLoad( tabcpuload,NULL,nb_cpu-1,  0,&MaxCpuload, &MinCpuload,&indice_cpuMax, &indice_cpuMin);
+	  
+// 	  cout <<" Max : "<< MaxCpuload << " cpu_"<<indice_cpuMax<<endl;
+// 	  cout <<" Min : "<< MinCpuload << " cpu_"<<indice_cpuMin<<endl;
+// 	  exit(0);
+	  if(cpuload_cur[0]<5.0 && cpuload_cur[indice_cpuMin+1]<80.0)
+	  {
+	  cpu_tmp=AccessToCPU(cpu_access,0);
+	  FindAndReplaceAffinity(composition_copie,compositionfile_temp,indice_cpuMin+1,0);
+	  nb_component = GenerateCompCpuFile(composition_copie,compositionfile,includeListe,componentListe);
+	  RegenerateCpuFile(cpu_tmp,includeListe,componentListe,nb_component);
+	  getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
+
+	  }
+	}
+	
 	while(copieListeTBC !=NULL && sortie)
 	{
-	  
-	  if(cpuload_cur[l]<75  && copieListeTBC!=NULL )
+	  for(i=1; i<nb_cpu;i++)
 	  {
-// 		if((copieListeTBC->name.compare("main"))==0)
-// 		{
-// 		  copieListeTBC=copieListeTBC->next;
-// 
-// 		}
-// 		else
-// 		{
-		tmp2 = copieListeTBC->name;
-		     // if(notFindName(ListeName,tmp2,i-1) && notComprisEntre(cpuload_cur[0],50,80))
-// 		      {
-			int o=0;
-		      ChangeAffinity(composition_copie,compositionfile_temp,tmp2,l);
-		      nb_component = GenerateCompCpuFile(composition_copie,compositionfile,includeListe,componentListe);  
-		      while((componentListe[o++].compare(tmp2))!=0);
-			o--;
-		      component= includeListe[o].substr(0,includeListe[o].size()-10);
-		      cout<<"name :"<<tmp2<<endl;
-		      cout<<"component :"<<component<<endl;
-		      sprintf(c,"_cpu_%d.txt",l);
-		      output= component+c;
-		      input ="inputfile/"+component+".txt";
-		      GenerateCpuFile(output,input,cpu_tmp,component,"_comp","_behaviour","_timing_characs");
-		      input.clear();
-		      component.clear();
-		      output.clear();
-		      copieListeTBC=copieListeTBC->next;
-		      getAllCpuLoad(nb_cpu,numerodossier++,NomDossierCpu,cpuload_cur,frequence);
-		      CopieCompositionFile(compositionfile,NomDossierCpu);  
-// 		      ListeName[i++]=tmp2;
-// 		      }
-// 		      else 
-// 		      {
-// 			cout<<"deja fait : "<<tmp2<<endl;
-// 			k++;
-// 			copieListeTBC=copieListeTBC->next;
-// 		      }
-		
+	    cpu_tmp = AccessToCPU(cpu_access,i);
+	    if(cpuload_cur[i]>83.0)
+	    {
+	      if(cpu_tmp->work_frequency<400)SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency+100);
+	      else SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency+50);
+		AccessToCPU(cpu_access,i)->work_frequency=cpu_tmp->work_frequency;
+		RegenerateCpuFile(cpu_access,includeListe,componentListe,nb_component);  
+	    }
+	    frequence[i]=cpu_tmp->work_frequency;
+	  }
 
-// 		}
+	  cpu_tmp = AccessToCPU(cpu_access,l);
+	  getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
+
+	  if(cpuload_cur[l]<70.0  && copieListeTBC!=NULL )
+	  {
+
+	    tmp2 = copieListeTBC->name;
+	    int o=0;
+	    ChangeAffinity(composition_copie,compositionfile_temp,tmp2,l);
+	    nb_component = GenerateCompCpuFile(composition_copie,compositionfile,includeListe,componentListe);  
+	    while((componentListe[o++].compare(tmp2))!=0);
+	      o--;
+	    component= includeListe[o].substr(0,includeListe[o].size()-10);
+	    cout<<"name :"<<tmp2<<endl;
+	    cout<<"component :"<<component<<endl;
+	    sprintf(c,"_cpu_%d.txt",l);
+	    output= component+c;
+	    input ="inputfile/"+component+".txt";
+	    GenerateCpuFile(output,input,cpu_tmp,component,"_comp","_behaviour","_timing_characs");
+	    copieListeTBC=copieListeTBC->next;
+	
 	    
 	  }
 	  else
 	  {
-	     if(cpuload_cur[nb_cpu-1]>75)  sortie=false;
 	      
-		
 		if(l<nb_cpu)
 		{
-		  while(!notComprisEntre(cpuload_cur[l],86.0,99.0))
-		  {
-// 		    float tmpp= cpuload_cur[l];
-		    int o=0;
-		    //cpu_tmp->work_frequency = cpu_tmp->work_frequency+50;
-		    SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency+50);
-
-		    frequence[l]=cpu_tmp->work_frequency;
-		    while((componentListe[o++].compare(tmp2))!=0);
-			o--;
-		      component= includeListe[o].substr(0,includeListe[o].size()-10);
-		      cout<<"name :"<<tmp2<<endl;
-		      cout<<"component :"<<component<<endl;
-		      sprintf(c,"_cpu_%d.txt",l);
-		      output= component+c;
-		      input ="inputfile/"+component+".txt";
-		      GenerateCpuFile(output,input,cpu_tmp,component,"_comp","_behaviour","_timing_characs");	
-		      getAllCpuLoad(nb_cpu,numerodossier++,NomDossierCpu,cpuload_cur,frequence);
-		      CopieCompositionFile(compositionfile,NomDossierCpu);  
-// 		      cout<<"tempp : "<<tmpp<<endl; exit(0);
-		  }
-		  AccessToCPU(cpu_access,l)->work_frequency=cpu_tmp->work_frequency;
-		 // cpu_tmp=cpu_tmp->next;
-		  l++;
-		  if(l>=nb_cpu) l=0;
-		  cpu_tmp=AccessToCPU(cpu_access,l);
-		  
-		}
-		else 
+	      if(cpuload_cur[l]>85.0)
 		{
-		  l=0;
-		  cpu_tmp = AccessToCPU(cpu_access,l);
+		  if(cpu_tmp->work_frequency<400)SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency+100);
+		  else SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency+50);
+		  frequence[l]=cpu_tmp->work_frequency;
+		  AccessToCPU(cpu_access,l)->work_frequency=cpu_tmp->work_frequency;
+		}
+		 else{ l++;
+		  if(l>=nb_cpu){ l=0;sortie=false;}
+		 }
 		  
 		}
+		
 	      cout<<"cpu_"<< l<<endl;
 	  }
 	  
-	}
-// 	cpu_access=cpu_tmp;
-	
-	getAllCpuLoad(nb_cpu,numerodossier++,NomDossierCpu,cpuload_cur,frequence);
-	if(cpuload_cur[0]<5.0 && cpuload_cur[l]<82.0)
+	}/// end while
+	/*
+	//getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
+	if(cpuload_cur[0]<5.0 && cpuload_cur[nb_cpu-1]<82.0)
 	{
+	  cpu_tmp=AccessToCPU(cpu_access,0);
 	  FindAndReplaceAffinity(composition_copie,compositionfile_temp,l,0);
 	  nb_component = GenerateCompCpuFile(composition_copie,compositionfile,includeListe,componentListe);
 	  RegenerateCpuFile(cpu_tmp,includeListe,componentListe,nb_component);
-	  getAllCpuLoad(nb_cpu,numerodossier++,NomDossierCpu,cpuload_cur,frequence);
+	  getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
 
 	}else
 	{
-	  
+	  */
 	  l=0;
-	  cpu_tmp =AccessToCPU(cpu_access,l);
-	  while(!notComprisEntre(cpuload_cur[l],86.0,99.0))
-		  {
-		    float tmpp= cpuload_cur[l];
-		    int o=0;
-		    //cpu_tmp->work_frequency = cpu_tmp->work_frequency+50;
-		    SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency+50);
-		    frequence[l]=cpu_tmp->work_frequency;
-		    while((componentListe[o++].compare(tmp2))!=0);
-			o--;
-		      component= includeListe[o].substr(0,includeListe[o].size()-10);
-		      cout<<"name :"<<tmp2<<endl;
-		      cout<<"component :"<<component<<endl;
-		      sprintf(c,"_cpu_%d.txt",l);
-		      output= component+c;
-		      input ="inputfile/"+component+".txt";
-		      GenerateCpuFile(output,input,cpu_tmp,component,"_comp","_behaviour","_timing_characs");	
-		      getAllCpuLoad(nb_cpu,numerodossier++,NomDossierCpu,cpuload_cur,frequence);
-		      CopieCompositionFile(compositionfile,NomDossierCpu);  
-// 		      cout<<"tempp : "<<tmpp<<endl; exit(0);
-		  }
-	}
+	  cout<<"zetre while"<<endl;
+	  while(cpuload_cur[l]>85.0)
+	  {
+	    cpu_tmp =AccessToCPU(cpu_access,l);
+	  if(cpu_tmp->work_frequency<200)SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency+100);
+	  else SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency+50);
+	  frequence[l]=cpu_tmp->work_frequency;
+	  AccessToCPU(cpu_access,l)->work_frequency=cpu_tmp->work_frequency;
+	  RegenerateCpuFile(cpu_access,includeListe,componentListe,nb_component);  
+	  getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
+	  }
 	thisMesCPU=NULL;
 
-	cout<<k<<" deja fait\n restant de la liste "<<endl;
 	
-	//for(int o=0;o<i;o++)cout<<"ListeName["<<o<<"] "<<ListeName[o]<<endl;
 	return numerodossier;
 }
 

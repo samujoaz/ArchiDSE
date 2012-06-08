@@ -248,7 +248,7 @@ void GenerateCpuFile(string output,string input,CPU C,string name,string S1, str
     
   } 
  // cout<<"fichier d'entrée "<<input<<endl;
-      cout<<output<<" \thas been generate"<<endl;
+ //     cout<<output<<" \thas been generate"<<endl;
 
     outputfile.close();
 
@@ -936,11 +936,11 @@ void RegenerateCpuFile(CPU MesCPU, string includeListe[],string componentListe[]
 			    tmp.clear();
 			    tmp= includeListe[i].substr(0,includeListe[i].size()-10);
 			    tmp = "inputfile/"+tmp+".txt";
-			    if(notFindName(ListeName,componentListe[i],n-1))
-			    {
+			   // if(notFindName(ListeName,componentListe[i],n-1))
+			   // {
 			    GenerateCpuFile(includeListe[i],tmp,cpu_tmp, componentListe[i],"_comp","_behaviour","_timing_characs");
-			    ListeName[n++]=componentListe[i]; 
-			    }
+			   // ListeName[n++]=componentListe[i]; 
+			    //}
 		    }
 		    tmp.clear();
 		    i++;     

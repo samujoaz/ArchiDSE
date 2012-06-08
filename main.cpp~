@@ -25,6 +25,7 @@ extern LISTE_TBC thisTBC;
 extern uint TSIZE;
 extern float TableTBC[100];
 extern uint nbTBC;
+char **_argv;
 
 int main (int argc,char* argv[])
 {
@@ -32,10 +33,10 @@ int main (int argc,char* argv[])
   uint numerodossier=0;
   char folder[100];
   string includeListe[TSIZE], componentListe[TSIZE],tmp;    
-  TBC_InitListe(&thisTBC);/// à faire une seule fois
   cpu *cpu_tmp=NULL,*cpu_nb=NULL,*access_cpu=NULL;
   
-   
+         TBC_InitListe(&thisTBC);/// à faire une seule fois
+
   time_t start,end;
   char szInput [256];
   double dif;
@@ -45,18 +46,10 @@ int main (int argc,char* argv[])
   
 
     if (argc == 5 && strcmp(argv[1],"DSE")==0)
-    { 
-      
+    {  
+      _argv =argv;
 	time (&start);
-	
-  
 	ReadCompositionFile(argv[2]);
-/*	
-	nb_component = GenerateCompCpuFile(argv[3],"composition.txt",includeListe,componentListe);
-	for(i; i<nb_component;i++) cout<<"includeListe[i]: "<<includeListe[i]<<endl;
-	      RegenerateCpuFile(thisMesCPU,includeListe,componentListe,nb_component);  
-// */
-	//cpu_nb = CloneCPU(thisMesCPU);	
   	nb_cpu=NB_CPU(CloneCPU(thisMesCPU));
  	CPU TabCPU[nb_cpu];
 	CopieCompositionFile(argv[3],"inputfile/");//copie qu'on pourra travailler dessus
@@ -73,7 +66,8 @@ int main (int argc,char* argv[])
 	      for (int i=0; i<nb_cpu;i++)
 	      {
 		FindAndReplaceAffinity("inputfile/composition_copie.txt","composition_temp.txt",i,0);
-		UpFreqCpu(cpu_tmp,100);
+ 		if(o!=0)
+		  UpFreqCpu(cpu_tmp,100);
 		cpu_tmp=cpu_tmp->next;
 	      }
 	
@@ -86,7 +80,6 @@ int main (int argc,char* argv[])
 	
 	time (&end);
 	cout<<"Elapsed time: " << int(difftime(end,start))/60 <<" min "<<int(difftime(end,start))%60<<" sec.\n";
-		Affiche_CPU(thisMesCPU);
 
 	
 /*	      

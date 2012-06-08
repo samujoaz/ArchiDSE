@@ -6,19 +6,11 @@ component main_comp
   uses Runnable comm_slice3;
   uses Runnable comm_slice4;
   uses Runnable comm_slice5;
-  uses Runnable comm_slice6;
-  uses Runnable comm_slice7;
-  uses Runnable comm_slice8;
-  uses Runnable comm_slice10;
   provides Runnable input_slice1;
   provides Runnable input_slice2;
   provides Runnable input_slice3;
   provides Runnable input_slice4;
   provides Runnable input_slice5;
-  provides Runnable input_slice6;
-  provides Runnable input_slice7;
-  provides Runnable input_slice8;
-  provides Runnable input_slice10;
   uses Runnable comm_write_buffer;
 };
 
@@ -31,62 +23,39 @@ behaviour main_behaviour of main_comp
 
 input_timer.run 
   {
-    (1) 1 { comm_slice1.run } 1 { comm_slice2.run } 1 { comm_slice3.run } 1 { comm_slice4.run } 1 { comm_slice5.run } 1 { comm_slice6.run } 1 { comm_slice7.run } 1 { comm_slice8.run } 1 { comm_slice10.run }
+    (1) 1 { comm_slice1.run } 1 { comm_slice2.run } 1 { comm_slice3.run } 1 { comm_slice4.run } 1 { comm_slice5.run } 
   }  
 
 input_slice1.run
   {
-    (1) SA -[ ( this_->counter < 2 )  ]-> SA 0 { none.none } ! { this_->counter++; }
-    (2) SA -[ ( this_->counter >= 2 ) ]-> SA 1 { comm_write_buffer.run } ! { this_->counter=0; }
+    (1) SA -[ ( this_->counter < 4 )  ]-> SA 0 { none.none } ! { this_->counter++; }
+    (2) SA -[ ( this_->counter >= 4 ) ]-> SA 1 { comm_write_buffer.run } ! { this_->counter=0; }
   }
 
 input_slice2.run
   {
-    (1) SA -[ ( this_->counter < 2 )  ]-> SA 0 { none.none } ! { this_->counter++; }
-    (2) SA -[ ( this_->counter >= 2 ) ]-> SA 1 { comm_write_buffer.run } ! { this_->counter=0; }
+    (1) SA -[ ( this_->counter < 4 )  ]-> SA 0 { none.none } ! { this_->counter++; }
+    (2) SA -[ ( this_->counter >= 4 ) ]-> SA 1 { comm_write_buffer.run } ! { this_->counter=0; }
   }
 
 input_slice3.run
   {
-    (1) SA -[ ( this_->counter < 2 )  ]-> SA 0 { none.none } ! { this_->counter++; }
-    (2) SA -[ ( this_->counter >= 2 ) ]-> SA 1 { comm_write_buffer.run } ! { this_->counter=0; }
+    (1) SA -[ ( this_->counter < 4 )  ]-> SA 0 { none.none } ! { this_->counter++; }
+    (2) SA -[ ( this_->counter >= 4 ) ]-> SA 1 { comm_write_buffer.run } ! { this_->counter=0; }
   }
 
 input_slice4.run
   {
-    (1) SA -[ ( this_->counter < 2 )  ]-> SA 0 { none.none } ! { this_->counter++; }
-    (2) SA -[ ( this_->counter >= 2 ) ]-> SA 1 { comm_write_buffer.run } ! {this_->counter=0; }
+    (1) SA -[ ( this_->counter < 4 )  ]-> SA 0 { none.none } ! { this_->counter++; }
+    (2) SA -[ ( this_->counter >= 4 ) ]-> SA 1 { comm_write_buffer.run } ! {this_->counter=0; }
   }
 
 input_slice5.run
   {
-    (1) SA -[ ( this_->counter < 2 )  ]-> SA 0 { none.none } ! { this_->counter++; }
-    (2) SA -[ ( this_->counter >= 2 ) ]-> SA 1 { comm_write_buffer.run } ! { this_->counter=0; }
+    (1) SA -[ ( this_->counter < 4 )  ]-> SA 0 { none.none } ! { this_->counter++; }
+    (2) SA -[ ( this_->counter >= 4 ) ]-> SA 1 { comm_write_buffer.run } ! { this_->counter=0; }
   }
 
-input_slice6.run
-  {
-    (1) SA -[ ( this_->counter < 2 )  ]-> SA 0 { none.none } ! { this_->counter++; }
-    (2) SA -[ ( this_->counter >= 2 ) ]-> SA 1 { comm_write_buffer.run } ! { this_->counter=0; }
-  }
-
-input_slice7.run
-  {
-    (1) SA -[ ( this_->counter < 2 )  ]-> SA 0 { none.none } ! { this_->counter++; }
-    (2) SA -[ ( this_->counter >= 2 ) ]-> SA 1 { comm_write_buffer.run } ! { this_->counter=0; }
-  }
-
-input_slice8.run
-  {
-    (1) SA -[ ( this_->counter < 2 )  ]-> SA 0 { none.none } ! { this_->counter++; }
-    (2) SA -[ ( this_->counter >= 2 ) ]-> SA 1 { comm_write_buffer.run } ! { this_->counter=0; }
-  }
-
-input_slice10.run
-  {
-    (1) SA -[ ( this_->counter < 2 )  ]-> SA 0 { none.none } ! { this_->counter++; }
-    (2) SA -[ ( this_->counter >= 2 ) ]-> SA 1 { comm_write_buffer.run } ! { this_->counter=0; }
-  }
 
 };
 
@@ -94,7 +63,7 @@ characteristics( Architecture_parameters ) main_timing_characs of main_behaviour
 {
 input_timer.run
   {
-    (1) { TBC 0 0 0 0 0 0 0 0 0} [ 10000 1200 500 100 120 50 10 12 5 ]
+    (1) { TBC 0 0 0 0 0} [ 10000 1200 500 100 120 50 10 12 5 ]
   }
 
 input_slice1.run
@@ -127,29 +96,7 @@ input_slice5.run
     (2) { TBC 0 } [ 10000 1200 500 100 120 50 10 12 5 ]
   }
   
-input_slice6.run
-  {
-    (1) { TBC 0 } [ 10000 1200 500 100 120 50 10 12 5 ]
-    (2) { TBC 0 } [ 10000 1200 500 100 120 50 10 12 5 ]
-  }  
-  
-input_slice7.run
-  {
-    (1) { TBC 0 } [ 10000 1200 500 100 120 50 10 12 5 ]
-    (2) { TBC 0 } [ 10000 1200 500 100 120 50 10 12 5 ]
-  }  
-  
-input_slice8.run
-  {
-    (1) { TBC 0 } [ 10000 1200 500 100 120 50 10 12 5 ]
-    (2) { TBC 0 } [ 10000 1200 500 100 120 50 10 12 5 ]
-  }  
-  
-input_slice10.run
-  {
-    (1) { TBC 0 } [ 10000 1200 500 100 120 50 10 12 5 ]
-    (2) { TBC 0 } [ 10000 1200 500 100 120 50 10 12 5 ]
-  }
+
 
 
 };
