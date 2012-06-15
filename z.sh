@@ -1,9 +1,9 @@
 
 
-chmod 755 r.sh
-sudo ./r.sh
-chmod 755 c.sh
-./c.sh
-chmod  755 exec.sh
-./exec.sh
+chmod 755 del.sh
+sudo ./del.sh
+chmod 755 compile.sh
+./compile.sh
+chmod  755 exec_all_archi.sh
+./exec_all_archi.sh
 

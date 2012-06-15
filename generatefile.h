@@ -20,6 +20,7 @@ typedef struct Liste_TBC{
 string name;
 uint affinity;
 float valeur;
+
 struct Liste_TBC *next;
 }Liste_TBC;
 typedef Liste_TBC *LISTE_TBC;

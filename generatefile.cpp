@@ -120,7 +120,7 @@ void TBC_Afficher(LISTE_TBC L)
 
 void GenerateCpuFile(string output,string input,CPU C,string name,string S1, string S2,string S3)
 {
-  ofstream outputfile(output.c_str());/// ios::app pour rajouter en fin du fichier ce qu'on veut ecrire 
+  ofstream outputfile(output.c_str(),ios::trunc);/// ios::app pour rajouter en fin du fichier ce qu'on veut ecrire 
   ///si on ne veut pas ecraser le fichier dans le cas où il existe déjà
   string line,mot,indice;
   char c[100]; 
@@ -217,6 +217,7 @@ void GenerateCpuFile(string output,string input,CPU C,string name,string S1, str
 		    ListeName[o++]=name;
 		    if(once && notFindName(ListeName,name,o-1))
 		      { 
+			nbTBC++;
 		      TBC_Ajouter(&thisTBC,name,C->indice_CPU,T_Total);
 		      }
 		  }		    
@@ -248,7 +249,7 @@ void GenerateCpuFile(string output,string input,CPU C,string name,string S1, str
     
   } 
  // cout<<"fichier d'entrée "<<input<<endl;
- //     cout<<output<<" \thas been generate"<<endl;
+  //    cout<<output<<" \thas been generate"<<endl;
 
     outputfile.close();
 
@@ -757,7 +758,7 @@ void ChangeAffinity(string compositionfile, string compositionfile_temp,string c
   ostringstream convert;   // stream used for the conversion
   
   
-  ofstream outputfile(compositionfile_temp.c_str());   
+  ofstream outputfile(compositionfile_temp.c_str(),ios::trunc);   
   if(!outputfile)
   {
     cout<<"ERREUR exit("<<7<<")impossible de crée le fichier de sortie: "<<compositionfile_temp<<endl;
@@ -800,7 +801,7 @@ void ChangeAffinity(string compositionfile, string compositionfile_temp,string c
   outputfile.close(); 
   readingfile.close();
   
-  ofstream write(compositionfile.c_str());   
+  ofstream write(compositionfile.c_str(),ios::trunc);   
   ifstream read(compositionfile_temp.c_str());
   while(getline(read,line))
   {
@@ -850,7 +851,7 @@ void FindAndReplaceAffinity(string compositionfile, string compositionfile_temp,
    string line,tmp;
   size_t pos=-1;
   ostringstream convert;
-  ofstream outputfile(compositionfile_temp.c_str());   
+  ofstream outputfile(compositionfile_temp.c_str(),ios::trunc);   
   if(!outputfile)
   {
     cout<<"ERREUR exit("<<5<<")impossible de crée le fichier: "<<compositionfile_temp<<endl;
@@ -898,7 +899,7 @@ void FindAndReplaceAffinity(string compositionfile, string compositionfile_temp,
   outputfile.close(); 
   readingfile.close();
   
-  ofstream write(compositionfile.c_str());   
+  ofstream write(compositionfile.c_str(),ios::trunc);   
   ifstream read(compositionfile_temp.c_str());
   while(getline(read,line))
   {
@@ -920,6 +921,7 @@ void RegenerateCpuFile(CPU MesCPU, string includeListe[],string componentListe[]
   once=true;thisTBC =NULL;
   string ListeName[TSIZE];
   ListeName[n++]="blabla";
+  nbTBC=0;
   for(int j=0;j<nb_cpu;j++)
 	{  
 	  i=0;

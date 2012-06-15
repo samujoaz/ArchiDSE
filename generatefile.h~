@@ -10,6 +10,8 @@
 #include <sstream>
 
 #include "fonctionsUtils.h"
+#include "regularisation.h"
+
 
 using namespace std;
 
@@ -18,6 +20,7 @@ typedef struct Liste_TBC{
 string name;
 uint affinity;
 float valeur;
+uint nbTBC;
 struct Liste_TBC *next;
 }Liste_TBC;
 typedef Liste_TBC *LISTE_TBC;

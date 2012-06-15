@@ -16,5 +16,7 @@ using namespace std;
 bool notFindName(string listename[] ,string index,int taille);
 bool notComprisEntre(float valeur,float x, float y);
 uint setCpuLoadLevel(CPU MesCPU,uint nb_cpu,string includeListe[],string componentListe[],uint num);
+bool getLevelTickTimer(string intput);
+bool ComprisEntre(float valeur,float x, float y);
 
 #endif
