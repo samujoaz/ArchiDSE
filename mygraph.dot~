@@ -1,0 +1,59 @@
+
+digraph graph_archi {
+  overlap = scale;
+  init[label="INIT"];
+   TBC[label="generation de fichier\nNB TBC"];
+   SL[label="SEUIL < NB_TBC"];
+   SH[label="SEUIL > NB_TBC\n nb_cpu parallele"];
+   L1[label="TickTimer = low"];
+   L2[label="TickTimer =  low"];
+   H1[label="TickTimer = high"];
+   H2[label="TickTimer = high"];
+   M1[label="TickTimer = medium"];
+   M2[label="TickTimer = medium"];
+   HH1[label="TickTimer = super high"];
+   HH2[label="TickTimer =  super high"];
+   SEQ1[label="ALGO SEQ\n offset 75-100 MHz "];
+   SEQ2[label="ALGO SEQ\n offset 0-25 MHz "];
+   SEQ3[label="ALGO SEQ\n offset 0 MHz "];
+   SEQ4[label="ALGO SEQ\n offset 0-100 MHz "];
+   PAR2[label="ALGO PAR\n offset 0-100 MHz "];
+   MIX1[label="ALGO SEQ + PAR\n offset 0-75 MHz "];
+   MIX2[label="ALGO SEQ\n regularistion\n offset +/-25MHz "];
+   FIN[label="histogramme \n trace \n fin"];
+   init -> TBC[];
+   TBC -> SL[color=blue];
+   TBC -> SH[color=red];
+   SL -> L1[color=black];
+   SL -> M1[color=black];
+   SL -> H1[color=black];
+   SL -> HH1[color=black];
+   SH -> L2[color=black];
+   SH -> M2[color=black];
+   SH -> H2[color=black];
+   SH -> HH2[color=black];
+   
+   L1 -> SEQ1[color=blue];
+   M1 -> SEQ2[color=blue];
+   H1 -> SEQ3[color=blue];
+   HH1 -> SEQ3[color=blue];
+   
+   L2 -> PAR2[color=blue];
+   M2 -> PAR2[color=blue];
+   H2 -> MIX1[color=blue];
+   HH2 -> SEQ4[color=blue];
+   
+   SEQ2 -> MIX2[color=red];
+   SEQ1 -> MIX2[color=red];
+   SEQ3 -> MIX2[color=red];
+
+   PAR2 -> MIX2[color=red];
+   MIX1 -> MIX2[color=red];
+   SEQ4 -> MIX2[color=red];
+   
+   MIX2->FIN[color="black"];
+   
+  
+}
+
+

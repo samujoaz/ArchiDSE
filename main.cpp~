@@ -15,7 +15,6 @@
 #include "regularisation.h"
 #define NbBoucle 1
 
-uint NbMaxCpu= 3;
 using namespace std;
 
 extern COMPONENTDSP thisComposantsDSP;
@@ -26,6 +25,8 @@ extern uint TSIZE;
 extern float TableTBC[100];
 extern uint nbTBC;
 char **_argv;
+extern float LoadMax;
+extern float LoadMin;
 
 
 int main (int argc,char* argv[])
@@ -42,13 +43,15 @@ int main (int argc,char* argv[])
   char szInput [256];
   double dif;
 
-  
-  
-  
-
-    if (argc == 5 && strcmp(argv[1],"DSE")==0)
+ 
+    if (argc == 7 && strcmp(argv[1],"DSE")==0)
     {  
-      _argv =argv;
+	_argv =argv;
+	tmp =  argv[argc-1];
+        LoadMax=atof(tmp.c_str()); 
+	tmp =  argv[argc-2];
+	LoadMin=atof(tmp.c_str());
+      
 	time (&start);
 	ReadCompositionFile(argv[2]);
   	nb_cpu=NB_CPU(CloneCPU(thisMesCPU));
@@ -74,7 +77,7 @@ int main (int argc,char* argv[])
 	
 	 //RegenerateCpuFile(TabCPU[o],includeListe,componentListe,nb_component); 
 	      numerodossier = numerodossier+ setCpuLoadLevel(TabCPU[o],nb_cpu,includeListe,componentListe,numerodossier);
-	      coucou();exit(0);
+	      
 	      GenScriptHistogram(nb_cpu ); 
 
 	     thisMesCPU = TabCPU[o];

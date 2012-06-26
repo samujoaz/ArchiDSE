@@ -3,19 +3,19 @@
 #include <main_behaviour_cpu_1.h>
 #include <slice_behaviour_cpu_2.h>
 #include <slice_behaviour_cpu_3.h>
+#include <slice_behaviour_cpu_4.h>
 #include <slice_behaviour_cpu_1.h>
 #include <slice_behaviour_cpu_2.h>
 #include <slice_behaviour_cpu_3.h>
+#include <slice_behaviour_cpu_4.h>
 #include <slice_behaviour_cpu_1.h>
 #include <slice_behaviour_cpu_2.h>
-#include <slice_behaviour_cpu_3.h>
-#include <slice_behaviour_cpu_1.h>
+#include <filter_behaviour_cpu_3.h>
+#include <filter_behaviour_cpu_4.h>
+#include <filter_behaviour_cpu_1.h>
 #include <filter_behaviour_cpu_2.h>
 #include <filter_behaviour_cpu_3.h>
 #include <filter_behaviour_cpu_4.h>
-#include <filter_behaviour_cpu_4.h>
-#include <filter_behaviour_cpu_4.h>
-#include <filter_behaviour_cpu_0.h>
 #include <filter_behaviour_cpu_0.h>
 #include <filter_behaviour_cpu_0.h>
 #include <filter_behaviour_cpu_0.h>
@@ -32,19 +32,19 @@ int main( int argc, char** argv )
 main_behaviour_cpu_1* main = create_main_timing_characs_cpu_1();
 slice_behaviour_cpu_2* slice1 = create_slice_timing_characs_cpu_2();
 slice_behaviour_cpu_3* slice2 = create_slice_timing_characs_cpu_3();
-slice_behaviour_cpu_1* slice3 = create_slice_timing_characs_cpu_1();
-slice_behaviour_cpu_2* slice4 = create_slice_timing_characs_cpu_2();
-slice_behaviour_cpu_3* slice5 = create_slice_timing_characs_cpu_3();
-slice_behaviour_cpu_1* slice6 = create_slice_timing_characs_cpu_1();
-slice_behaviour_cpu_2* slice7 = create_slice_timing_characs_cpu_2();
-slice_behaviour_cpu_3* slice8 = create_slice_timing_characs_cpu_3();
-slice_behaviour_cpu_1* slice10 = create_slice_timing_characs_cpu_1();
-filter_behaviour_cpu_2* filter1 = create_filter_timing_characs_cpu_2();
-filter_behaviour_cpu_3* filter2 = create_filter_timing_characs_cpu_3();
-filter_behaviour_cpu_4* filter3 = create_filter_timing_characs_cpu_4();
-filter_behaviour_cpu_4* filter4 = create_filter_timing_characs_cpu_4();
-filter_behaviour_cpu_4* filter5 = create_filter_timing_characs_cpu_4();
-filter_behaviour_cpu_0* filter6 = create_filter_timing_characs_cpu_0();
+slice_behaviour_cpu_4* slice3 = create_slice_timing_characs_cpu_4();
+slice_behaviour_cpu_1* slice4 = create_slice_timing_characs_cpu_1();
+slice_behaviour_cpu_2* slice5 = create_slice_timing_characs_cpu_2();
+slice_behaviour_cpu_3* slice6 = create_slice_timing_characs_cpu_3();
+slice_behaviour_cpu_4* slice7 = create_slice_timing_characs_cpu_4();
+slice_behaviour_cpu_1* slice8 = create_slice_timing_characs_cpu_1();
+slice_behaviour_cpu_2* slice10 = create_slice_timing_characs_cpu_2();
+filter_behaviour_cpu_3* filter1 = create_filter_timing_characs_cpu_3();
+filter_behaviour_cpu_4* filter2 = create_filter_timing_characs_cpu_4();
+filter_behaviour_cpu_1* filter3 = create_filter_timing_characs_cpu_1();
+filter_behaviour_cpu_2* filter4 = create_filter_timing_characs_cpu_2();
+filter_behaviour_cpu_3* filter5 = create_filter_timing_characs_cpu_3();
+filter_behaviour_cpu_4* filter6 = create_filter_timing_characs_cpu_4();
 filter_behaviour_cpu_0* filter7 = create_filter_timing_characs_cpu_0();
 filter_behaviour_cpu_0* filter8 = create_filter_timing_characs_cpu_0();
 filter_behaviour_cpu_0* filter10 = create_filter_timing_characs_cpu_0();
@@ -204,31 +204,31 @@ cnx_slice1.configure_affinity( 2 );
 cnx_slice2.configure_priority_and_sched_fifo( 14, true );
 cnx_slice2.configure_affinity( 3 );
 cnx_slice3.configure_priority_and_sched_fifo( 13, true );
-cnx_slice3.configure_affinity( 1 );
+cnx_slice3.configure_affinity( 4 );
 cnx_slice4.configure_priority_and_sched_fifo( 13, true );
-cnx_slice4.configure_affinity( 2 );
+cnx_slice4.configure_affinity( 1 );
 cnx_slice5.configure_priority_and_sched_fifo( 12, true );
-cnx_slice5.configure_affinity( 3 );
+cnx_slice5.configure_affinity( 2 );
 cnx_slice6.configure_priority_and_sched_fifo( 12, true );
-cnx_slice6.configure_affinity( 1 );
+cnx_slice6.configure_affinity( 3 );
 cnx_slice7.configure_priority_and_sched_fifo( 11, true );
-cnx_slice7.configure_affinity( 2 );
+cnx_slice7.configure_affinity( 4 );
 cnx_slice8.configure_priority_and_sched_fifo( 11, true );
-cnx_slice8.configure_affinity( 3 );
+cnx_slice8.configure_affinity( 1 );
 cnx_slice10.configure_priority_and_sched_fifo( 10, true );
-cnx_slice10.configure_affinity( 1 );
+cnx_slice10.configure_affinity( 2 );
 cnx_filter1.configure_priority_and_sched_fifo( 10, true );
-cnx_filter1.configure_affinity( 2 );
+cnx_filter1.configure_affinity( 3 );
 cnx_filter2.configure_priority_and_sched_fifo( 10, true );
-cnx_filter2.configure_affinity( 3 );
+cnx_filter2.configure_affinity( 4 );
 cnx_filter3.configure_priority_and_sched_fifo( 10, true );
-cnx_filter3.configure_affinity( 4 );
+cnx_filter3.configure_affinity( 1 );
 cnx_filter4.configure_priority_and_sched_fifo( 8, true );
-cnx_filter4.configure_affinity( 4 );
+cnx_filter4.configure_affinity( 2 );
 cnx_filter5.configure_priority_and_sched_fifo( 8, true );
-cnx_filter5.configure_affinity( 4 );
+cnx_filter5.configure_affinity( 3 );
 cnx_filter6.configure_priority_and_sched_fifo( 8, true );
-cnx_filter6.configure_affinity( 0 );
+cnx_filter6.configure_affinity( 4 );
 cnx_filter7.configure_priority_and_sched_fifo( 7, true );
 cnx_filter7.configure_affinity( 0 );
 cnx_filter8.configure_priority_and_sched_fifo( 7, true );

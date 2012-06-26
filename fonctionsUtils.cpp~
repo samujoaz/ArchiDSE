@@ -286,8 +286,8 @@ int NB_COMPONENTDSP(COMPONENTDSP A){if(A == NULL) return 0; return NB_COMPONENTD
 
 void Affiche_CPU(CPU A)
 {
-    cpu *tmp = A; 
-//     tmp = CloneCPU(A);
+    cpu *tmp = new cpu; 
+    tmp = CloneCPU(A);
     while(tmp!=NULL)
     {     
       cout<<"cpu_"<<tmp->indice_CPU<<": "<<tmp->name_cpu<<endl;

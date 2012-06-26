@@ -5,6 +5,8 @@ extern COMPONENTDSP thisComposantsDSP;
 extern COMPONENTCPU thisComposantsCPU;
 extern CPU thisMesCPU;
 extern char **_argv;
+extern float LoadMax;
+extern float LoadMin;
 
 using namespace std;
 
@@ -249,12 +251,12 @@ void GenScriptHistogram(uint nb_cpu)
  ofstream output("hist_all_archi.gnu",ios::trunc);
  output<<"reset\nset yrange [0:100]\nset xrange [-1:]\nset ylabel \"Taux de chargement des CPU (%)\"\n";
  output<<"set label \"Frequence\\n (MHz)\"  at -1,-1 rotate by 0   offset character 0,-0.5, 0\n";
- output<<"set style data histogram\nset style histogram cluster gap 4\nset style fill solid border -1\nset boxwidth 1.0 \n";
- output<<"set xtics border in scale 0,0 nomirror rotate by 90  offset character 1.5,-1, 0\nset xtics  norangelimit font \",7.5\"\n set xtics ( ";
+ output<<"set style data histogram\nset style histogram cluster gap 10\nset style fill solid border -1\nset boxwidth 1.0 \n";
+ output<<"set xtics border in scale 0,0 nomirror rotate by 90  offset character 1.7,-1, 0\nset xtics  norangelimit font \",9\"\n set xtics ( ";
  BufferFreqHisto = BufferFreqHisto.substr(0,BufferFreqHisto.size()-2);
  output<<BufferFreqHisto<<")";
  output<<"\nplot 'all_cpu_hist.dat' using 1 title \"cpu_0\"";
  for(int i=1; i<nb_cpu;i++)
  output<<", '' using "<<i+1<<" title \"cpu_"<<i<<"\"";
- output<<", 85 with lines linecolor rgb \"red\"  title \"Max\", 70 with lines linecolor rgb \"red\" title \"Min\";\npause -1 \n";
+ output<<", "<<LoadMax<<" with lines linecolor rgb \"red\"  title \"Max\", "<<LoadMin<<"  with lines linecolor rgb \"red\" title \"Min\";\npause -1 \n";
 }

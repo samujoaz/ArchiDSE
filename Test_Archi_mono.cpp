@@ -11,7 +11,8 @@
 #include "fonctionsUtils.h"
 #include "generatefile.h"
 #include "regularisation.h"
-
+ float LoadMax;
+ float LoadMin;
 
 
 using namespace std;
@@ -46,19 +47,23 @@ void GenScriptHistogram(uint nb_cpu)
  output<<"\nplot 'mono_archi_hist.dat' using 1:xticlabels(\""<<BufferFreqHisto<<"\") title \"cpu_0\"";
  for(int i=1; i<nb_cpu;i++)
  output<<", '' using "<<i+1<<" title \"cpu_"<<i<<"\"";
- output<<", 85 with lines linecolor rgb \"red\"  title \"Max\", 70 with lines linecolor rgb \"red\" title \"Min\";\npause -1 \n";
+ output<<", "<<LoadMax<<" with lines linecolor rgb \"red\"  title \"Max\", "<<LoadMin<<"  with lines linecolor rgb \"red\" title \"Min\";\npause -1 \n";
 }
 
 int main (int argc,char* argv[])
 {
   uint nb_component=0,nb_cpu;
-  string includeListe[TSIZE], componentListe[TSIZE];    
+  string includeListe[TSIZE], componentListe[TSIZE],tmp;    
 ostringstream convert;
   time_t start,end;
   double dif;
 
-    if (argc == 4 && strcmp(argv[1],"DSE")==0)
+    if (argc == 6 && strcmp(argv[1],"DSE")==0)
     {  
+	tmp =  argv[argc-1];
+        LoadMax=atof(tmp.c_str()); 
+	tmp =  argv[argc-2];
+	LoadMin=atof(tmp.c_str()); 
 	time (&start);
 	string buffer;
 	 size_t pos;	

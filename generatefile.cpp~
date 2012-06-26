@@ -4,7 +4,8 @@
 #include "fonctionsUtils.h"
 
 
-
+extern float LoadMax;
+extern float LoadMin;
 uint TSIZE=100;
 float TableTBC[100];
 uint nbTBC=0;
@@ -921,6 +922,7 @@ void RegenerateCpuFile(CPU MesCPU, string includeListe[],string componentListe[]
   once=true;thisTBC =NULL;
   string ListeName[TSIZE];
   ListeName[n++]="blabla";
+  nbTBC=0;
   for(int j=0;j<nb_cpu;j++)
 	{  
 	  i=0;
