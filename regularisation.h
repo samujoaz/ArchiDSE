@@ -6,7 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
-
+#include <cstdlib>
 
 #include "fonctionsUtils.h"
 #include "generatefile.h"

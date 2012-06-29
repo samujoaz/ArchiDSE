@@ -177,7 +177,7 @@ void GenerateCpuFile(string output,string input,CPU C,string name,string S1, str
 	  pos=line.find("TBC");
 	  if (pos!=-1)
 	  {/// on  va se repositionner au debut de la ligne
-	    inputfile.seekg(-line.size(),ios::cur);
+	    inputfile.seekg((int)(-line.size()),ios::cur);
 	    
 	   while(inputfile>>mot && sortie) 
 	    {
@@ -227,7 +227,7 @@ void GenerateCpuFile(string output,string input,CPU C,string name,string S1, str
 		  sortie=false;
 		}
 	    }
-	    inputfile.seekg(-3*mot.size()+2,ios::cur);	    
+	    inputfile.seekg((int)(-3*mot.size()+2),ios::cur);	    
 	    sortie=true;
 	  }	  
 	  outputfile<<line<<endl;
@@ -286,7 +286,7 @@ uint GenerateCompCpuFile(string input,string output,string includeListe[], strin
 	  pos=line.find("include");
 	    if (pos!=-1)
 	    {/// on  va se repositionner au debut de la ligne.
-	    in1.seekg(-line.size()-1,ios::cur);
+	    in1.seekg((int)(-line.size()-1),ios::cur);
 	    in1>>Stmp;
 	    in1>>Stmp;
 	    pos=line.find("include");
@@ -314,10 +314,10 @@ uint GenerateCompCpuFile(string input,string output,string includeListe[], strin
 		  if (pos!=-1)
 		  {/// on  va se repositionner au debut de la ligne
 		  /// on va récupérer les caractère: sliceX, X étant le numéro.
-		  in2.seekg(-line.size()-1,ios::cur);
+		  in2.seekg((int)(-line.size()-1),ios::cur);
 		  in2>>Stmp;//cout<<Stmp<<endl;
 		  in2>>Stmp;//cout<< Stmp<<endl;
-		  in2>>component_n[i];//cout<<"component : "<<component_n[i]<<endl;
+		  in2>>component_n[i];cout<<"component : "<<component_n[i]<<endl;
 		  componentListe[i]=component_n[i];
 		  in2>>Stmp;//cout<<Stmp<<endl;
 		  Stmp.clear();
@@ -326,6 +326,7 @@ uint GenerateCompCpuFile(string input,string output,string includeListe[], strin
 	      }
 	      in2.close();
 	  }
+	  //e();
 	  nb_affinity=i;i=0;
 		for(i;i<nb_affinity;i++)
 		{
@@ -338,7 +339,7 @@ uint GenerateCompCpuFile(string input,string output,string includeListe[], strin
 		pos=line.find(mot);
 		  if (pos!=-1)
 		  {/// on va récupérer l'affinity qui est en 3ème position de la chaine de mot		
-		  in3.seekg(-line.size()-1,ios::cur);
+		  in3.seekg((int)(-line.size()-1),ios::cur);
 		  in3>>Stmp;
 		  in3>>Stmp;
 		  in3>>affinity[i];//cout<<affinity[i]<<endl;
@@ -455,6 +456,7 @@ uint GenerateCompCpuFile(string input,string output,string includeListe[], strin
      o.close();
      ii.close();*/
     // sleep(1.0);
+    
      return nb_affinity;
      
 }
@@ -488,7 +490,7 @@ void GenerateDspFile(const char *output,string input, COMPONENTDSP C)
 	  pos=line.find("TBC");
 	  if (pos!=-1)
 	  {/// on  va se repositionner au debut de la ligne
-	    inputfile.seekg(-line.size(),ios::cur);
+	    inputfile.seekg((int)(-line.size()),ios::cur);
 	   while(inputfile>>mot && sortie) 
 	    {
 		if((mot.compare("TBC"))==0)
@@ -524,7 +526,7 @@ void GenerateDspFile(const char *output,string input, COMPONENTDSP C)
 		  sortie=false;
 		}
 	    }
-	    inputfile.seekg(-3*mot.size()+2,ios::cur);	    
+	    inputfile.seekg((int)(-3*mot.size()+2),ios::cur);	    
 	    sortie=true;
 	  }	  
 	  outputfile<<line<<endl;
@@ -543,7 +545,7 @@ void GenerateDspFile(const char *output,string input, COMPONENTDSP C)
 void ReadCompositionFile(char * compositionfile)
 {
   uint nb_ligne=0,nb_file=0;
-  string line, filename,tmp; 
+  string line, filename,tmp,tmp2; 
 
   char dir[100];
   char outputcomposition[100];
@@ -559,7 +561,7 @@ void ReadCompositionFile(char * compositionfile)
   {
     
     uint freq=0, taille=0,assoc=0,bpl=0;
-    uint indice_cpu=0,indice_cacheL1=0,indice_cacheL2=0,indice_dsp=0;
+    uint indice_cpu=0,indice_cacheL1=0,indice_cacheL2=0,indice_dsp=0,indice;
     
     while(listing_file>>line){ /// on lit mot par mot le fichier et on instantie les composants
       
@@ -570,34 +572,43 @@ void ReadCompositionFile(char * compositionfile)
 	if(line=="PU")
 	{
 	    listing_file>>line;
+	    tmp= line.substr(line.size()-1,line.size());
+	    indice_cpu = atoi(tmp.c_str());
 	    listing_file>>filename;
 	    listing_file>>freq;
-	    MonCpu=ADD_CPU(MonCpu,filename,freq);
+	    MonCpu=ADD_CPU(MonCpu,filename,freq,indice_cpu);
 	}
 	else{
 	    if(line=="CACHE")
 	    {
 	      listing_file>>line;
-	      tmp = line.substr(0,line.size()-2);	      	      
+	      tmp = line.substr(0,line.size()-2);
+	      tmp2= line.substr(line.size()-1,line.size());
+	      indice= atoi(tmp2.c_str());
 	      listing_file>>taille;
 	      listing_file>>assoc;
 	      listing_file>>bpl;
-	      if(tmp =="L1") MesCacheL1=ADD_CACHE(MesCacheL1,taille,assoc,bpl);
-	      else {if(tmp =="L2") MesCacheL2=ADD_CACHE(MesCacheL2,taille,assoc,bpl);}
+	      if(tmp =="L1") MesCacheL1=ADD_CACHE(MesCacheL1,taille,assoc,bpl,indice);
+	      else {if(tmp =="L2") MesCacheL2=ADD_CACHE(MesCacheL2,taille,assoc,bpl,indice);}
+	     
 	    }
 	    else{
 	      if(line =="DSP")
 	      {
 		listing_file>>line;
+		tmp= line.substr(line.size()-1,line.size());
+		indice_dsp = atoi(tmp.c_str());
 		listing_file>>filename;
 		listing_file>>freq;
-		MonDsp=ADD_DSP(MonDsp,filename,freq);
+		MonDsp=ADD_DSP(MonDsp,filename,freq,indice_dsp);
 	      }
 	    }
 	}
 	
-      }/// end if component
+      }/// end if component 
+      
       else{
+	
 	  if(line =="connection")
 	  {
 	      listing_file>>line;
@@ -611,8 +622,10 @@ void ReadCompositionFile(char * compositionfile)
 		if(tmp=="L1_")
 		{
 		  indice_cacheL1=atoi(line.substr(tmp.size(),line.size()).c_str());
-		  MesComposantsCPU = ADD_COMPONENTCPU(MesComposantsCPU,AccessToCPU(MonCpu,indice_cpu),AccessToCACHE(MesCacheL1,indice_cacheL1),indice_cacheL1,indice_cpu,"cpu");
-		  
+		  cacheL1_tmp = FindCACHE(MesCacheL1,indice_cacheL1);
+		  cpu_tmp = FindCPU(MonCpu,indice_cpu);
+		  MesComposantsCPU = ADD_COMPONENTCPU(MesComposantsCPU,cpu_tmp,cacheL1_tmp,cacheL1_tmp->indice_cache,cpu_tmp->indice_CPU,"cpu");
+		 
 		  //thisComposantsCPU = ADD_COMPONENTCPU(thisComposantsCPU,AccessToCPU(MonCpu,indice_cpu),AccessToCACHE(MesCacheL1,indice_cacheL1),indice_cacheL1,indice_cpu,"cpu");
 		}
 	      }
@@ -624,14 +637,16 @@ void ReadCompositionFile(char * compositionfile)
 		    listing_file>>line;
 		    tmp=line.substr(0,line.size()-1);
 		      if(tmp=="L1_")
-		      {			
+		      {				
 			indice_cacheL1=atoi(line.substr(tmp.size(),line.size()).c_str());
-			MesComposantsDSP = ADD_COMPONENTDSP(MesComposantsDSP,AccessToDSP(MonDsp,indice_dsp),AccessToCACHE(MesCacheL1,indice_cacheL1),indice_cacheL1,indice_dsp,"dsp");
+			dsp_tmp = FindDSP(MonDsp,indice_dsp);
+			cacheL1_tmp = FindCACHE(MesCacheL1,indice_cacheL1);
+			MesComposantsDSP = ADD_COMPONENTDSP(MesComposantsDSP,dsp_tmp,cacheL1_tmp,cacheL1_tmp->indice_cache,dsp_tmp->indice_DSP,"dsp");
 		      }
 		}
 	      else{
 		if(tmp=="L1_")
-		{
+		{ 
 		  indice_cacheL1=atoi(line.substr(tmp.size(),line.size()).c_str());
 		  listing_file>>line;
 		  listing_file>>line;
@@ -639,16 +654,17 @@ void ReadCompositionFile(char * compositionfile)
 		  if(tmp=="L2_")
 		  {
 		      indice_cacheL2=atoi(line.substr(tmp.size(),line.size()).c_str());
-		      cacheL1_tmp=AccessToCACHE(MesCacheL1,indice_cacheL1);
-		      cacheL2_tmp=AccessToCACHE(MesCacheL2,indice_cacheL2);
+		      cacheL1_tmp=FindCACHE(MesCacheL1,indice_cacheL1);
+		      cacheL2_tmp=FindCACHE(MesCacheL2,indice_cacheL2);
 		      
 		      if(GetNamelinkCache(cacheL1_tmp) =="dsp"){
-		      CompoDSP_temp=AccessToCOMPONENTDSP(MesComposantsDSP,GetLinkCacheL1DSP(MesComposantsDSP,indice_cacheL1));
+		      CompoDSP_temp=AccessToCOMPONENTDSP(MesComposantsDSP,GetLinkCacheL1DSP(MesComposantsDSP,cacheL1_tmp->indice_cache));
 		      ADD_CACHE_L2_TO_COMPONENTDSP(CompoDSP_temp,cacheL2_tmp);
+		      
 		      }
 		      else{
 			if(GetNamelinkCache(cacheL1_tmp) =="cpu"){
-			CompoCPU_temp=AccessToCOMPONENTCPU(MesComposantsCPU,GetLinkCacheL1CPU(MesComposantsCPU,indice_cacheL1));
+			CompoCPU_temp=AccessToCOMPONENTCPU(MesComposantsCPU,GetLinkCacheL1CPU(MesComposantsCPU,cacheL1_tmp->indice_cache));
 			ADD_CACHE_L2_TO_COMPONENTCPU(CompoCPU_temp,cacheL2_tmp);
 			}
 		      }
@@ -826,7 +842,7 @@ int getAffinityOf(string inputfile, string componentname)
 	pos=line.find(tmp);
 	  if (pos!=-1)
 	  {
-	    read.seekg(-line.size()-1,ios::cur);
+	    read.seekg((int)(-line.size()-1),ios::cur);
 	    read>>tmp;
 	    read>>tmp;
 	    read>>ret;
@@ -919,8 +935,8 @@ void RegenerateCpuFile(CPU MesCPU, string includeListe[],string componentListe[]
   cpu_tmp  = CloneCPU(MesCPU);
   nb_cpu=NB_CPU(CloneCPU(MesCPU));
   once=true;thisTBC =NULL;
-  string ListeName[TSIZE];
-  ListeName[n++]="blabla";
+  //string ListeName[TSIZE];
+  //ListeName[n++]="blabla";
   nbTBC=0;
   for(int j=0;j<nb_cpu;j++)
 	{  
@@ -953,4 +969,5 @@ void RegenerateCpuFile(CPU MesCPU, string includeListe[],string componentListe[]
 
 }
 
+// void getConnexionThread(string filename )
 

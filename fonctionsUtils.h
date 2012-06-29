@@ -29,6 +29,7 @@ typedef struct cache{
   uint taille;
   uint associativity;
   uint bpl;
+  uint indice_cache;
   string namelink;
   struct cache *next;
   }cache;
@@ -65,10 +66,13 @@ typedef struct componentdsp{
 typedef componentdsp *COMPONENTDSP;
 
 CPU FindCPU(CPU mon_cpu, uint indice);
+CACHE FindCACHE(CACHE mon_cache, uint indice);
+DSP FindDSP(DSP mon_dsp, uint indice);
 
-CPU ADD_CPU(CPU mon_cpu, string name,uint freq);
-DSP ADD_DSP(DSP mon_dsp, string name,uint freq);
-CACHE ADD_CACHE(CACHE ma_cache,uint taille, uint assoc, uint bpl);
+
+CPU ADD_CPU(CPU mon_cpu, string name,uint freq, uint indice);
+DSP ADD_DSP(DSP mon_dsp, string name,uint freq, uint indice);
+CACHE ADD_CACHE(CACHE ma_cache,uint taille, uint assoc, uint bpl,uint indice);
 COMPONENTCPU ADD_COMPONENTCPU(COMPONENTCPU my_component,CPU mon_cpu,CACHE ma_cache,uint indice_cache,uint indice_cpu, string link);
 COMPONENTDSP ADD_COMPONENTDSP(COMPONENTDSP my_component,DSP mon_dsp,CACHE ma_cache, uint indice_cache,uint indice_dsp, string link);
 void ADD_CACHE_L2_TO_COMPONENTCPU(COMPONENTCPU my_component,CACHE L2);

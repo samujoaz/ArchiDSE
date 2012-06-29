@@ -9,6 +9,7 @@
 #include <fstream>
 #include <sstream>
 
+#include <cstdlib>
 #include "fonctionsUtils.h"
 #include "regularisation.h"
 

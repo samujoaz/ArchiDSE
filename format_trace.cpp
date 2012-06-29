@@ -10,6 +10,11 @@
 #include <stdlib.h>
 #include <string.h>
  
+//#include <unistd.h>
+//#include <sys/stat.h>
+//#include <sys/types.h>
+
+#include <cstdlib>
 using namespace std;
 
 bool my_vector_sort(vector < double >i, vector < double >j)
@@ -375,11 +380,15 @@ int main(int argc, char **argv)
 
     string CPU_PATH;
     char c[100];    
-    
+   string cmd; 
     uint l_argc = argc-1;
-    //cout <<"argc "<<argc<<endl;sleep(3);
-    sprintf(c,"mkdir cpuloadfile%s",argv[l_argc]);
-    system(c);
+  //  cout <<"argc "<<argc<<endl;sleep(3); exit(0);
+    sprintf(c,"mkdir  cpuloadfile%s",argv[l_argc]);
+	cmd =c;
+    if(system(c)!=-1){ cout<< "okay system"<<endl; }
+else{ cout <<"probleme de la commande system("<<c<<")"<<endl; exit(0);}
+   
+ 
      sprintf(c,"cpuloadfile%s/cpuload.txt",argv[l_argc]);
     //CPU_PATH = c+ "/cpuload.txt";
     ofstream outputcpuload(c);

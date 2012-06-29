@@ -702,7 +702,7 @@ int getSpeedTickTimer(string input)
 	if (pos!=-1)
 	{/// on  va se repositionner au debut de la ligne
 // 	cout<<line<<endl;
-	    inputfile.seekg(-line.size()-1,ios::cur);
+	    inputfile.seekg((int)(-line.size()-1),ios::cur);
 	    inputfile>>mot; 
 // 	    cout<<mot<<endl;
 	    while(mot.compare("\n")!=0 && i++<9)
@@ -729,6 +729,7 @@ int getSpeedTickTimer(string input)
 	if(nanoseconde>=600000000 && nanoseconde<1000000000) return IS_HIGH;
 	if(nanoseconde>=400000000 && nanoseconde<600000000) return IS_MEDIUM;
 	if(nanoseconde<400000000) return IS_LOW;
+	
       }
 
 }
