@@ -251,7 +251,7 @@ void GenScriptHistogram(uint nb_cpu)
  ofstream output("hist_all_archi.gnu",ios::trunc);
  output<<"reset\nset yrange [0:100]\nset xrange [-1:]\nset ylabel \"Taux de chargement des CPU (%)\"\n";
  output<<"set label \"Frequence\\n (MHz)\"  at -1,-1 rotate by 0   offset character 0,-0.5, 0\n";
- output<<"set style data histogram\nset style histogram cluster gap 10\nset style fill solid border -1\nset boxwidth 1.0 \n";
+ output<<"set style data histogram\nset style histogram cluster gap 4 \nset style fill solid border -1\nset boxwidth 1.0 \n";
  output<<"set xtics border in scale 0,0 nomirror rotate by 90  offset character 1.7,-1, 0\nset xtics  norangelimit font \",9\"\n set xtics ( ";
  BufferFreqHisto = BufferFreqHisto.substr(0,BufferFreqHisto.size()-2);
  output<<BufferFreqHisto<<")";

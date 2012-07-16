@@ -1,0 +1,24 @@
+
+component filter_comp_cpu_0 
+{ 
+  provides Runnable input;
+  uses Runnable output;
+};
+
+behaviour filter_behaviour_cpu_0 of filter_comp_cpu_0
+{
+  input.run 
+  {
+    (1) 1 { output.run }
+  }  
+};
+
+characteristics( Architecture_parameters ) filter_timing_characs_cpu_0 of filter_behaviour_cpu_0
+{
+  input.run
+  {
+    (1) { 13.6198 0 } [ 8500000 1635056 823677 1500 3470 1247 30 817 411 ]
+}
+
+};
+

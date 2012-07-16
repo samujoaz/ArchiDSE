@@ -1,0 +1,103 @@
+dans le dossier: cpuloadfile0/
+mean CPU0: 98.0617	Frequence du cpu: 350 Mhz
+mean CPU1: 0	Frequence du cpu: 350 Mhz
+mean CPU2: 0	Frequence du cpu: 350 Mhz
+mean CPU3: 0	Frequence du cpu: 350 Mhz
+mean CPU4: 0	Frequence du cpu: 0 Mhz
+*****
+dans le dossier: cpuloadfile1/
+mean CPU0: 98.1232	Frequence du cpu: 350 Mhz
+mean CPU1: 0	Frequence du cpu: 350 Mhz
+mean CPU2: 0	Frequence du cpu: 350 Mhz
+mean CPU3: 0	Frequence du cpu: 350 Mhz
+*****
+dans le dossier: cpuloadfile2/
+mean CPU0: 98.1274	Frequence du cpu: 350 Mhz
+mean CPU1: 0	Frequence du cpu: 350 Mhz
+mean CPU2: 0	Frequence du cpu: 350 Mhz
+mean CPU3: 0	Frequence du cpu: 350 Mhz
+*****
+dans le dossier: cpuloadfile3/
+mean CPU0: 97.8836	Frequence du cpu: 350 Mhz
+mean CPU1: 32.8342	Frequence du cpu: 350 Mhz
+mean CPU2: 0	Frequence du cpu: 350 Mhz
+mean CPU3: 0	Frequence du cpu: 350 Mhz
+*****
+dans le dossier: cpuloadfile4/
+mean CPU0: 97.8959	Frequence du cpu: 350 Mhz
+mean CPU1: 32.713	Frequence du cpu: 350 Mhz
+mean CPU2: 0	Frequence du cpu: 350 Mhz
+mean CPU3: 0	Frequence du cpu: 350 Mhz
+*****
+dans le dossier: cpuloadfile5/
+mean CPU0: 97.8681	Frequence du cpu: 350 Mhz
+mean CPU1: 98.1081	Frequence du cpu: 350 Mhz
+mean CPU2: 0	Frequence du cpu: 350 Mhz
+mean CPU3: 0	Frequence du cpu: 350 Mhz
+*****
+dans le dossier: cpuloadfile6/
+mean CPU0: 97.9171	Frequence du cpu: 350 Mhz
+mean CPU1: 82.3282	Frequence du cpu: 450 Mhz
+mean CPU2: 0	Frequence du cpu: 350 Mhz
+mean CPU3: 0	Frequence du cpu: 350 Mhz
+*****
+dans le dossier: cpuloadfile7/
+mean CPU0: 97.9278	Frequence du cpu: 350 Mhz
+mean CPU1: 78.3549	Frequence du cpu: 450 Mhz
+mean CPU2: 0	Frequence du cpu: 350 Mhz
+mean CPU3: 0	Frequence du cpu: 350 Mhz
+*****
+dans le dossier: cpuloadfile8/
+mean CPU0: 97.9442	Frequence du cpu: 350 Mhz
+mean CPU1: 82.3204	Frequence du cpu: 450 Mhz
+mean CPU2: 0	Frequence du cpu: 350 Mhz
+mean CPU3: 0	Frequence du cpu: 350 Mhz
+*****
+dans le dossier: cpuloadfile9/
+mean CPU0: 97.8158	Frequence du cpu: 350 Mhz
+mean CPU1: 82.0939	Frequence du cpu: 450 Mhz
+mean CPU2: 72.9447	Frequence du cpu: 350 Mhz
+mean CPU3: 0	Frequence du cpu: 350 Mhz
+*****
+dans le dossier: cpuloadfile10/
+mean CPU0: 97.9499	Frequence du cpu: 350 Mhz
+mean CPU1: 82.2813	Frequence du cpu: 450 Mhz
+mean CPU2: 72.9426	Frequence du cpu: 350 Mhz
+mean CPU3: 0	Frequence du cpu: 350 Mhz
+*****
+dans le dossier: cpuloadfile11/
+mean CPU0: 97.9416	Frequence du cpu: 350 Mhz
+mean CPU1: 82.1322	Frequence du cpu: 450 Mhz
+mean CPU2: 72.9539	Frequence du cpu: 350 Mhz
+mean CPU3: 0	Frequence du cpu: 350 Mhz
+*****
+dans le dossier: cpuloadfile12/
+mean CPU0: 97.9509	Frequence du cpu: 350 Mhz
+mean CPU1: 82.3759	Frequence du cpu: 450 Mhz
+mean CPU2: 72.9841	Frequence du cpu: 350 Mhz
+mean CPU3: 0	Frequence du cpu: 350 Mhz
+*****
+dans le dossier: cpuloadfile13/
+mean CPU0: 97.9348	Frequence du cpu: 350 Mhz
+mean CPU1: 82.3082	Frequence du cpu: 450 Mhz
+mean CPU2: 72.782	Frequence du cpu: 350 Mhz
+mean CPU3: 72.7869	Frequence du cpu: 350 Mhz
+*****
+dans le dossier: cpuloadfile14/
+mean CPU0: 97.9346	Frequence du cpu: 350 Mhz
+mean CPU1: 82.3746	Frequence du cpu: 450 Mhz
+mean CPU2: 72.8278	Frequence du cpu: 350 Mhz
+mean CPU3: 72.8367	Frequence du cpu: 350 Mhz
+*****
+dans le dossier: cpuloadfile15/
+mean CPU0: 97.9597	Frequence du cpu: 400 Mhz
+mean CPU1: 82.197	Frequence du cpu: 450 Mhz
+mean CPU2: 72.9567	Frequence du cpu: 350 Mhz
+mean CPU3: 73.8792	Frequence du cpu: 350 Mhz
+*****
+dans le dossier: cpuloadfile16/
+mean CPU0: 97.9437	Frequence du cpu: 450 Mhz
+mean CPU1: 82.2348	Frequence du cpu: 450 Mhz
+mean CPU2: 72.9569	Frequence du cpu: 350 Mhz
+mean CPU3: 73.5189	Frequence du cpu: 350 Mhz
+*****

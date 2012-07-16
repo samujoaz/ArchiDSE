@@ -1,0 +1,54 @@
+
+component coder_comp
+{
+  provides Runnable input10111132;
+  provides Runnable input1051188;
+  provides Runnable input12111132;
+  provides Runnable input1221118;
+
+  uses Runnable output10111132;
+  uses Runnable output1051188;
+  uses Runnable output12111132;
+  uses Runnable output1221118;
+};
+
+behaviour coder_behaviour of coder_comp
+{
+  input10111132.run
+  {
+    (1) 1 { output10111132.run } 
+  }
+  input1051188.run
+  {
+    (1) 1 { output1051188.run } 
+  }
+  input12111132.run
+  {
+    (1) 1 { output12111132.run } 
+  }
+  input1221118.run
+  {
+    (1) 1 { output1221118.run } 
+  }
+};
+
+characteristics( Architecture_parameters ) coder_timing_characs of coder_behaviour
+{
+  input10111132.run
+  {
+    (1) { TBC 0 } [ 56465687 12455392 7523449 1038 10200 22570 589 600 200 ]
+  }
+  input1051188.run
+  {
+    (1) { TBC 0 } [ 5911643 1304010 787663 109 3912 787 62 30 8 ]
+  }
+  input12111132.run
+  {
+    (1) { TBC 0 } [ 56465687 12455392 7523449 1038 10200 22570 589 600 200 ]
+  }
+  input1221118.run
+  {
+    (1) { TBC 0 } [ 3849548 941674 626026 300 2825 626 162 30 7 ]
+  }
+
+};

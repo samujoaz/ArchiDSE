@@ -7,14 +7,104 @@
 
 uint TSIZE=100;
 float TableTBC[100];
-uint nbTBC=0;
+// uint nbTBC=0;
 COMPONENTDSP thisComposantsDSP=NULL;
 COMPONENTCPU thisComposantsCPU=NULL;
 CPU thisMesCPU;
 DSP thisMesDSP;
 LISTE_TBC thisTBC;
+LISTE_TBC thisTBC2;
+GROUP_TBC GroupAffinity;
 bool once =true;
+extern char **_argv;
 
+
+void G_TBC_InitListe(GROUP_TBC *L)
+{
+  if(!G_TBC_estVide(*L)){
+	    G_TBC_InitListe(&((*L)->next));
+	    *L = NULL;
+	} 
+}
+
+bool G_TBC_estVide(GROUP_TBC L)
+{
+if(L == NULL)return true;
+else return false;                        
+} 
+
+void G_TBC_Ajouter(GROUP_TBC *L,int nb_input,int *Liste_affinity,string include_name,string *input_name,string *component_name, string *cnx_name,char *typeAff)
+{
+   Group_TBC *tmp = *L;
+       Group_TBC *nouveau =new Group_TBC;
+       if(nouveau == NULL){
+                  exit(1);
+             }
+             
+       nouveau->nb_input = nb_input;
+       nouveau->include_name=include_name;
+       nouveau->input_name =  new string[nb_input];
+       nouveau->component_name = new string[nb_input];
+       nouveau->cnx_name = new string[nb_input];
+       nouveau->affinity = new int[nb_input];
+       nouveau->TypeAff = new char[nb_input];
+       for(int p=0; p<nb_input;p++)
+       {
+       nouveau->input_name[p] = input_name[p];
+       nouveau->component_name[p]= component_name[p];
+       nouveau->cnx_name[p] = cnx_name[p];
+       nouveau->affinity[p] = Liste_affinity[p];
+       nouveau->TypeAff[p] = typeAff[p];
+       }
+       
+       nouveau->next = NULL;
+       if(G_TBC_estVide(*L)){
+            *L = nouveau;           
+       }
+       else{
+            tmp = *L;
+            while(tmp->next != NULL){
+                 tmp = tmp->next;   
+            }
+            tmp->next = nouveau;
+       }
+}
+
+
+void G_TBC_Afficher(GROUP_TBC L)
+{
+ // ofstream fileTBC("listeTBC.txt",ios::app);
+  //fileTBC<<"liste des valeurs de TBC N°: "<<toto<<endl;
+         Group_TBC *tmp;
+         if(G_TBC_estVide(L)){
+            cout<<"!la liste est vide!" <<endl;           
+         }
+         else{
+	   
+           tmp = CloneG_TBC(L);
+           while(tmp != NULL){
+	      cout<<tmp->include_name << ".txt avec "<< tmp->nb_input<< " input(s) "<<endl;
+	     for(int p=0; p<tmp->nb_input;p++)
+	      {
+               cout<<"(component_name : "<<tmp->component_name[p]<<")\t (cnx_name : "<<tmp->cnx_name[p]<<")\t (input_name : "<<tmp->input_name[p]<<")\t affinity : "<<tmp->affinity[p]<<" TypeAff : "<<tmp->TypeAff[p]<<endl;
+		//fileTBC<<"(val :"<<tmp->valeur<<") (aff :"<<tmp->affinity<<") name :"<<tmp->name<<endl;
+	      }
+                tmp = tmp->next;    
+           }  
+           cout<<endl;
+         }
+     
+      // fileTBC<<"fin de la liste des valeurs de TBC N°: "<<toto++<<endl<<endl<<endl;
+
+ }
+ GROUP_TBC CloneG_TBC(GROUP_TBC mon_tbc)
+{
+  Group_TBC *clone = new Group_TBC;
+  memcpy(&clone,&mon_tbc,sizeof(GROUP_TBC));
+  return clone;
+}
+
+/**                           *************************                         **/
 
 bool TBC_estVide(LISTE_TBC L){
          if(L == NULL){
@@ -51,7 +141,28 @@ void TBC_Ajouter(LISTE_TBC *L,string name,uint affinity,float valeur){
             }
             tmp->next = nouveau;
        }
-     }
+     }  
+     
+void TBC_Ajouter2(LISTE_TBC *L,string name){
+  Liste_TBC *tmp = *L;
+  Liste_TBC *nouveau =new Liste_TBC;
+  if(nouveau == NULL){
+	    exit(1);
+	}
+  nouveau->name = name;
+  nouveau->next = NULL;
+  if(TBC_estVide(*L)){
+      *L = nouveau;           
+  }
+  else{
+      tmp = *L;
+      while(tmp->next != NULL){
+	    tmp = tmp->next;   
+      }
+      tmp->next = nouveau;
+  }
+}  
+
   
  void TBC_Trier(LISTE_TBC *L){
        Liste_TBC *tmp1, *tmp2;
@@ -116,16 +227,254 @@ void TBC_Afficher(LISTE_TBC L)
        fileTBC<<"fin de la liste des valeurs de TBC N°: "<<toto++<<endl<<endl<<endl;
 
  }
-
-
-void GenerateCpuFile(string output,string input,CPU C,string name,string S1, string S2,string S3)
+ 
+int getValAffinity(char x)
 {
+  //int res; 
+  if(int('A') <= int(x) && int(x) <= int('Z'))
+   return AFF_GROUP;
+  else
+  {
+     if(48 <= int(x) && int(x) <= 55)
+     return AFF_FIXE;
+     else
+     {
+	  if(int(x)==int('?'))return AFF_VAR;
+	  else 
+	  {
+	    cout <<"\n Dans la fonction : int getValAffinity(char x)\n erreur(405):\n problème dans la lecture  du fichier de composition" <<endl;
+	    cout <<" une ou plusieurs lignes définissant l'affinité des cpu est ou sont mal formatée(s)\n voir fichier composition.... \n"<<endl;
+	    //exit(405);
+	  }
+     }
+  }
+  
+}
+
+void CalculTBC(GROUP_TBC Liste, CPU MesCPU){
+      Group_TBC *Liste_tmp;
+      string S3;
+      string output,cnx_name, input,  include_name,component_name;
+      CPU cpu_tmp=NULL;
+      char carac[10]; 
+      
+      if(G_TBC_estVide(Liste))
+	{
+	cout<<"Pas de calcul de TBC car la liste est vide" <<endl;           
+	}
+      else
+	{
+	  Liste_tmp = CloneG_TBC(Liste);
+	  while(Liste_tmp != NULL)
+	  {
+	    if(Liste_tmp->nb_input>1)
+	    {
+	      include_name = Liste_tmp->include_name;
+	      S3 = Liste_tmp->component_name[0].substr(include_name.size(),include_name.size());
+	      if(S3.size()>0)sprintf(carac,"_%s",S3.c_str());
+	      else sprintf(carac,"_%d",0); 
+	      input = _argv[2]+include_name+".txt";
+	      output=include_name+carac+".txt";
+	      GenerateCpuFileMultiInput( output, input,MesCPU, Liste,carac);
+	      
+	    }
+	    else
+	    {
+	      if(Liste_tmp->nb_input==1)/// calcul normal comme poour les cas où, l'on avait que les slices, filters...
+	      {/// argv[2] == inputfile/ où le dossier des fichier d'origine
+		  
+		include_name = Liste_tmp->include_name;
+		S3 = Liste_tmp->component_name[0].substr(include_name.size(),include_name.size());
+		if(S3.size()>0)sprintf(carac,"_%s",S3.c_str());
+		else sprintf(carac,"_%d",0); 
+		input = _argv[2]+include_name+".txt";
+		output=include_name+carac+".txt";
+		//cnx_name = Liste_tmp->[0];
+		cpu_tmp = AccessToCPU(MesCPU,Liste_tmp->affinity[0]);
+		GenerateCpuFile(output,input,cpu_tmp, carac);
+			     
+	      }
+	    }
+	   
+	    Liste_tmp = Liste_tmp->next;    
+	  }  
+	  
+	}
+  }
+
+  
+void GenerateCpuFileMultiInput(string output,string input,CPU MesCPU,GROUP_TBC Liste,char *indice){
   ofstream outputfile(output.c_str(),ios::trunc);/// ios::app pour rajouter en fin du fichier ce qu'on veut ecrire 
   ///si on ne veut pas ecraser le fichier dans le cas où il existe déjà
-  string line,mot,indice;
-  char c[100]; 
+  string line,mot;
+  string input_name;
+  string S1="_comp",S2="_behaviour",S3="_timing_characs";
   size_t pos;
-  //string slice1("slice_comp"), slice2("slice_behaviour"), 
+  string stringtemp;
+  uint i=0, fin=1;
+  float T_RWDATA;	//temps passé à lire et écrire des datas
+  float T_Inst;  	//temps passé dans les instructions (ms)
+  float T_Total; 	//temps total
+  float T_OneDATA;  	//ms pour lire ou écrire une data
+  float MissPred;	//MissPred
+  float Pen_L1;  	//penalité pour un miss L1
+  float Pen_L2;  	//penalité pour un miss L2
+  ostringstream oss;
+  bool sortie=true;
+  uint Nb_instr, load, store, instrL1,R_L1_Miss,W_L1_Miss,instrL2,R_L2_Miss,W_L2_Miss;
+  
+  CPU Cpu=NULL;
+
+  if(outputfile)
+  {
+    ifstream inputfile(input.c_str());
+    if(inputfile)
+    {
+      string ListeName[TSIZE];
+     
+     
+      while(getline(inputfile,line)) 
+      {	  	
+	/// si besoin de remplacer une autre chaine rajouter la dans le definition de la fonction 
+	///et utiliser le if ci-dessous pour faire le remplacement. 
+		  pos=line.find(S1);
+		  if(pos<=line.size()) 
+		  {	    
+		    stringtemp =S1+indice;
+		    line.replace(pos,S1.size(),stringtemp);
+		    stringtemp.clear();
+		  }
+		   pos=line.find(S2);
+		  if(pos<=line.size()) 
+		  {	    
+		    stringtemp =S2+indice;
+		    line.replace(pos,S2.size(),stringtemp);
+		    stringtemp.clear();
+		  }
+		  pos=line.find(S3);
+		  if(pos<=line.size()) 
+		  {	    
+		    stringtemp =S3+indice;
+		    line.replace(pos,S3.size(),stringtemp);
+		    stringtemp.clear();
+		  }
+		  fin=0;
+		  pos=line.find("input");
+		 if(pos!=-1) fin=1;
+		  for(int p=0; p < Liste->nb_input && fin ;p++)
+		  {
+		    input_name = Liste->input_name[p];
+		    pos=line.find(input_name);
+		   // cout<<input_name<<endl;
+		    if(pos!=-1 )
+		    {
+		      
+			outputfile<<line<<endl;
+			getline(inputfile,line); 
+			outputfile<<line<<endl;
+			getline(inputfile,line);
+			pos=line.find("TBC");
+			    while (pos!=-1 &&fin)
+			    {/// on  va se repositionner au debut de la ligne
+				inputfile.seekg((int)(-line.size()),ios::cur);
+				fin=0;
+
+				while(inputfile>>mot && sortie) 
+				{
+				/// pour les mutli input
+				if((mot.compare("TBC"))==0)
+				{
+				i=0;
+				while(mot!="[")
+				{
+				inputfile>>mot;
+				if(++i>100){/// si au bout du 100ème caractère lu on ne trouve pas le  crochet on qui l'exécution
+				cout<<--i <<" iterations no '[' found incorrect file or format in : "<<input<<endl; 
+				cout<<"voir fonction : GenerateCpuFileMultiInput(,,,)  exit("<<13<<")"<<endl;
+				exit(13);
+
+				}
+
+				} 
+				while(mot!="]"&&sortie)
+				{
+				Cpu=AccessToCPU(MesCPU,Liste->affinity[p]);
+				inputfile>>Nb_instr;	inputfile>>load;  		inputfile>>store;
+				inputfile>>instrL1;		inputfile>>R_L1_Miss;		inputfile>>W_L1_Miss;
+				inputfile>>instrL2;		inputfile>>R_L2_Miss;		inputfile>>W_L2_Miss;
+
+				T_OneDATA=1.0/(Cpu->work_frequency*1000.0);
+				Pen_L1=10.0/(Cpu->work_frequency*1000.0);
+				Pen_L2=100.0/(Cpu->work_frequency*1000.0);
+				T_Inst=Nb_instr/(Cpu->work_frequency*Cpu->dmips*1000.0)+instrL1*Pen_L1+instrL2*Pen_L2;
+				T_RWDATA=(store+load)*(T_OneDATA)+(R_L2_Miss*Pen_L2+W_L2_Miss*Pen_L2)+(R_L1_Miss*Pen_L1+W_L1_Miss*Pen_L1);
+				MissPred=(77066983.0/(1500*5.0))*Cpu->pipeline*T_OneDATA;
+				T_Total=MissPred+T_RWDATA+T_Inst;
+				//cout<<"TBC = "<<T_Total<<" pour  "<<input<<endl;
+			      
+				inputfile>>mot;
+				oss<<T_Total;
+
+				}		    
+
+				if(pos<=line.size()){ line.replace(pos,3, oss.str());}
+				oss.str(""); oss.clear();
+				sortie=false;
+				}
+
+				}
+				inputfile.seekg((int)(-3*mot.size())+2,ios::cur);	    
+				sortie=true;
+				stringtemp = line;
+				getline(inputfile,line);
+				pos=line.find("TBC");
+				if(pos!=-1 ) 
+				{
+				  fin=1;
+				}
+				outputfile<<stringtemp<<endl;
+				
+				  
+		    
+			    }
+			    
+		    }
+		    
+		  }
+		  
+	  outputfile<<line<<endl;
+      }
+    inputfile.close();
+    }
+    else {
+      cout<<"ERREUR exit("<<11<<"): Impossible d'ouvrir le fichier:"<<input<<endl;
+      cout<<"voir fonction : GenerateCpuFileMultiInput(,,,) "<<endl;
+      exit(11);
+      
+    }
+    
+  }
+  else {
+    cout<<"ERREUR exit("<<12<<"): Impossible d'ouvrir le fichier:"<<output<<endl;
+      cout<<"voir fonction : GenerateCpuFileMultiInput(,,,) "<<endl;
+    exit(12);
+    
+  } 
+//   cout<<"fichier d'entrée "<<input<<endl;
+//        cout<<output<<" \thas been generate2"<<endl;
+      
+   outputfile.close();
+
+}
+
+
+  
+void GenerateCpuFile(string output,string input,CPU C,char *indice){
+  ofstream outputfile(output.c_str(),ios::trunc);/// ios::app pour rajouter en fin du fichier ce qu'on veut ecrire 
+  ///si on ne veut pas ecraser le fichier dans le cas où il existe déjà
+  string line,mot;
+  size_t pos;
+  string S1="_comp",S2="_behaviour",S3="_timing_characs";
   string stringtemp;
   uint i=0;
   float T_RWDATA;	//temps passé à lire et écrire des datas
@@ -138,8 +487,7 @@ void GenerateCpuFile(string output,string input,CPU C,string name,string S1, str
   ostringstream oss;
   bool sortie=true;
   uint Nb_instr, load, store, instrL1,R_L1_Miss,W_L1_Miss,instrL2,R_L2_Miss,W_L2_Miss;
-  sprintf(c,"_cpu_%d",C->indice_CPU);
-  indice=c;
+  
 
   if(outputfile)
   {
@@ -177,7 +525,7 @@ void GenerateCpuFile(string output,string input,CPU C,string name,string S1, str
 	  pos=line.find("TBC");
 	  if (pos!=-1)
 	  {/// on  va se repositionner au debut de la ligne
-	    inputfile.seekg(-line.size(),ios::cur);
+	    inputfile.seekg((int)(-line.size()),ios::cur);
 	    
 	   while(inputfile>>mot && sortie) 
 	    {
@@ -214,12 +562,14 @@ void GenerateCpuFile(string output,string input,CPU C,string name,string S1, str
 		    		    
 
 		    oss<<T_Total;
-		    ListeName[o++]=name;
-		    if(once && notFindName(ListeName,name,o-1))
-		      { 
-			nbTBC++;
-		      TBC_Ajouter(&thisTBC,name,C->indice_CPU,T_Total);
-		      }
+// 		    ListeName[o++]=name;
+		    //if(once && notFindName(ListeName,name,o-1)  )
+		    //  { 
+			//nbTBC++;
+		     // TBC_Ajouter(&thisTBC,name,C->indice_CPU,T_Total);
+		    //cout <<name<<endl;
+		  //  sleep(1.0);
+		    //  }
 		  }		    
 
 		  if(pos<=line.size()){ line.replace(pos,3, oss.str());}
@@ -227,7 +577,7 @@ void GenerateCpuFile(string output,string input,CPU C,string name,string S1, str
 		  sortie=false;
 		}
 	    }
-	    inputfile.seekg(-3*mot.size()+2,ios::cur);	    
+	    inputfile.seekg((int)(-3*mot.size())+2,ios::cur);	    
 	    sortie=true;
 	  }	  
 	  outputfile<<line<<endl;
@@ -248,10 +598,10 @@ void GenerateCpuFile(string output,string input,CPU C,string name,string S1, str
     exit(12);
     
   } 
- // cout<<"fichier d'entrée "<<input<<endl;
-  //    cout<<output<<" \thas been generate"<<endl;
-
-    outputfile.close();
+//   cout<<"fichier d'entrée "<<input<<endl;
+//        cout<<output<<" \thas been generate"<<endl;
+//       sleep(1.0);
+   outputfile.close();
 
 }
 
@@ -260,13 +610,14 @@ void GenerateCpuFile(string output,string input,CPU C,string name,string S1, str
 /// on génrérer le fichier composition 
 /// savoir les includes à mettre on lira les mot après le include.
 /// cette focntion doit retourner n fichier a générer
-uint GenerateCompCpuFile(string input,string output,string includeListe[], string componentListe[] )
+void GenerateCompCpuFile(string input,string output,string includeListe[], string componentListe[],  uint* N_affinity,uint* N_include)
 {
   ofstream outputfile(output.c_str());
-  string ListeFileToGenerate[TSIZE], component_type[TSIZE],component_n[TSIZE];
-  string line,mot,Stmp,S2,S3, behaviour("_behaviour"), carac("_timing_characs");
+  string ListeFileToGenerate[TSIZE], component_type[TSIZE],component_inst[TSIZE];
+  string line,mot,Stmp,S2,S3, behaviour("_behaviour"), carac("_timing_characs"),tmp;
   uint i=0,j=0, fin=0, nb_include=0, nb_component=0,nb_affinity=0,affinity[TSIZE],count=0;
   size_t pos;
+  bool  go=true;
   char c[TSIZE];
    
 
@@ -279,185 +630,319 @@ uint GenerateCompCpuFile(string input,string output,string includeListe[], strin
     ifstream in1(input.c_str());
     if(in1)
     {
+      for(int r=0 ; r<TSIZE; r++) affinity[r]=0;
       i=0;
-      /// lecture des includes pour savoir les fichiers a ouvrir
+      /// lecture des includes pour savoir les fichiers à ouvrir
       	while(getline(in1,line) && fin<10) /// si au out de 15 itérations on ne trouve plus d'include on arrete de chercher
 	{	    
 	  pos=line.find("include");
 	    if (pos!=-1)
 	    {/// on  va se repositionner au debut de la ligne.
-	    in1.seekg(-line.size()-1,ios::cur);
+	    in1.seekg((int)(-line.size()-1),ios::cur);
 	    in1>>Stmp;
 	    in1>>Stmp;
 	    pos=line.find("include");
 	    if (pos!=-1)
 	    ListeFileToGenerate[i] = Stmp.substr(0,Stmp.size()-1);
-	    
+	    //cout<<ListeFileToGenerate[i]<<endl;
 	    Stmp.clear();
 	    i++;
 	    }
 	    else fin++;
 	}
+	
 	in1.close();
-	  nb_include=i;
-	  fin=0;
-	  i=0;
+	nb_include=i;
+	fin=0;
+	i=0;
+	  
 	  for(j=0; j<nb_include;j++)
 	  {
-	    
 	    S2=ListeFileToGenerate[j].substr(0,ListeFileToGenerate[j].size()-4)+behaviour;
-	   // cout<<S2<<endl;
 	    ifstream in2(input.c_str());
+	    
 	      while(getline(in2,line)) 
 	      {	    
 		pos=line.find(S2);
 		  if (pos!=-1)
 		  {/// on  va se repositionner au debut de la ligne
 		  /// on va récupérer les caractère: sliceX, X étant le numéro.
-		  in2.seekg(-line.size()-1,ios::cur);
+		  in2.seekg((int)(-line.size()-1),ios::cur);
 		  in2>>Stmp;//cout<<Stmp<<endl;
 		  in2>>Stmp;//cout<< Stmp<<endl;
-		  in2>>component_n[i];//cout<<"component : "<<component_n[i]<<endl;
-		  componentListe[i]=component_n[i];
+		  in2>>component_inst[i];//cout<<"component : "<<component_inst[i]<<endl;
+		  componentListe[i]=component_inst[i];
 		  in2>>Stmp;//cout<<Stmp<<endl;
 		  Stmp.clear();
 		  i++;
 		  } 
 	      }
+	      
 	      in2.close();
 	  }
-	  nb_affinity=i;i=0;
-		for(i;i<nb_affinity;i++)
-		{
-		  	  ifstream in3(input.c_str());
+	   string ListeName[TSIZE], inputName[TSIZE]; char typeAffinity[TSIZE];
+	   uint incr=0;
 
-	      while(getline(in3,line) && i<nb_affinity) /// Deuxième lecture
+	  nb_component=i;i=0; /// penser à changer nb_aff en nb_fichier a créér
+	  j=0;
+	  ifstream in3(input.c_str());uint o=0;
+// 	  for(i;i<nb_component;i++)
+// 	  {
+	    go=true;
+	    S2="cnx_";
+	    ListeName[o++]="init";
+	    while(getline(in3,line) && go ) /// Deuxième lecture
 	      {
-		
-		mot="cnx_"+component_n[i]+".configure_affinity(";
-		pos=line.find(mot);
-		  if (pos!=-1)
-		  {/// on va récupérer l'affinity qui est en 3ème position de la chaine de mot		
-		  in3.seekg(-line.size()-1,ios::cur);
-		  in3>>Stmp;
-		  in3>>Stmp;
-		  in3>>affinity[i];//cout<<affinity[i]<<endl;
-		  in3>>Stmp;
-		  Stmp.clear();
+		//mot=component_inst[i];
+		pos=line.find("connection");
+		if (int(pos)!=-1)
+		{
+// 		    mot=S2+mot;
+// 		    pos=line.find(mot);
+// 		    if(int(pos)!=-1)
+// 		    {
+		      mot=".input";
+		      pos=line.find(mot);
+		       if(int(pos)!=-1)
+		       {
+			  in3.seekg((int)(-line.size()-1),ios::cur);
+			  in3>>Stmp;
+			  in3>>Stmp;
+			  in3>>Stmp;
+			  in3>>Stmp;
+			  in3>>Stmp;
+			  in3>>Stmp;
+			  ListeName[o++]=Stmp;
+			  if( notFindName(ListeName,Stmp,o-1))
+			  {
+			    inputName[incr++]=Stmp.substr(0,(int)(Stmp.size()-1));
+			    //cout <<inputName[incr-1]<<endl;
+			    //cout<<line<<endl;
+			  }
+		       }
+		      
+		    }
+		  
+		    mot=".configure_affinity(";
+		    pos=line.find(mot);
+		      if (int(pos)!=-1)
+		      {/// on va récupérer l'affinity qui est en 3ème position de la chaine de mot	
+		      in3.seekg((int)(-line.size()-1),ios::cur);
+		      in3>>Stmp;
+		      in3>>Stmp;
+		      char carac_temp; 
+		      
+		      S3=Stmp.substr(int(S2.size()),int(Stmp.size()-S2.size()-mot.size()));
+// 		      in3>>affinity[j];//cout<<affinity[j]<<endl; 
+		      in3>>carac_temp;
+		      Stmp=carac_temp;
+// 		      cout<<carac<<endl;
+		      if(getValAffinity(carac_temp)==AFF_FIXE) affinity[j]=atoi(Stmp.c_str());
+			else affinity[j]=0;
+		      
+		      ListeName[o++]=S3;
+		      if( notFindName(ListeName,S3,o-1))
+		      {
+			typeAffinity[j]=carac_temp;
+			component_type[j]=S3; //cout<<component_type[j]<<endl;
+		      //componentListe[j]=S3;/// remplacer par component type
+// 			if(once) {TBC_Ajouter2(&thisTBC,S3);nbTBC++;}
+			j++;
+		      }
+		      in3>>Stmp;
+		      		      
+		      }
+		      
+// 		}		   
+// 		else 
+// 		{
+		  pos=line.find("t1.start.run");
+		  if(pos !=-1) 
+		  {
+		    in3.seekg(int(0),ios::beg);
+		    go =false;
 		  }
+// 		}
 	      }
-	     in3.close(); 
+// 	  } 
+// 	  cout << incr<<" == "<<j<<endl;
+//  	  e(); coucou();
+	  in3.close();
+	  nb_affinity=j;
+	  if(once)/// cette partie est faite une seule fois, tout au début de l'algo.
+	  {
+	 /// construction de la liste des affinités, utilisation de component_type, affinity, inputName
+	    for(i=0;i<nb_component;i++)
+	    {
+	      int nb_input=0,Liste_affinity[TSIZE];
+	      string include_name,input_name[TSIZE],cnx_name[TSIZE],component_name[TSIZE]; char typeAffinity_[TSIZE];
+	      fin=1;
+	      for(j=0; j<nb_include && fin;j++)
+		{
+		  S2=ListeFileToGenerate[j].substr(0,ListeFileToGenerate[j].size()-4);
+		  S3=component_inst[i].substr(0,S2.size()); 
+		  if(S3.compare(S2)==0){fin=0; include_name=S2;}
+		}
+		//cout<<include_name<<endl;
+	      
+	      for(int p = 0; p<incr  ;p++)
+	      {
+	      
+		S3=inputName[p].substr(0,component_inst[i].size());/// on enlève le .inputXXX
+		if(S3.compare(component_inst[i])==0  )
+		{
+		S2=inputName[p].substr((int)(component_inst[i].size()+1),(int)(inputName[p].size())); 
+		pos=S2.find(".");/// pour eviter les cas déjà fait ou pas correct 
+		if(pos==-1)
+		{
+		  input_name[nb_input]=S2;
+		  cnx_name[nb_input]=component_type[p];
+		  Liste_affinity[nb_input]=affinity[p];
+		  typeAffinity_[nb_input]=typeAffinity[p];
+		  component_name[nb_input]=S3;
+		  nb_input++;
+		}		
+		}
+			
+	      }
+	      G_TBC_Ajouter(&GroupAffinity,nb_input,Liste_affinity,include_name,input_name,component_name,cnx_name,typeAffinity_);
+	      }
 	  }
 	  Stmp.clear();
-
-	   /// maintenant rajoutons les extensions..
-	   i=0;
-	   fin=1;
-	   ifstream in4(input.c_str());
-	  
-	      	   fin=1;
-	      while(getline(in4,line)&&fin) ///  lecture des qu'on arrive au premier include
+	   /// maintenant rajoutons les extensions.. pour les includes : 
+	  i=0;
+	  ifstream in4(input.c_str());
+	  fin=1;
+// 	  string SaveListeName[TSIZE];
+// 	  int id_listeName=0;
+	  *N_include=0;
+	  while(getline(in4,line)&&fin) ///  lecture des qu'on arrive au premier include
+	  {
+		
+	      if(line.find("component")!=-1){fin=0;}
+	      for(j=0;j<nb_include ;j++)
 	      {
-		string ListeName[TSIZE];
-// 		cout<<"nb_include "<<nb_include<<endl;
-		for(j=0;j<nb_include;j++)
-		{
 		 uint o=0;
-
-		    pos=line.find(ListeFileToGenerate[i]);
+		      S2=ListeFileToGenerate[j].substr(0,ListeFileToGenerate[j].size()-4);
+		      pos=line.find(S2);
 		      if(pos!=-1) 
 		      {
-			for(i=j;i<nb_affinity;i++)
-			{
-			  ListeName[o++]="init";
-			  S2=ListeFileToGenerate[j].substr(0,ListeFileToGenerate[j].size()-4);
-			  S3=component_n[i].substr(0,S2.size());
-			    
+			  for(i=0;i<nb_component && fin ;i++)
+			  {
+			    S3=component_inst[i].substr(0,S2.size());
 			    if(S3.compare(S2)==0 )
 			    {
-			      component_type[i]=S2;
-			      sprintf(c,"_cpu_%d",affinity[i]);
-			      includeListe[i]=S2+c+".txt";
-			      ListeName[o++]=includeListe[i];
-			      if( notFindName(ListeName,includeListe[i],o-1))
-			      {
-				Stmp =Stmp+"include "+S2+c+".txt;\n";
-				
-			      }
+				S3 = component_inst[i].substr(S2.size(),S2.size());
+				if(S3.size()>0)sprintf(c,"_%s.txt",S3.c_str());
+				else sprintf(c,"_%d.txt",0);
+
+				includeListe[i]=S2+c;
+				count++;
+
+				Stmp =Stmp+"include "+S2+c+";\n";
+			      
 			    }
-			 }
-			 fin=0;
-			 //cout<<"Stmp \n"<<Stmp<<endl;
-		      line.replace(0,line.size(),Stmp);
-		      Stmp.clear();
-		      outputfile<<line<<endl;
-		    }
-		   
-		    
-	      }
+			  }
+			  
+			    
+			  if((int)(Stmp.size())>1)
+			  {
+			    Stmp= Stmp.substr(0,(int)(Stmp.size()-1));
+			    outputfile<<Stmp<<endl;  /// on ecrit dans le fichier composition de sortie
+			  }
+			  
+			  Stmp.clear();	
+			
+		      }
+		 
+	      } 
 	  }
+
+	  *N_include = count;
+/// on va ecrire la suite du fichier de composition de sortie 
 	  in4.close();
 	  i=0;
 	  fin=1;
+	  j=0;
+	  int l_prec=0;
 	  ifstream in5(input.c_str());
-	  while(getline(in5,line)){
-	   fin=1;
+	  while(getline(in5,line) ){
+	    pos=line.find("timer");if (pos!=-1 && fin){  outputfile<<line<<endl; fin=0;}
+	    
 	    pos=line.find("component_instance");
 	    if (pos!=-1)
 	    {
-	      for(i=0;i<nb_affinity && fin;i++)
+	      
+	      for(int  l=0;l<nb_include;l++)
 	      {
-	      S2=component_n[i]+" "+component_type[i]+carac;
-	      pos=line.find(S2);
+		  tmp=ListeFileToGenerate[l].substr(0,ListeFileToGenerate[l].size()-4);
+		  for(i=0;i<nb_component;i++)
+		  {
+		      S2=component_inst[i]+ " " +tmp+carac;
+		      pos=line.find(S2);
 		      if (pos!=-1)
 		      {
-			sprintf(c,"_cpu_%d",affinity[i]);
+			S3 = component_inst[i].substr(tmp.size(),tmp.size());
+			if(S3.size()>0)sprintf(c,"_%s",S3.c_str());
+			else sprintf(c,"_%d",0);
 			Stmp= S2+c;
-			line.replace(pos,S2.size(),Stmp);
-			Stmp.clear();
-			S2=component_type[i]+behaviour;
+			S3= line;
+			S3.replace(pos,S2.size(),Stmp);
+			S2=tmp+behaviour;
 			pos=line.find(S2);
-			    if (pos!=-1)
-			    {
-			      sprintf(c,"_cpu_%d",affinity[i]);
-			      Stmp= S2+c;
-			      line.replace(pos,S2.size(),Stmp);
-			      Stmp.clear();
-			      fin=0;
-			    }
+			if (pos!=-1)
+			{
+			  
+			  Stmp= S2+c;
+			  S3.replace(pos,S2.size(),Stmp);
+			    outputfile<<S3<<endl;
+			}
+			
 		      }
-	      }
-	      outputfile<<line<<endl;
-
-	    }
+		  }// for(i=0;i<nb_component;i++)
+	      }// end for(int  l=0;l<nb_include;l++) ///
+ 	    }// end if  pos=line.find("component_instance");  if (pos!=-1)
 	    else
-	    {
-	      pos=line.find("include");
-	      if (pos==-1)  outputfile<<line<<endl;
+	    {	      
+	      S2="configure_affinity(";
+	      pos=line.find(S2);
+	      if (pos!=-1)
+	      {	
+		  in5.seekg((int)(-line.size()-1),ios::cur);
+		  in5>>Stmp;
+		  in5>>Stmp;
+		  char carac;
+		  in5>>carac;
+		  if(getValAffinity(carac)!=AFF_FIXE){line.replace((int)(pos+S2.size()+1),1,"0");}
+		  outputfile<<line<<endl;
+		  in5>>Stmp;
+		  in5.seekg((int)(1),ios::cur);	/// repositionnement fin de ligne;
+			    
+	      }
+	      else
+	      {
+		pos=line.find("include");
+		if (pos==-1){  outputfile<<line<<endl; }
+	      }
 	      
 	    } 
 	  }
 	  in5.close();
 
-      //cout<<nb_include<<" include(s) dans le fichier : "<<input<<endl;
-      cout<<nb_affinity<<" fichier(s) à créer."<<endl;
+//        cout<<nb_include<<" include(s) dans le fichier : "<<input<<endl;
+//        cout<<nb_affinity<<" fichier(s) à créer."<<endl;
     }
     else {
       cout<<"ERREUR exit("<<10<<"): Impossible d'ouvrir le fichier:"<<input<<endl;
       cout<<"voir fonction : GenerateCompCpuFile(,,,)"<<endl;
       exit(10);}
     
-     // cout<<output<<" \thas been generate"<<endl;
-    /* ifstream ii(input.c_str());
-     ofstream o("copiecomposition.txt");
-     while(getline(ii,line)) o<<line<<endl;
-     
-     o.close();
-     ii.close();*/
-    // sleep(1.0);
-     return nb_affinity;
-     
+      cout<<output<<" \thas been generate"<<endl;
+  //   return nb_affinity;
+  *N_affinity =nb_affinity;
+  
 }
+
 
 
 void GenerateDspFile(const char *output,string input, COMPONENTDSP C)
@@ -488,7 +973,7 @@ void GenerateDspFile(const char *output,string input, COMPONENTDSP C)
 	  pos=line.find("TBC");
 	  if (pos!=-1)
 	  {/// on  va se repositionner au debut de la ligne
-	    inputfile.seekg(-line.size(),ios::cur);
+	    inputfile.seekg((int)(-line.size()),ios::cur);
 	   while(inputfile>>mot && sortie) 
 	    {
 		if((mot.compare("TBC"))==0)
@@ -524,7 +1009,7 @@ void GenerateDspFile(const char *output,string input, COMPONENTDSP C)
 		  sortie=false;
 		}
 	    }
-	    inputfile.seekg(-3*mot.size()+2,ios::cur);	    
+	    inputfile.seekg((int)(-3*mot.size())+2,ios::cur);	    
 	    sortie=true;
 	  }	  
 	  outputfile<<line<<endl;
@@ -540,10 +1025,11 @@ void GenerateDspFile(const char *output,string input, COMPONENTDSP C)
 
 
 // void ReadCompositionFile(char * compositionfile, char * compositionmain, CPU MonCpu,DSP MonDsp,COMPONENTCPU MesComposantsCPU, COMPONENTDSP MesComposantsDSP, CACHE MesCacheL1,CACHE MesCacheL2)
-void ReadCompositionFile(char * compositionfile)
+void ReadCompositionFile(string compositionfile)
 {
+  
   uint nb_ligne=0,nb_file=0;
-  string line, filename,tmp; 
+  string line, filename,tmp,tmp2; 
 
   char dir[100];
   char outputcomposition[100];
@@ -553,13 +1039,13 @@ void ReadCompositionFile(char * compositionfile)
   COMPONENTCPU MesComposantsCPU=NULL,CompoCPU_temp=NULL;
   COMPONENTDSP MesComposantsDSP=NULL,CompoDSP_temp=NULL;  
   
-  ifstream listing_file(compositionfile);   
+  ifstream listing_file(compositionfile.c_str());   
  
   if(listing_file)
   {
     
     uint freq=0, taille=0,assoc=0,bpl=0;
-    uint indice_cpu=0,indice_cacheL1=0,indice_cacheL2=0,indice_dsp=0;
+    uint indice_cpu=0,indice_cacheL1=0,indice_cacheL2=0,indice_dsp=0,indice;
     
     while(listing_file>>line){ /// on lit mot par mot le fichier et on instantie les composants
       
@@ -570,34 +1056,43 @@ void ReadCompositionFile(char * compositionfile)
 	if(line=="PU")
 	{
 	    listing_file>>line;
+	    tmp= line.substr(line.size()-1,line.size());
+	    indice_cpu = atoi(tmp.c_str());
 	    listing_file>>filename;
 	    listing_file>>freq;
-	    MonCpu=ADD_CPU(MonCpu,filename,freq);
+	    MonCpu=ADD_CPU(MonCpu,filename,freq,indice_cpu);
 	}
 	else{
 	    if(line=="CACHE")
 	    {
 	      listing_file>>line;
-	      tmp = line.substr(0,line.size()-2);	      	      
+	      tmp = line.substr(0,line.size()-2);
+	      tmp2= line.substr(line.size()-1,line.size());
+	      indice= atoi(tmp2.c_str());
 	      listing_file>>taille;
 	      listing_file>>assoc;
 	      listing_file>>bpl;
-	      if(tmp =="L1") MesCacheL1=ADD_CACHE(MesCacheL1,taille,assoc,bpl);
-	      else {if(tmp =="L2") MesCacheL2=ADD_CACHE(MesCacheL2,taille,assoc,bpl);}
+	      if(tmp =="L1") MesCacheL1=ADD_CACHE(MesCacheL1,taille,assoc,bpl,indice);
+	      else {if(tmp =="L2") MesCacheL2=ADD_CACHE(MesCacheL2,taille,assoc,bpl,indice);}
+	     
 	    }
 	    else{
 	      if(line =="DSP")
 	      {
 		listing_file>>line;
+		tmp= line.substr(line.size()-1,line.size());
+		indice_dsp = atoi(tmp.c_str());
 		listing_file>>filename;
 		listing_file>>freq;
-		MonDsp=ADD_DSP(MonDsp,filename,freq);
+		MonDsp=ADD_DSP(MonDsp,filename,freq,indice_dsp);
 	      }
 	    }
 	}
 	
-      }/// end if component
+      }/// end if component 
+      
       else{
+	
 	  if(line =="connection")
 	  {
 	      listing_file>>line;
@@ -611,8 +1106,10 @@ void ReadCompositionFile(char * compositionfile)
 		if(tmp=="L1_")
 		{
 		  indice_cacheL1=atoi(line.substr(tmp.size(),line.size()).c_str());
-		  MesComposantsCPU = ADD_COMPONENTCPU(MesComposantsCPU,AccessToCPU(MonCpu,indice_cpu),AccessToCACHE(MesCacheL1,indice_cacheL1),indice_cacheL1,indice_cpu,"cpu");
-		  
+		  cacheL1_tmp = FindCACHE(MesCacheL1,indice_cacheL1);
+		  cpu_tmp = FindCPU(MonCpu,indice_cpu);
+		  MesComposantsCPU = ADD_COMPONENTCPU(MesComposantsCPU,cpu_tmp,cacheL1_tmp,cacheL1_tmp->indice_cache,cpu_tmp->indice_CPU,"cpu");
+		 
 		  //thisComposantsCPU = ADD_COMPONENTCPU(thisComposantsCPU,AccessToCPU(MonCpu,indice_cpu),AccessToCACHE(MesCacheL1,indice_cacheL1),indice_cacheL1,indice_cpu,"cpu");
 		}
 	      }
@@ -624,14 +1121,16 @@ void ReadCompositionFile(char * compositionfile)
 		    listing_file>>line;
 		    tmp=line.substr(0,line.size()-1);
 		      if(tmp=="L1_")
-		      {			
+		      {				
 			indice_cacheL1=atoi(line.substr(tmp.size(),line.size()).c_str());
-			MesComposantsDSP = ADD_COMPONENTDSP(MesComposantsDSP,AccessToDSP(MonDsp,indice_dsp),AccessToCACHE(MesCacheL1,indice_cacheL1),indice_cacheL1,indice_dsp,"dsp");
+			dsp_tmp = FindDSP(MonDsp,indice_dsp);
+			cacheL1_tmp = FindCACHE(MesCacheL1,indice_cacheL1);
+			MesComposantsDSP = ADD_COMPONENTDSP(MesComposantsDSP,dsp_tmp,cacheL1_tmp,cacheL1_tmp->indice_cache,dsp_tmp->indice_DSP,"dsp");
 		      }
 		}
 	      else{
 		if(tmp=="L1_")
-		{
+		{ 
 		  indice_cacheL1=atoi(line.substr(tmp.size(),line.size()).c_str());
 		  listing_file>>line;
 		  listing_file>>line;
@@ -639,16 +1138,17 @@ void ReadCompositionFile(char * compositionfile)
 		  if(tmp=="L2_")
 		  {
 		      indice_cacheL2=atoi(line.substr(tmp.size(),line.size()).c_str());
-		      cacheL1_tmp=AccessToCACHE(MesCacheL1,indice_cacheL1);
-		      cacheL2_tmp=AccessToCACHE(MesCacheL2,indice_cacheL2);
+		      cacheL1_tmp=FindCACHE(MesCacheL1,indice_cacheL1);
+		      cacheL2_tmp=FindCACHE(MesCacheL2,indice_cacheL2);
 		      
 		      if(GetNamelinkCache(cacheL1_tmp) =="dsp"){
-		      CompoDSP_temp=AccessToCOMPONENTDSP(MesComposantsDSP,GetLinkCacheL1DSP(MesComposantsDSP,indice_cacheL1));
+		      CompoDSP_temp=AccessToCOMPONENTDSP(MesComposantsDSP,GetLinkCacheL1DSP(MesComposantsDSP,cacheL1_tmp->indice_cache));
 		      ADD_CACHE_L2_TO_COMPONENTDSP(CompoDSP_temp,cacheL2_tmp);
+		      
 		      }
 		      else{
 			if(GetNamelinkCache(cacheL1_tmp) =="cpu"){
-			CompoCPU_temp=AccessToCOMPONENTCPU(MesComposantsCPU,GetLinkCacheL1CPU(MesComposantsCPU,indice_cacheL1));
+			CompoCPU_temp=AccessToCOMPONENTCPU(MesComposantsCPU,GetLinkCacheL1CPU(MesComposantsCPU,cacheL1_tmp->indice_cache));
 			ADD_CACHE_L2_TO_COMPONENTCPU(CompoCPU_temp,cacheL2_tmp);
 			}
 		      }
@@ -662,7 +1162,7 @@ void ReadCompositionFile(char * compositionfile)
 	   {
 	    nb_ligne--;
 	    cout <<" \n\n ATTENTION ===> Problème à la ligne: "<<nb_ligne<<" dans le fichier: "<<compositionfile<<" <==="<<endl; 
-	    listing_file.seekg(-listing_file.tellg(),ios::cur);
+	    listing_file.seekg((int)(-listing_file.tellg()),ios::cur);
 	    while(nb_ligne>0){getline(listing_file,line);nb_ligne--;}
 	    cout<<line <<" :Cette ligne n'est pas correcte \n \n"<<endl;
 	    
@@ -670,13 +1170,11 @@ void ReadCompositionFile(char * compositionfile)
 	      {
 		if(line.substr(10,2)=="PU"){
 		  cout<<" Required format CPU :";
-		  cout<<" component PU CPUX inputfile/file_name.txt freq "<<endl;
+		  cout<<" component PU CPUX "<<_argv[2]<<"file_name.txt freq "<<endl;
 		  cout<<" X : cpu number"<<endl;
 		  cout<<" file_name.txt : architecture decription texte file"<<endl;
 		  cout<<" freq: cpu working frequency"<<endl;
-		  cout<<" Example: component PU CPU0 inputfile/cortexA8.txt 200\n"<<endl;
-		  
-		  
+		  cout<<" Example: component PU CPU0 "<<_argv[2]<<"cortexA8.txt 200\n"<<endl;
 		  cout<<"ERREUR exit("<<1<<") de format dans le fichier: "<<compositionfile<<"\nvoir fonction : ReadCompositionFile(,,,) "<<endl;
 		  exit(1);
 		}
@@ -700,11 +1198,11 @@ void ReadCompositionFile(char * compositionfile)
 		{
 		  if(line.substr(10,3)=="DSP"){
 		  cout<<" Required format DSP :";
-		  cout<<" component DSP DSPX inputfile/file_name.txt freq "<<endl;
+		  cout<<" component DSP DSPX "<<_argv[2]<<"file_name.txt freq "<<endl;
 		  cout<<" X : dsp number"<<endl;
 		  cout<<" file_name.txt : architecture decription texte file"<<endl;
 		  cout<<" freq: dsp working frequency"<<endl;
-		  cout<<" Example: component DSP DSP1 inputfile/dsp3.txt 200\n"<<endl;
+		  cout<<" Example: component DSP DSP1 "<<_argv[2]<<"dsp3.txt 200\n"<<endl;
 		  
 		  
 		  cout<<"ERREUR exit("<<3<<") de format dans le fichier: "<<compositionfile<<"\nvoir fonction : ReadCompositionFile(,,,) "<<endl;
@@ -741,15 +1239,85 @@ void ReadCompositionFile(char * compositionfile)
   }
   
   listing_file.close();
-
-
-    thisComposantsCPU= MesComposantsCPU;
-    thisComposantsDSP= MesComposantsDSP;
-    thisMesCPU=MonCpu;
-    thisMesDSP=MonDsp;
+  thisComposantsCPU= MesComposantsCPU;
+  thisComposantsDSP= MesComposantsDSP;
+  thisMesCPU=MonCpu;
+  thisMesDSP=MonDsp;
 
 
 }
+
+/*
+void CalculAffinity(string output, string input,GROUP_TBC Liste, int NewAffinity)
+{
+    for(int p=0; p< Liste->nb_input;p++)
+    {
+	if(getValAffinity(Liste->TypeAff[p])==AFF_VAR)
+	{
+	  ChangeAffinity(output,input,Liste->cnx_name[p], NewAffinity);
+	  
+	}
+	else
+	{
+	    if(getValAffinity(Liste->TypeAff[p])==AFF_GROUP)/// recherche alors tout les autres qu'on doit mettre  sur le même cpu
+	    {
+	      findsimilarAffinityGroup(Liste,Liste->TypeAff[p], group);
+	    }
+	}
+    }
+}
+*/
+void FindSimilarGroup(GROUP_TBC Liste, char Type, string Group_cnxname[], int *taille)
+{
+  Group_TBC *Liste_tmp;
+  Liste_tmp = CloneG_TBC(Liste);
+  int i=0;
+  *taille=0;
+  while(Liste_tmp->next!=NULL)
+  {
+    for(int p=0; p< Liste_tmp->nb_input;p++)
+    {
+      if(Liste_tmp->TypeAff[p]==Type)
+      {
+	Group_cnxname[i++]= Liste_tmp->cnx_name[p];
+      }
+    }
+    Liste_tmp=Liste_tmp->next;
+  }
+  *taille =i;
+}
+
+bool findnotint(int *list, int index, int taille)
+{
+  
+for(int i=0;i<taille;i++) 
+  if(list[i]==index)return false;
+    
+  return true;
+}
+
+void FindGroupCpuFix(GROUP_TBC Liste, int Group_Aff[], int *taille)
+{
+  Group_TBC *Liste_tmp;
+  Liste_tmp = CloneG_TBC(Liste);
+  int i=0;
+  *taille=0;
+  while(Liste_tmp->next!=NULL)
+  {
+    for(int p=0; p< Liste_tmp->nb_input;p++)
+    {
+	if(getValAffinity(Liste_tmp->TypeAff[p])==AFF_FIXE && findnotint(Group_Aff,Liste_tmp->affinity[p],i))
+      {
+	
+	Group_Aff[i++]= Liste_tmp->affinity[p];
+      }
+    }
+    Liste_tmp=Liste_tmp->next;
+  }
+  *taille =i;
+}
+
+
 
 void ChangeAffinity(string compositionfile, string compositionfile_temp,string component,uint NewAffinity) 
 {
@@ -826,7 +1394,7 @@ int getAffinityOf(string inputfile, string componentname)
 	pos=line.find(tmp);
 	  if (pos!=-1)
 	  {
-	    read.seekg(-line.size()-1,ios::cur);
+	    read.seekg((int)(-line.size()-1),ios::cur);
 	    read>>tmp;
 	    read>>tmp;
 	    read>>ret;
@@ -843,6 +1411,7 @@ int getAffinityOf(string inputfile, string componentname)
   }
   
 }
+
 
 
 void FindAndReplaceAffinity(string compositionfile, string compositionfile_temp,uint OldAffinity,uint NewAffinity)
@@ -911,46 +1480,502 @@ void FindAndReplaceAffinity(string compositionfile, string compositionfile_temp,
   
 }
 
-void RegenerateCpuFile(CPU MesCPU, string includeListe[],string componentListe[], uint nb_component)
+// void RegenerateCpuFile(CPU MesCPU, string includeListe[],string componentListe[], uint nb_component)
+// void RegenerateCpuFile(CPU MesCPU,string includeListe[], string componentListe[], uint nb_affinity, uint nb_include)
+
+void RegenerateCpuFile(CPU MesCPU,string includeListe[], string componentListe[], uint nb_affinity, uint nb_include)
 {
-  string tmp;
+  string tmp,name;
   uint i=0,indice=0, j=0, nb_cpu=0,n=0;
   CPU cpu_tmp=NULL;
   cpu_tmp  = CloneCPU(MesCPU);
   nb_cpu=NB_CPU(CloneCPU(MesCPU));
-  once=true;thisTBC =NULL;
+  //once=true;thisTBC =NULL;
   string ListeName[TSIZE];
   ListeName[n++]="blabla";
-  nbTBC=0;
+ // nbTBC=0;
+  
+ // for(int l =0;l<nb_affinity;l++) cout <<componentListe[l]<<endl;
+  for(int l =0;l<nb_include;l++) cout <<includeListe[l]<<endl;
+ 
   for(int j=0;j<nb_cpu;j++)
 	{  
 	  i=0;
 	   
-		while(i<nb_component)
+		while(i<nb_affinity)
 		{
 		    tmp= includeListe[i].substr(0,includeListe[i].size()-4);/// -4 == ".txt"
 		    
-		
 			indice=atoi(includeListe[i].substr(tmp.size()-1,tmp.size()).c_str());
 			    if(indice==j)
 			    {
 			    
 			    tmp.clear();
 			    tmp= includeListe[i].substr(0,includeListe[i].size()-10);
-			    tmp = "inputfile/"+tmp+".txt";
-			   // if(notFindName(ListeName,componentListe[i],n-1))
-			   // {
-			    GenerateCpuFile(includeListe[i],tmp,cpu_tmp, componentListe[i],"_comp","_behaviour","_timing_characs");
-			   // ListeName[n++]=componentListe[i]; 
-			    //}
+			    name = componentListe[i].substr(0,tmp.size());
+			    tmp = _argv[2]+tmp+".txt";
+			    ListeName[n++]=includeListe[i];
+			    if(notFindName(ListeName,includeListe[i],n-1))
+			    {
+// 			    GenerateCpuFile(includeListe[i],tmp,cpu_tmp, name,"_comp","_behaviour","_timing_characs");
+			     
+			    }
 		    }
 		    tmp.clear();
 		    i++;     
 		}
 		 cpu_tmp=cpu_tmp->next;
 	}
-  once=false;
+  //once=false;
+  
 
 }
 
 
+
+// void getConnexionThread(string filename )
+
+/*
+
+
+ uint GenerateCompCpuFile(string input,string output,string includeListe[], string componentListe[] )
+{
+  ofstream outputfile(output.c_str());
+  string ListeFileToGenerate[TSIZE], component_type[TSIZE],component_n[TSIZE];
+  string line,mot,Stmp,S2,S3, behaviour("_behaviour"), carac("_timing_characs");
+  uint i=0,j=0, fin=0, nb_include=0, nb_component=0,nb_affinity=0,affinity[TSIZE],count=0;
+  size_t pos;
+  char c[TSIZE];
+   
+
+    if(!outputfile){
+      cout<<"ERREUR exit("<<9<<") impossible de crée le fichier de sortie"<<output<<endl;
+      cout<<"voir fonction : GenerateCompCpuFile(,,,)"<<endl;
+      exit(9);
+      
+    }
+    ifstream in1(input.c_str());
+    if(in1)
+    {
+      for(int r=0 ; r<TSIZE; r++) affinity[r]=0;
+      i=0;
+      /// lecture des includes pour savoir les fichiers a ouvrir
+      	while(getline(in1,line) && fin<10) /// si au out de 15 itérations on ne trouve plus d'include on arrete de chercher
+	{	    
+	  pos=line.find("include");
+	    if (pos!=-1)
+	    {/// on  va se repositionner au debut de la ligne.
+	    in1.seekg((int)(-line.size()-1),ios::cur);
+	    in1>>Stmp;
+	    in1>>Stmp;
+	    pos=line.find("include");
+	    if (pos!=-1)
+	    ListeFileToGenerate[i] = Stmp.substr(0,Stmp.size()-1);
+	    Stmp.clear();
+	    i++;
+	    }
+	    else fin++;
+	}
+	in1.close();
+	  nb_include=i;
+	  fin=0;
+	  i=0;
+	  for(j=0; j<nb_include;j++)
+	  {
+	    
+	    S2=ListeFileToGenerate[j].substr(0,ListeFileToGenerate[j].size()-4)+behaviour;
+	   // cout<<S2<<endl;
+	    ifstream in2(input.c_str());
+	      while(getline(in2,line)) 
+	      {	    
+		pos=line.find(S2);
+		  if (pos!=-1)
+		  {/// on  va se repositionner au debut de la ligne
+		  /// on va récupérer les caractère: sliceX, X étant le numéro.
+		  in2.seekg((int)(-line.size()-1),ios::cur);
+		  in2>>Stmp;//cout<<Stmp<<endl;
+		  in2>>Stmp;//cout<< Stmp<<endl;
+		  in2>>component_n[i];//cout<<"component : "<<component_n[i]<<endl;
+		  componentListe[i]=component_n[i];
+		  in2>>Stmp;//cout<<Stmp<<endl;
+		  Stmp.clear();
+		  i++;
+		  } 
+	      }
+	      in2.close();
+	  }
+	  
+	  nb_affinity=i;i=0; /// penser à changer nb_aff en nb_fichier a créér
+	  ifstream in3(input.c_str());
+		for(i;i<nb_affinity;i++)
+		{
+		  bool  go=true;
+// 		  in3.seekg(0,ios::beg);	 
+	      while(getline(in3,line) && go ) /// Deuxième lecture
+	      {
+// 				mot="cnx_"+component_n[i]+".configure_affinity(";
+		mot=component_n[i];
+		 pos=line.find(mot);
+		if (int(pos)!=-1)
+		{
+		    mot="configure_affinity(";
+		    pos=line.find(mot);
+		      if (int(pos)!=-1)
+		      {/// on va récupérer l'affinity qui est en 3ème position de la chaine de mot	
+		     // cout<<line<<endl;
+		      in3.seekg((int)(-line.size()-1),ios::cur);
+		      in3>>Stmp;
+		      in3>>Stmp;
+		      in3>>affinity[i];//cout<<affinity[i]<<endl; cnager les i en incr++
+		      in3>>Stmp;
+		      Stmp.clear();
+		      mot.clear();
+		      }
+		      
+		}		   
+		else 
+		{
+		  pos=line.find("t1.start.run");
+		  if(pos !=-1) 
+		  {
+		    in3.seekg(int(0),ios::beg);
+// 		    cout<<line<<endl;
+// 		    cout << endl << "On se trouve au " << in3.tellg() << "ieme octet." << endl;
+		    go =false;
+		  }
+		}
+
+		
+	      }
+// 	     in3.close(); in3.open(input.c_str());
+	  }
+	  in3.close();
+	 // e();
+// 	  for(i=0;i<nb_affinity;i++)
+// 	    cout<<"aff: "<<affinity[i]<<endl;
+	  
+	  Stmp.clear();
+
+	   /// maintenant rajoutons les extensions..
+	   i=0;
+	   fin=1;
+	   ifstream in4(input.c_str());
+	      	   fin=1;
+	      while(getline(in4,line)&&fin) ///  lecture des qu'on arrive au premier include
+	      {
+		string ListeName[TSIZE];
+// 		cout<<"nb_include "<<nb_include<<endl;
+		for(j=0;j<nb_include;j++)
+		{
+		 uint o=0;
+
+		    pos=line.find(ListeFileToGenerate[i]);
+		      if(pos!=-1) 
+		      {
+			for(i=j;i<nb_affinity;i++)
+			{
+			  ListeName[o++]="init";
+			  S2=ListeFileToGenerate[j].substr(0,ListeFileToGenerate[j].size()-4);
+			  S3=component_n[i].substr(0,S2.size());
+			    
+			    if(S3.compare(S2)==0 )
+			    {
+			      component_type[i]=S2;
+			      sprintf(c,"_cpu_%d",affinity[i]);
+			      includeListe[i]=S2+c+".txt";
+			      cout << "include liste "<<includeListe[i]<<endl;
+			      ListeName[o++]=includeListe[i];
+			      if( notFindName(ListeName,includeListe[i],o-1))
+			      {
+				Stmp =Stmp+"include "+S2+c+".txt;\n";
+				
+			      }
+			    }
+			 }
+			 fin=0;
+			 //cout<<"Stmp \n"<<Stmp<<endl;
+		      line.replace(0,line.size(),Stmp);
+		      Stmp.clear();
+		      outputfile<<line<<endl;
+		    }
+		   
+		    
+	      }
+	  }
+	  in4.close();
+	  i=0;
+	  fin=1;
+	  ifstream in5(input.c_str());
+	  while(getline(in5,line)){
+	   fin=1;
+	    pos=line.find("component_instance");
+	    if (pos!=-1)
+	    {
+	      for(i=0;i<nb_affinity && fin;i++)
+	      {
+	      S2=component_n[i]+" "+component_type[i]+carac;
+	      pos=line.find(S2);
+		      if (pos!=-1)
+		      {
+			sprintf(c,"_cpu_%d",affinity[i]);
+			Stmp= S2+c;
+			line.replace(pos,S2.size(),Stmp);
+			Stmp.clear();
+			S2=component_type[i]+behaviour;
+			pos=line.find(S2);
+			    if (pos!=-1)
+			    {
+			      sprintf(c,"_cpu_%d",affinity[i]);
+			      Stmp= S2+c;
+			      line.replace(pos,S2.size(),Stmp);
+			      Stmp.clear();
+			      fin=0;
+			    }
+		      }
+	      }
+	      outputfile<<line<<endl;
+// cout<<line<<endl;
+	    }
+	    else
+	    {
+	      pos=line.find("include");
+	      if (pos==-1)  outputfile<<line<<endl;
+// cout<<line<<endl;
+	    } 
+	  }
+	  in5.close();
+
+      cout<<nb_include<<" include(s) dans le fichier : "<<input<<endl;
+      cout<<nb_affinity<<" fichier(s) à créer."<<endl;
+    }
+    else {
+      cout<<"ERREUR exit("<<10<<"): Impossible d'ouvrir le fichier:"<<input<<endl;
+      cout<<"voir fonction : GenerateCompCpuFile(,,,)"<<endl;
+      exit(10);}
+    
+     // cout<<output<<" \thas been generate"<<endl;
+
+    // sleep(1.0);
+     return nb_affinity;
+     
+}
+*/
+
+
+/**
+ * ancienne fonction pour arjouter les affinités CPU  par defaut quand il n'y en avait passéfin=1;
+	  in4.seekg(int(0),ios::beg);
+	  while(getline(in4,line)&&fin) ///  lecture des qu'on arrive au premier include
+	      {
+		
+		if(line.find("component")!=-1){fin=0;}
+		for(j=0;j<nb_include && fin;j++)
+		{
+		 uint o=0;
+
+		    pos=line.find(component_n[j]);
+		      if(pos!=-1 && notFindName(SaveListeName,component_n[j],id_listeName)) 
+		      {
+			    for(i=0;i<nb_component;i++)
+			    {
+				  ListeName[o++]="init";
+				  S2=ListeFileToGenerate[j].substr(0,ListeFileToGenerate[j].size()-4);
+				  S3=component_n[i].substr(0,S2.size());
+				    
+				    if(S3.compare(S2)==0 )
+				    {
+					sprintf(c,"_cpu_%d",0);/// ATTENTION ce sont tout  les componsants qui n'ont pas d'affinity on rajout  celui du cpu 0 par défaut
+					includeListe[i]=S2+c+".txt";
+					ListeName[o++]=includeListe[i];
+					if( notFindName(ListeName,includeListe[i],o-1))
+					{
+					  Stmp =Stmp+"include "+S2+c+".txt;\n";
+					  SaveListeName[id_listeName++]=S2;
+					}
+				    }
+			    }
+			  Stmp= Stmp.substr(0,(int)(Stmp.size()-1));
+			  line.replace(0,line.size(),Stmp);
+			  Stmp.clear();
+			  outputfile<<line<<endl; /// on ecrit dans le fichier composition de sortie
+		    }
+		   
+		    
+	      }
+	  }
+	  
+	  
+	  pour les component_instance
+	  
+	    else
+			  {
+			   
+			   pos=line.find(component_n[i]);
+			      if (pos!=-1)
+			      {
+				  S2=component_n[i] + " "+component_n[i]+carac;
+				  pos=line.find(S2);
+				  if (pos!=-1)
+				  {
+				  //  sprintf(c,"_cpu_%d",0);
+				   // Stmp= S2;
+				   // S3= line;
+				   // S3.replace(pos,S2.size(),Stmp);
+				    //Stmp.clear();
+				    S2=component_n[i]+behaviour;
+				    pos=line.find(S2);
+				    
+					if (pos!=-1)
+					{
+					  //sprintf(c,"_cpu_%d",0);
+					 // Stmp= S2;
+					 // S3.replace(pos,S2.size(),Stmp);
+					  SaveListeName[id_listeName++]=line;
+					if(notFindName(SaveListeName,line,id_listeName-1)) 
+					  mot= mot+ line+"\n";
+					 // Stmp.clear();
+					}
+				  }
+			      }
+			  }
+ 	  **/
+
+/**
+ * ifstream in5(input.c_str());
+	  while(getline(in5,line) ){
+	    pos=line.find("timer");if (pos!=-1 && fin){  outputfile<<line<<endl; fin=0;}
+	    
+	    pos=line.find("component_instance");
+	    if (pos!=-1)
+	    {
+	      for(int  l=0;l<nb_include;l++)
+	      {
+		
+		go=true;
+		tmp=ListeFileToGenerate[l].substr(0,ListeFileToGenerate[l].size()-4);
+	      for(i=0;i<nb_component;i++)
+	      {
+		
+		S2 = ListeFileToGenerate[l].substr(0,ListeFileToGenerate[l].size()-4);
+		S3 = component_inst[i].substr(0,S2.size());
+		if(S3.compare(S2)==0)
+		{ 
+		  id_listeName=0;
+		  SaveListeName[id_listeName]="init";
+		    for(j=0;j<nb_affinity;j++)
+		    {
+			S2=component_inst[i];  
+			S3=component_type[j];
+			
+			if(S3.compare(S2)==0 ) /// si  le component est idem que le nom de la connexion
+			{ go=false;
+			      S2=component_inst[i] + " "+tmp+carac;
+			      pos=line.find(S2);
+			      if (pos!=-1)
+			      {
+				if(getValAffinity(typeAffinity[j])==AFF_FIXE) sprintf(c,"_cpu_%c",typeAffinity[j]);
+				      else sprintf(c,"_cpu_%d",0);
+// 				sprintf(c,"_cpu_%d",affinity[j]);
+				Stmp= S2+c;
+				S3= line;
+				S3.replace(pos,S2.size(),Stmp);
+				S2=tmp+behaviour;
+				pos=line.find(S2);
+				SaveListeName[id_listeName++]=component_inst[i];
+				    if (pos!=-1)
+				    {
+				      if(getValAffinity(typeAffinity[j])==AFF_FIXE) sprintf(c,"_cpu_%c",typeAffinity[j]);
+				      else sprintf(c,"_cpu_%d",0);
+// 				      sprintf(c,"_cpu_%d",affinity[j]);
+				      Stmp= S2+c;
+				      S3.replace(pos,S2.size(),Stmp);
+				     if(notFindName(SaveListeName,component_inst[i],id_listeName-1))
+				     {
+					outputfile<<S3<<endl;
+				     }
+				    }
+			      }
+			}
+		    }
+		
+		    if(go)/// partie rajouter pour les generator, cypher, modulator....
+		    { 
+		      for(j=0;j<nb_affinity;j++)
+		      {
+			  S2=component_inst[i];  
+			  S3=component_type[j].substr(0,S2.size());
+		    
+			  if(S3.compare(S2)==0  )
+			  {
+			    S2=component_inst[i] + " "+tmp+carac;
+				  pos=line.find(S2);
+				  if (pos!=-1)
+				  {
+				    if(getValAffinity(typeAffinity[j])==AFF_FIXE) sprintf(c,"_cpu_%c",typeAffinity[j]);
+				      else sprintf(c,"_cpu_%d",0);
+// 				    sprintf(c,"_cpu_%d",affinity[j]);
+				    Stmp= S2+c;
+				    S3= line;
+				    S3.replace(pos,S2.size(),Stmp);
+				    S2=tmp+behaviour;
+				    pos=S3.find(S2);
+					if (pos!=-1)
+					{
+					  if(getValAffinity(typeAffinity[j])==AFF_FIXE) sprintf(c,"_cpu_%c",typeAffinity[j]);
+				      else sprintf(c,"_cpu_%d",0);
+// 					  sprintf(c,"_cpu_%d",affinity[j]);
+					  Stmp= S2+c;
+					  S3.replace(pos,S2.size(),Stmp); 
+					  SaveListeName[id_listeName++]=S3;
+					  
+					if(notFindName(SaveListeName,S3,id_listeName-1)) 
+					{ 
+					  outputfile<<S3<<endl; mot.clear();
+					}
+					}
+				  }
+				  go=false;
+			  }
+			
+			  
+			  
+		      }
+		   }
+	      }
+	   }// for(i=0;i<nb_component;i++)
+	}// end for(int  l=0;l<nb_include;l++) ///
+	      
+	     ///// if((int)(mot.size())>1) {mot= mot.substr(0,(int)(mot.size()-1));line=mot;}
+	      //outputfile<<line<<endl;
+	     // mot.clear();
+	      
+ 	    }// end if  pos=line.find("component_instance");  if (pos!=-1)
+	    else
+	    {	      
+	      S2="configure_affinity(";
+	      pos=line.find(S2);
+	      if (pos!=-1)
+	      {	
+		  in5.seekg((int)(-line.size()-1),ios::cur);
+		  in5>>Stmp;
+		  in5>>Stmp;
+		  char carac;
+		  in5>>carac;
+		  if(getValAffinity(carac)!=AFF_FIXE){line.replace((int)(pos+S2.size()+1),1,"0");}
+		  outputfile<<line<<endl;
+		  in5>>Stmp;
+		  in5.seekg((int)(1),ios::cur);	/// repositionnement fin de ligne;
+			    
+	      }
+	      else
+	      {
+		pos=line.find("include");
+		if (pos==-1){  outputfile<<line<<endl; }
+	      }
+	      
+	    } 
+	  }
+	  in5.close();
+
+
+**/

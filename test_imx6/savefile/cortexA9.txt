@@ -1,0 +1,4 @@
+start_frequency: 100
+end_frequency: 1000
+dmips: 2.5
+pipeline: 8

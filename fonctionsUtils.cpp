@@ -3,7 +3,7 @@
 
 
 /// fonctions utiles
-CPU ADD_CPU(CPU mon_cpu, string name,uint freq)
+CPU ADD_CPU(CPU mon_cpu, string name,uint freq, uint indice)
 {
   cpu *newcpu = new cpu;
   int nb_ligne=0;
@@ -13,6 +13,7 @@ CPU ADD_CPU(CPU mon_cpu, string name,uint freq)
   if(cpu_file)
   {
     newcpu->name_cpu=name;
+    newcpu->indice_CPU= indice;
      while(cpu_file>>line ){ /// on lit mot par mot le fichier et on instantie les composants
       nb_ligne++;
       cpu_file>>tmp;
@@ -56,7 +57,7 @@ CPU ADD_CPU(CPU mon_cpu, string name,uint freq)
   }
 }
 
-DSP ADD_DSP(DSP mon_dsp, string name,uint freq)
+DSP ADD_DSP(DSP mon_dsp, string name,uint freq, uint indice)
 {
   dsp *newdsp = new dsp;
   int nb_ligne=0;;
@@ -96,7 +97,7 @@ DSP ADD_DSP(DSP mon_dsp, string name,uint freq)
   if(!(freq>=newdsp->start_frequency && freq<=newdsp->end_frequency)) 
   {cout<<"pour le "<<name<<" la plage frequentielle doit être compris entre :["<<newdsp->start_frequency<<","<<newdsp->end_frequency<<"]"<<endl; exit(3);}
    else newdsp->work_frequency = freq;
-
+   newdsp->indice_DSP = indice;
   dsp_file.close();
   newdsp->next = NULL;
   if(mon_dsp==NULL)return newdsp;
@@ -110,64 +111,65 @@ DSP ADD_DSP(DSP mon_dsp, string name,uint freq)
 }
 
 
-CACHE ADD_CACHE(CACHE ma_cache,uint taille, uint assoc, uint bpl)
+CACHE ADD_CACHE(CACHE ma_cache,uint taille, uint assoc, uint bpl,uint indice)
 {
-  cache *newcache = new cache;
-  /// on assigne les parametres du nouveau cache
-  newcache-> taille=taille;
-  newcache->associativity =assoc; 
-  newcache->bpl = bpl;
-  newcache->next = NULL;
-  if(ma_cache==NULL){ return newcache;}
-  else 
-  {
-    cache *cache_temp=ma_cache; 
-    while(cache_temp->next!=NULL) cache_temp = cache_temp->next;
- 
-    cache_temp->next= newcache;
-    return ma_cache;
-  }
+    cache *newcache = new cache;
+    /// on assigne les parametres du nouveau cache
+    newcache-> taille=taille;
+    newcache->associativity =assoc; 
+    newcache->bpl = bpl;
+    newcache->indice_cache = indice;
+    newcache->next = NULL;
+    if(ma_cache==NULL){ return newcache;}
+    else 
+    {
+      cache *cache_temp=ma_cache; 
+      while(cache_temp->next!=NULL) cache_temp = cache_temp->next;
+  
+      cache_temp->next= newcache;
+      return ma_cache;
+    }
 }
 
 COMPONENTCPU ADD_COMPONENTCPU(COMPONENTCPU my_component,CPU mon_cpu,CACHE ma_cache,uint indice_cache,uint indice_cpu, string link)
 {
-  componentcpu *new_component= new componentcpu;
-  new_component->CPU_=mon_cpu;
-  new_component->L1_=ma_cache;
-  ma_cache->namelink=link;
-  mon_cpu->indice_cache_L1= indice_cache;
-  mon_cpu->indice_CPU= indice_cpu;
-  new_component->next = NULL;
-  if(my_component==NULL) { return new_component;}
-  else
-  {
-      componentcpu *compo_tmp=my_component;
-      while(compo_tmp->next!=NULL)compo_tmp=compo_tmp->next;
-      
-      compo_tmp->next = new_component;
-      return my_component;
-  }
+    componentcpu *new_component= new componentcpu;
+    new_component->CPU_=mon_cpu;
+    new_component->L1_=ma_cache;
+    ma_cache->namelink=link;
+    mon_cpu->indice_cache_L1= indice_cache;
+    mon_cpu->indice_CPU= indice_cpu;
+    new_component->next = NULL;
+    if(my_component==NULL) { return new_component;}
+    else
+    {
+	componentcpu *compo_tmp=my_component;
+	while(compo_tmp->next!=NULL)compo_tmp=compo_tmp->next;
+	
+	compo_tmp->next = new_component;
+	return my_component;
+    }
 }
 
 
 COMPONENTDSP ADD_COMPONENTDSP(COMPONENTDSP my_component,DSP mon_dsp,CACHE ma_cache, uint indice_cache,uint indice_dsp, string link)
 {
-  componentdsp *new_component= new componentdsp;
-  new_component->DSP_=mon_dsp;
-  new_component->L1_=ma_cache;
-  mon_dsp->indice_cache_L1= indice_cache;
-  mon_dsp->indice_DSP= indice_dsp;  
-  ma_cache->namelink=link;
-  new_component->next = NULL;
-  if(my_component==NULL) { return new_component;}
-  else
-  {
-    componentdsp *compo_tmp=my_component;
-    while(compo_tmp->next!=NULL)compo_tmp=compo_tmp->next;
+    componentdsp *new_component= new componentdsp;
+    new_component->DSP_=mon_dsp;
+    new_component->L1_=ma_cache;
+    mon_dsp->indice_cache_L1= indice_cache;
+    mon_dsp->indice_DSP= indice_dsp;  
+    ma_cache->namelink=link;
+    new_component->next = NULL;
+    if(my_component==NULL) { return new_component;}
+    else
+    {
+      componentdsp *compo_tmp=my_component;
+      while(compo_tmp->next!=NULL)compo_tmp=compo_tmp->next;
 
-    compo_tmp->next = new_component;
-    return my_component;
-  }
+      compo_tmp->next = new_component;
+      return my_component;
+    }
 }
 
 
@@ -177,25 +179,25 @@ string GetNamelinkCache(CACHE ma_cache){if(ma_cache!=NULL) return ma_cache->name
 
 uint GetLinkCacheL1DSP(COMPONENTDSP my_component,uint indice)
 {
-  componentdsp *tmp=my_component;
-  while(tmp!=NULL)
-  {
-    if(tmp->DSP_->indice_cache_L1==indice){return tmp->DSP_->indice_DSP;}        
-    tmp = tmp->next;
-  }
-  return NULL;
+    componentdsp *tmp=my_component;
+    while(tmp!=NULL)
+    {
+      if(tmp->DSP_->indice_cache_L1==indice){return tmp->DSP_->indice_DSP;}        
+      tmp = tmp->next;
+    }
+    return NULL;
 }
 
 
 uint GetLinkCacheL1CPU(COMPONENTCPU my_component,uint indice)
 {
-  componentcpu *tmp=my_component;
-  while(tmp!=NULL)
-  {
-    if(tmp->CPU_->indice_cache_L1==indice){return tmp->CPU_->indice_CPU;}        
-    tmp = tmp->next;
-  }
-  return NULL;
+    componentcpu *tmp=my_component;
+    while(tmp!=NULL)
+    {
+      if(tmp->CPU_->indice_cache_L1==indice){return tmp->CPU_->indice_CPU;}        
+      tmp = tmp->next;
+    }
+    return NULL;
 }
  
 
@@ -216,67 +218,82 @@ void SetWorkFrequencyCPU(CPU mon_cpu, uint new_freq)
   }
 }
 /// pour avoir acces au i-ème composant
-CPU AccessToCPU(CPU mon_cpu, uint indice)
-{
-  cpu *tmp_cpu=new cpu;
-  tmp_cpu= CloneCPU(mon_cpu);
- for(uint i=0; i<indice && tmp_cpu!=NULL;i++)
- {
-   tmp_cpu=tmp_cpu->next;
- }
- if(tmp_cpu==NULL)
- {
-   return NULL;
- }
- else 
- {
-   return tmp_cpu;
- }
-}
-CPU FindCPU(CPU mon_cpu, uint indice)
-{
- while(mon_cpu->indice_CPU!=indice && mon_cpu!=NULL) mon_cpu=mon_cpu->next;
- if(mon_cpu==NULL) return NULL;
- else return mon_cpu;
-}
+  CPU AccessToCPU(CPU mon_cpu, uint indice)
+  {
+      cpu *tmp_cpu=new cpu;
+      tmp_cpu= CloneCPU(mon_cpu);
+      for(uint i=0; i<indice && tmp_cpu!=NULL;i++)
+      {
+	tmp_cpu=tmp_cpu->next;
+      }
+      if(tmp_cpu==NULL)
+      {
+	return NULL;
+      }
+      else 
+      {
+	return tmp_cpu;
+      }
+  }
 
-DSP AccessToDSP(DSP mon_dsp, uint indice)
-{
- for(uint i=0; i<indice && mon_dsp!=NULL;i++) mon_dsp=mon_dsp->next;
- if(mon_dsp==NULL) return NULL;
- else return mon_dsp;
-}
+  CPU FindCPU(CPU mon_cpu, uint indice)
+  {
+      while(mon_cpu->indice_CPU!=indice && mon_cpu!=NULL) mon_cpu=mon_cpu->next;
+      if(mon_cpu==NULL) return NULL;
+      else return mon_cpu;
+  }
 
-CACHE AccessToCACHE(CACHE ma_cache, uint indice)
-{
- for(uint i=0; i<indice && ma_cache!=NULL;i++) ma_cache=ma_cache->next;
- if(ma_cache==NULL) return NULL;
- else return ma_cache;
-}
-COMPONENTCPU AccessToCOMPONENTCPU(COMPONENTCPU my_component, uint indice)
-{
- for(uint i=0; i<indice && my_component!=NULL;i++) my_component=my_component->next;
- if(my_component==NULL) return NULL;
- else return my_component;
-}
-COMPONENTDSP AccessToCOMPONENTDSP(COMPONENTDSP my_component, uint indice)
-{
- for(uint i=0; i<indice && my_component!=NULL;i++) my_component=my_component->next;
- if(my_component==NULL) return NULL;
- else return my_component;
-}
+  CACHE FindCACHE(CACHE ma_cache, uint indice)
+  {
+      while(ma_cache->indice_cache!=indice && ma_cache!=NULL) ma_cache=ma_cache->next;
+      if(ma_cache==NULL) return NULL;
+      else return ma_cache;
+  }
+  DSP FindDSP(DSP mon_dsp, uint indice)
+  {
+      while(mon_dsp->indice_DSP!=indice && mon_dsp!=NULL) mon_dsp=mon_dsp->next;
+      if(mon_dsp==NULL) return NULL;
+      else return mon_dsp;
+  }
+  DSP AccessToDSP(DSP mon_dsp, uint indice)
+  {
+      for(uint i=0; i<indice && mon_dsp!=NULL;i++) mon_dsp=mon_dsp->next;
+      if(mon_dsp==NULL) return NULL;
+      else return mon_dsp;
+  }
 
-CPU CloneCPU(CPU mon_cpu)
-{
-  cpu *clone= new cpu;
-  memcpy(&clone,&mon_cpu,sizeof(CPU));
-  return clone;
-}
+  CACHE AccessToCACHE(CACHE ma_cache, uint indice)
+  {
+      for(uint i=0; i<indice && ma_cache!=NULL;i++) ma_cache=ma_cache->next;
+      if(ma_cache==NULL) return NULL;
+      else return ma_cache;
+  }
+  
+  COMPONENTCPU AccessToCOMPONENTCPU(COMPONENTCPU my_component, uint indice)
+  {
+      for(uint i=0; i<indice && my_component!=NULL;i++) my_component=my_component->next;
+      if(my_component==NULL) return NULL;
+      else return my_component;
+  }
+  
+  COMPONENTDSP AccessToCOMPONENTDSP(COMPONENTDSP my_component, uint indice)
+  {
+      for(uint i=0; i<indice && my_component!=NULL;i++) my_component=my_component->next;
+      if(my_component==NULL) return NULL;
+      else return my_component;
+  }
 
-void DeleteCPUList(CPU mon_cpu)
-{
- delete(mon_cpu); 
-}
+  CPU CloneCPU(CPU mon_cpu)
+  {
+      cpu *clone= new cpu;
+      memcpy(&clone,&mon_cpu,sizeof(CPU));
+      return clone;
+  }
+
+  void DeleteCPUList(CPU mon_cpu)
+  {
+  delete(mon_cpu); 
+  }
 
 int NB_CPU(CPU A){if(A == NULL) return 0; return NB_CPU(A->next)+1;}
 int NB_DSP(DSP A){if(A == NULL) return 0; return NB_DSP(A->next)+1;}

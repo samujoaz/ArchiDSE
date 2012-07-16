@@ -1,0 +1,54 @@
+
+component cypher_comp
+{
+  provides Runnable input10111132;
+  provides Runnable input1051188;
+  provides Runnable input12111132;
+  provides Runnable input1221118;
+
+  uses Runnable output10111132;
+  uses Runnable output1051188;
+  uses Runnable output12111132;
+  uses Runnable output1221118;
+};
+
+behaviour cypher_behaviour of cypher_comp
+{
+  input10111132.run
+  {
+    (1) 1 { output10111132.run } 
+  }
+  input1051188.run
+  {
+    (1) 1 { output1051188.run } 
+  }
+  input12111132.run
+  {
+    (1) 1 { output12111132.run } 
+  }
+  input1221118.run
+  {
+    (1) 1 { output1221118.run } 
+  }
+};
+
+characteristics( Architecture_parameters ) cypher_timing_characs of cypher_behaviour
+{
+  input10111132.run
+  {
+    (1) { TBC 0 } [ 56465687 12455392 7523449 1038 10200 22570 589 600 200 ]
+  }
+  input1051188.run
+  {
+    (1) { TBC 0 } [ 282328 62276 37617 5 187 37 3 1 1 ]
+  }
+  input12111132.run
+  {
+    (1) { TBC 0 } [ 56465687 12455392 7523449 1038 10200 22570 589 600 200 ]
+  }
+  input1221118.run
+  {
+    (1) { TBC 0 } [ 2476410 605778 402722 191 1817 402 104 18 4 ]
+  }
+
+};

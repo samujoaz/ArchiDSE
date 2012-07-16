@@ -21,6 +21,10 @@ extern COMPONENTDSP thisComposantsDSP;
 extern COMPONENTCPU thisComposantsCPU;
 extern CPU thisMesCPU;
 extern LISTE_TBC thisTBC;
+extern LISTE_TBC thisTBC2;
+extern GROUP_TBC GroupAffinity;
+
+
 extern uint TSIZE;
 extern float TableTBC[100];
 extern uint nbTBC;
@@ -37,43 +41,48 @@ int main (int argc,char* argv[])
   string includeListe[TSIZE], componentListe[TSIZE],tmp;    
   cpu *cpu_tmp=NULL,*cpu_nb=NULL,*access_cpu=NULL;
   
-         TBC_InitListe(&thisTBC);/// à faire une seule fois
-
+  TBC_InitListe(&thisTBC);/// à faire une seule fois
+  TBC_InitListe(&thisTBC2);
+  G_TBC_InitListe(&GroupAffinity);
   time_t start,end;
   char szInput [256];
   double dif;
 
  
-    if (argc == 7 && strcmp(argv[1],"DSE")==0)
+    if (argc == 8 && strcmp(argv[1],"DSE")==0)
     {  
 	_argv =argv;
 	tmp =  argv[argc-1];
         LoadMax=atof(tmp.c_str()); 
 	tmp =  argv[argc-2];
-	LoadMin=atof(tmp.c_str());
-      
+	LoadMin=atof(tmp.c_str());      
 	time (&start);
-	ReadCompositionFile(argv[2]);
+	tmp = string(argv[2])+string(argv[3]);
+	ReadCompositionFile(tmp.str());
   	nb_cpu=NB_CPU(CloneCPU(thisMesCPU));
  	CPU TabCPU[nb_cpu];
-	CopieCompositionFile(argv[3],"inputfile/");//copie qu'on pourra travailler dessus
+	tmp = string(argv[2])+string(argv[4]);
+	CopieCompositionFile(tmp.c_str(),argv[2]);//copie qu'on pourra travailler dessus
  	
 // 	for(int o=0;o<NbBoucle;o++) 
 // 	{ TabCPU[o]=CloneCPU(thisMesCPU); 
 // 	}
 // 	
+	
+// 	cout <<int('a')<< endl;e();
  	for(int o=0;o<NbBoucle;o++)
  	{	
 	      TabCPU[o]=CloneCPU(thisMesCPU); 
  	      cpu_tmp = TabCPU[o];
+	     
+// 	      for (int i=0; i<nb_cpu;i++)
+// 	      {
+// 		FindAndReplaceAffinity("inputfile/composition_copie.txt","composition_temp.txt",i,0);
+//  		//if(o!=0)
+// 		//  UpFreqCpu(cpu_tmp,100);
+// 		//cpu_tmp=cpu_tmp->next;
+// 	      }
 	      
-	      for (int i=0; i<nb_cpu;i++)
-	      {
-		FindAndReplaceAffinity("inputfile/composition_copie.txt","composition_temp.txt",i,0);
- 		//if(o!=0)
-		//  UpFreqCpu(cpu_tmp,100);
-		//cpu_tmp=cpu_tmp->next;
-	      }
 	
 	 //RegenerateCpuFile(TabCPU[o],includeListe,componentListe,nb_component); 
 	      numerodossier = numerodossier+ setCpuLoadLevel(TabCPU[o],nb_cpu,includeListe,componentListe,numerodossier);
