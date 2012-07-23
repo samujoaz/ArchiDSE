@@ -270,13 +270,15 @@ void CalculTBC(GROUP_TBC Liste, CPU MesCPU){
 	    if(Liste_tmp->nb_input>1)
 	    {
 	      include_name = Liste_tmp->include_name;
+// 	      cout<<"fct " <<include_name <<endl;
 	      S3 = Liste_tmp->component_name[0].substr(include_name.size(),include_name.size());
 	      if(S3.size()>0)sprintf(carac,"_%s",S3.c_str());
 	      else sprintf(carac,"_%d",0); 
 	      input = _argv[2]+include_name+".txt";
 	      output=include_name+carac+".txt";
-	      GenerateCpuFileMultiInput( output, input,MesCPU, Liste,carac);
-	      
+	      GenerateCpuFileMultiInput( output, input,MesCPU, Liste_tmp,carac);
+// 	      cout<< "fct " <<Liste_tmp->input_name[0]<<endl;
+
 	    }
 	    else
 	    {
@@ -289,10 +291,21 @@ void CalculTBC(GROUP_TBC Liste, CPU MesCPU){
 		else sprintf(carac,"_%d",0); 
 		input = _argv[2]+include_name+".txt";
 		output=include_name+carac+".txt";
-		//cnx_name = Liste_tmp->[0];
+// 		cnx_name = Liste_tmp->cnx_name[0];
 		cpu_tmp = AccessToCPU(MesCPU,Liste_tmp->affinity[0]);
 		GenerateCpuFile(output,input,cpu_tmp, carac);
-			     
+// 		sleep(1.0);	     
+	      }
+	      else { 
+		cout<< "timer output "<<endl;
+		include_name = Liste_tmp->include_name;
+		//S3 = Liste_tmp->component_name[0].substr(include_name.size(),include_name.size());
+		sprintf(carac,"_%d",0); 
+		input = _argv[2]+include_name+".txt";
+		output=include_name+carac+".txt";
+// 		cnx_name = Liste_tmp->cnx_name[0];
+		cpu_tmp = AccessToCPU(MesCPU,0);
+		GenerateCpuFile(output,input,cpu_tmp, carac);
 	      }
 	    }
 	   
@@ -365,7 +378,9 @@ void GenerateCpuFileMultiInput(string output,string input,CPU MesCPU,GROUP_TBC L
 		  {
 		    input_name = Liste->input_name[p];
 		    pos=line.find(input_name);
-		   // cout<<input_name<<endl;
+// 		    cout<<Liste->component_name[0]<<endl;
+// 		    cout<< Liste->input_name[0]<<endl;
+		    
 		    if(pos!=-1 )
 		    {
 		      
@@ -460,7 +475,7 @@ void GenerateCpuFileMultiInput(string output,string input,CPU MesCPU,GROUP_TBC L
     exit(12);
     
   } 
-//   cout<<"fichier d'entrée "<<input<<endl;
+//    cout<<"fichier d'entrée "<<input<<endl;
 //        cout<<output<<" \thas been generate2"<<endl;
       
    outputfile.close();
@@ -633,7 +648,7 @@ void GenerateCompCpuFile(string input,string output,string includeListe[], strin
       for(int r=0 ; r<TSIZE; r++) affinity[r]=0;
       i=0;
       /// lecture des includes pour savoir les fichiers à ouvrir
-      	while(getline(in1,line) && fin<10) /// si au out de 15 itérations on ne trouve plus d'include on arrete de chercher
+      	while(getline(in1,line)) /// si au out de 15 itérations on ne trouve plus d'include on arrete de chercher
 	{	    
 	  pos=line.find("include");
 	    if (pos!=-1)
@@ -644,13 +659,13 @@ void GenerateCompCpuFile(string input,string output,string includeListe[], strin
 	    pos=line.find("include");
 	    if (pos!=-1)
 	    ListeFileToGenerate[i] = Stmp.substr(0,Stmp.size()-1);
-	    //cout<<ListeFileToGenerate[i]<<endl;
+// 	    cout<<ListeFileToGenerate[i]<<endl;
 	    Stmp.clear();
 	    i++;
 	    }
-	    else fin++;
+	    //else fin++;
 	}
-	
+
 	in1.close();
 	nb_include=i;
 	fin=0;
@@ -756,7 +771,7 @@ void GenerateCompCpuFile(string input,string output,string includeListe[], strin
 // 		}		   
 // 		else 
 // 		{
-		  pos=line.find("t1.start.run");
+		  pos=line.find("start.run");
 		  if(pos !=-1) 
 		  {
 		    in3.seekg(int(0),ios::beg);
@@ -820,13 +835,16 @@ void GenerateCompCpuFile(string input,string output,string includeListe[], strin
 	  {
 		
 	      if(line.find("component")!=-1){fin=0;}
-	      for(j=0;j<nb_include ;j++)
+ 	      //cout <<line<<endl;
+	      for(j=0;j<nb_include && fin;j++)
 	      {
 		 uint o=0;
 		      S2=ListeFileToGenerate[j].substr(0,ListeFileToGenerate[j].size()-4);
 		      pos=line.find(S2);
 		      if(pos!=-1) 
 		      {
+// 			cout<<S2<<endl;
+// 			cout <<line<<endl;
 			  for(i=0;i<nb_component && fin ;i++)
 			  {
 			    S3=component_inst[i].substr(0,S2.size());
@@ -843,6 +861,7 @@ void GenerateCompCpuFile(string input,string output,string includeListe[], strin
 			      
 			    }
 			  }
+			 
 			  
 			    
 			  if((int)(Stmp.size())>1)
@@ -850,12 +869,15 @@ void GenerateCompCpuFile(string input,string output,string includeListe[], strin
 			    Stmp= Stmp.substr(0,(int)(Stmp.size()-1));
 			    outputfile<<Stmp<<endl;  /// on ecrit dans le fichier composition de sortie
 			  }
+			  else {coucou(); cout<<line<<endl;}
 			  
 			  Stmp.clear();	
 			
 		      }
+		      
 		 
 	      } 
+	      
 	  }
 
 	  *N_include = count;
@@ -867,13 +889,14 @@ void GenerateCompCpuFile(string input,string output,string includeListe[], strin
 	  int l_prec=0;
 	  ifstream in5(input.c_str());
 	  while(getline(in5,line) ){
-	    pos=line.find("timer");if (pos!=-1 && fin){  outputfile<<line<<endl; fin=0;}
+	    //pos=line.find("timer");if (pos!=-1 ){  outputfile<<line<<endl; fin=0;}
 	    
 	    pos=line.find("component_instance");
 	    if (pos!=-1)
 	    {
-	      
-	      for(int  l=0;l<nb_include;l++)
+	     // pos=line.find("timer");if (pos!=-1 ){  outputfile<<line<<endl;fin=0;}
+	     go=false;
+	      for(int  l=0;l<nb_include &&fin;l++)
 	      {
 		  tmp=ListeFileToGenerate[l].substr(0,ListeFileToGenerate[l].size()-4);
 		  for(i=0;i<nb_component;i++)
@@ -892,7 +915,7 @@ void GenerateCompCpuFile(string input,string output,string includeListe[], strin
 			pos=line.find(S2);
 			if (pos!=-1)
 			{
-			  
+			  go=true;
 			  Stmp= S2+c;
 			  S3.replace(pos,S2.size(),Stmp);
 			    outputfile<<S3<<endl;
@@ -901,6 +924,8 @@ void GenerateCompCpuFile(string input,string output,string includeListe[], strin
 		      }
 		  }// for(i=0;i<nb_component;i++)
 	      }// end for(int  l=0;l<nb_include;l++) ///
+	      if(go)pos=line.find("timer");if (pos!=-1 ){  outputfile<<line<<endl;fin=0;}
+	      fin=1;
  	    }// end if  pos=line.find("component_instance");  if (pos!=-1)
 	    else
 	    {	      
@@ -923,6 +948,10 @@ void GenerateCompCpuFile(string input,string output,string includeListe[], strin
 	      {
 		pos=line.find("include");
 		if (pos==-1){  outputfile<<line<<endl; }
+// 		else
+// 		{
+// 		  pos=line.find("timer");if (pos!=-1 ){  outputfile<<line<<endl;}
+// 		}
 	      }
 	      
 	    } 
@@ -937,10 +966,9 @@ void GenerateCompCpuFile(string input,string output,string includeListe[], strin
       cout<<"voir fonction : GenerateCompCpuFile(,,,)"<<endl;
       exit(10);}
     
-      cout<<output<<" \thas been generate"<<endl;
+    //  cout<<output<<" \thas been generate"<<endl;
   //   return nb_affinity;
   *N_affinity =nb_affinity;
-  
 }
 
 
@@ -1247,26 +1275,7 @@ void ReadCompositionFile(string compositionfile)
 
 }
 
-/*
-void CalculAffinity(string output, string input,GROUP_TBC Liste, int NewAffinity)
-{
-    for(int p=0; p< Liste->nb_input;p++)
-    {
-	if(getValAffinity(Liste->TypeAff[p])==AFF_VAR)
-	{
-	  ChangeAffinity(output,input,Liste->cnx_name[p], NewAffinity);
-	  
-	}
-	else
-	{
-	    if(getValAffinity(Liste->TypeAff[p])==AFF_GROUP)/// recherche alors tout les autres qu'on doit mettre  sur le même cpu
-	    {
-	      findsimilarAffinityGroup(Liste,Liste->TypeAff[p], group);
-	    }
-	}
-    }
-}
-*/
+
 void FindSimilarGroup(GROUP_TBC Liste, char Type, string Group_cnxname[], int *taille)
 {
   Group_TBC *Liste_tmp;
@@ -1290,13 +1299,9 @@ void FindSimilarGroup(GROUP_TBC Liste, char Type, string Group_cnxname[], int *t
 bool findnotint(int *list, int index, int taille)
 {
   
-for(int i=0;i<taille;i++)
-{
-      if(list[i]==index)
-      {
-      return false;
-      }
-  }
+for(int i=0;i<taille;i++) 
+  if(list[i]==index)return false;
+    
   return true;
 }
 
@@ -1306,20 +1311,20 @@ void FindGroupCpuFix(GROUP_TBC Liste, int Group_Aff[], int *taille)
   Liste_tmp = CloneG_TBC(Liste);
   int i=0;
   *taille=0;
-  while(Liste_tmp->next!=NULL)
+  while(Liste_tmp!=NULL)
   {
     for(int p=0; p< Liste_tmp->nb_input;p++)
     {
-	if(getValAffinity(Liste_tmp->TypeAff[p])==AFF_FIXE && findnotint(Group_Aff,Liste_tmp->affinity[p],i))
+//       cout<<Liste_tmp->TypeAff[p] << endl;
+	if(getValAffinity(Liste_tmp->TypeAff[p])==AFF_FIXE   && findnotint(Group_Aff,Liste_tmp->affinity[p],i))
       {
-	
 	Group_Aff[i++]= Liste_tmp->affinity[p];
+//  	cout << "group " <<Group_Aff[i-1] <<endl;
       }
     }
     Liste_tmp=Liste_tmp->next;
   }
   *taille =i;
-  cout<<i<<endl;
 }
 
 

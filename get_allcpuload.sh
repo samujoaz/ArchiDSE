@@ -15,5 +15,6 @@ sudo ./test.exe 2> $1
 
 #gnuplot cpuloadfile$2/$1_all.gnu &
 #dot -Tps graph.dot -o graph.ps
+cp a cpuloadfile$3
 cp graph.dot cpuloadfile$3
 #okular graph.ps & 

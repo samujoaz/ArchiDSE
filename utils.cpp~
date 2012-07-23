@@ -102,8 +102,7 @@ void getAllCpuLoad(uint nb_cpu, int numerodossier, float cpuload[], int frequenc
       exit(404);
     }
     i=0;
-    string ttmp = string(_argv[2])+string(_argv[3]);
-    ifstream fichierHDW(ttmp.c_str());/// fichier d'entrée qu'on va copier !
+    ifstream fichierHDW(_argv[2]);/// fichier d'entrée qu'on va copier !
     line.clear();
     if(fichierHDW)
     {

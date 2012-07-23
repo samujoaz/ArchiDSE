@@ -4,23 +4,19 @@
 $BENCH_ROOT/generators/component_generator.exe main_0.txt
 $BENCH_ROOT/generators/component_generator.exe slice_1.txt
 $BENCH_ROOT/generators/component_generator.exe slice_2.txt
-$BENCH_ROOT/generators/component_generator.exe slice_3.txt
-$BENCH_ROOT/generators/component_generator.exe slice_4.txt
-$BENCH_ROOT/generators/component_generator.exe slice_5.txt
-$BENCH_ROOT/generators/component_generator.exe slice_6.txt
-$BENCH_ROOT/generators/component_generator.exe slice_7.txt
-$BENCH_ROOT/generators/component_generator.exe slice_8.txt
-$BENCH_ROOT/generators/component_generator.exe slice_10.txt
 $BENCH_ROOT/generators/component_generator.exe filter_1.txt
 $BENCH_ROOT/generators/component_generator.exe filter_2.txt
-$BENCH_ROOT/generators/component_generator.exe filter_3.txt
-$BENCH_ROOT/generators/component_generator.exe filter_4.txt
-$BENCH_ROOT/generators/component_generator.exe filter_5.txt
-$BENCH_ROOT/generators/component_generator.exe filter_6.txt
-$BENCH_ROOT/generators/component_generator.exe filter_7.txt
-$BENCH_ROOT/generators/component_generator.exe filter_8.txt
-$BENCH_ROOT/generators/component_generator.exe filter_10.txt
 $BENCH_ROOT/generators/component_generator.exe write_buffer_0.txt
+$BENCH_ROOT/generators/component_generator.exe generator_0.txt
+$BENCH_ROOT/generators/component_generator.exe cypher_0.txt
+$BENCH_ROOT/generators/component_generator.exe coder_0.txt
+$BENCH_ROOT/generators/component_generator.exe modulator_0.txt
+$BENCH_ROOT/generators/component_generator.exe snk_0.txt
+$BENCH_ROOT/generators/component_generator.exe void_1.txt
+$BENCH_ROOT/generators/component_generator.exe void_2.txt
+$BENCH_ROOT/generators/component_generator.exe void_3.txt
+$BENCH_ROOT/generators/component_generator.exe void_4.txt
+$BENCH_ROOT/generators/component_generator.exe timer_manager_0.txt
 OS_NAME=`uname`
 COMPILE_OPTS=""
 LIBLINK=""
@@ -28,21 +24,17 @@ LIBLINK=""
 ${CROSS_PREFIX}g++ $COMPILE_OPTS -c -I $BENCH_ROOT/runtime -I . main_behaviour_0.cpp
 ${CROSS_PREFIX}g++ $COMPILE_OPTS -c -I $BENCH_ROOT/runtime -I . slice_behaviour_1.cpp
 ${CROSS_PREFIX}g++ $COMPILE_OPTS -c -I $BENCH_ROOT/runtime -I . slice_behaviour_2.cpp
-${CROSS_PREFIX}g++ $COMPILE_OPTS -c -I $BENCH_ROOT/runtime -I . slice_behaviour_3.cpp
-${CROSS_PREFIX}g++ $COMPILE_OPTS -c -I $BENCH_ROOT/runtime -I . slice_behaviour_4.cpp
-${CROSS_PREFIX}g++ $COMPILE_OPTS -c -I $BENCH_ROOT/runtime -I . slice_behaviour_5.cpp
-${CROSS_PREFIX}g++ $COMPILE_OPTS -c -I $BENCH_ROOT/runtime -I . slice_behaviour_6.cpp
-${CROSS_PREFIX}g++ $COMPILE_OPTS -c -I $BENCH_ROOT/runtime -I . slice_behaviour_7.cpp
-${CROSS_PREFIX}g++ $COMPILE_OPTS -c -I $BENCH_ROOT/runtime -I . slice_behaviour_8.cpp
-${CROSS_PREFIX}g++ $COMPILE_OPTS -c -I $BENCH_ROOT/runtime -I . slice_behaviour_10.cpp
 ${CROSS_PREFIX}g++ $COMPILE_OPTS -c -I $BENCH_ROOT/runtime -I . filter_behaviour_1.cpp
 ${CROSS_PREFIX}g++ $COMPILE_OPTS -c -I $BENCH_ROOT/runtime -I . filter_behaviour_2.cpp
-${CROSS_PREFIX}g++ $COMPILE_OPTS -c -I $BENCH_ROOT/runtime -I . filter_behaviour_3.cpp
-${CROSS_PREFIX}g++ $COMPILE_OPTS -c -I $BENCH_ROOT/runtime -I . filter_behaviour_4.cpp
-${CROSS_PREFIX}g++ $COMPILE_OPTS -c -I $BENCH_ROOT/runtime -I . filter_behaviour_5.cpp
-${CROSS_PREFIX}g++ $COMPILE_OPTS -c -I $BENCH_ROOT/runtime -I . filter_behaviour_6.cpp
-${CROSS_PREFIX}g++ $COMPILE_OPTS -c -I $BENCH_ROOT/runtime -I . filter_behaviour_7.cpp
-${CROSS_PREFIX}g++ $COMPILE_OPTS -c -I $BENCH_ROOT/runtime -I . filter_behaviour_8.cpp
-${CROSS_PREFIX}g++ $COMPILE_OPTS -c -I $BENCH_ROOT/runtime -I . filter_behaviour_10.cpp
 ${CROSS_PREFIX}g++ $COMPILE_OPTS -c -I $BENCH_ROOT/runtime -I . write_buffer_behaviour_0.cpp
-${CROSS_PREFIX}g++ test.cpp $COMPILE_OPTS -I $BENCH_ROOT/runtime -I . filter_behaviour_1.o filter_behaviour_10.o filter_behaviour_2.o filter_behaviour_3.o filter_behaviour_4.o filter_behaviour_5.o filter_behaviour_6.o filter_behaviour_7.o filter_behaviour_8.o main_behaviour_0.o slice_behaviour_1.o slice_behaviour_10.o slice_behaviour_2.o slice_behaviour_3.o slice_behaviour_4.o slice_behaviour_5.o slice_behaviour_6.o slice_behaviour_7.o slice_behaviour_8.o write_buffer_behaviour_0.o -L $BENCH_ROOT/runtime -lruntime $LIBLINK -o test.exe
+${CROSS_PREFIX}g++ $COMPILE_OPTS -c -I $BENCH_ROOT/runtime -I . generator_behaviour_0.cpp
+${CROSS_PREFIX}g++ $COMPILE_OPTS -c -I $BENCH_ROOT/runtime -I . cypher_behaviour_0.cpp
+${CROSS_PREFIX}g++ $COMPILE_OPTS -c -I $BENCH_ROOT/runtime -I . coder_behaviour_0.cpp
+${CROSS_PREFIX}g++ $COMPILE_OPTS -c -I $BENCH_ROOT/runtime -I . modulator_behaviour_0.cpp
+${CROSS_PREFIX}g++ $COMPILE_OPTS -c -I $BENCH_ROOT/runtime -I . void_behaviour_1.cpp
+${CROSS_PREFIX}g++ $COMPILE_OPTS -c -I $BENCH_ROOT/runtime -I . void_behaviour_2.cpp
+${CROSS_PREFIX}g++ $COMPILE_OPTS -c -I $BENCH_ROOT/runtime -I . void_behaviour_3.cpp
+${CROSS_PREFIX}g++ $COMPILE_OPTS -c -I $BENCH_ROOT/runtime -I . void_behaviour_4.cpp
+${CROSS_PREFIX}g++ $COMPILE_OPTS -c -I $BENCH_ROOT/runtime -I . snk_behaviour_0.cpp
+${CROSS_PREFIX}g++ $COMPILE_OPTS -c -I $BENCH_ROOT/runtime -I . timer_manager_behaviour_0.cpp
+${CROSS_PREFIX}g++ test.cpp $COMPILE_OPTS -I $BENCH_ROOT/runtime -I . coder_behaviour_0.o cypher_behaviour_0.o filter_behaviour_1.o filter_behaviour_2.o generator_behaviour_0.o main_behaviour_0.o modulator_behaviour_0.o slice_behaviour_1.o slice_behaviour_2.o snk_behaviour_0.o timer_manager_behaviour_0.o void_behaviour_1.o void_behaviour_2.o void_behaviour_3.o void_behaviour_4.o write_buffer_behaviour_0.o -L $BENCH_ROOT/runtime -lruntime $LIBLINK -o test.exe
