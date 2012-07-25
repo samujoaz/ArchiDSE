@@ -21,7 +21,7 @@ component_instance modulator_behaviour modulator modulator_timing_characs;
 component_instance snk_behaviour snk snk_timing_characs;
 
 component_instance Timer_impl t1 timer;
-configuration t1->configure_timerspec_and_sched_fifo( 0, 100000, 0, 40000000, true, 99 );
+configuration t1->configure_timerspec_and_sched_fifo( 0, 100000, 0, 20000000, true, 99 );
 
 connection( asynchronous ) cnx_main t1.tick main.input_timer;
 configuration cnx_main.configure_priority_and_sched_fifo( 99, true );
@@ -33,19 +33,19 @@ configuration cnx_slice1.configure_priority_and_sched_fifo( 34, true );
 configuration cnx_slice1.configure_affinity( 1 );
 connection( asynchronous ) cnx_slice2 main.comm_slice2 slice2.input;
 configuration cnx_slice2.configure_priority_and_sched_fifo( 34, true );
-configuration cnx_slice2.configure_affinity( B );
+configuration cnx_slice2.configure_affinity( ? );
 
 connection( asynchronous ) cnx_filter1 slice1.output filter1.input;
 configuration cnx_filter1.configure_priority_and_sched_fifo( 33, true );
-configuration cnx_filter1.configure_affinity( A );
+configuration cnx_filter1.configure_affinity( 1 );
 connection( asynchronous ) cnx_filter2 slice2.output filter2.input;
 configuration cnx_filter2.configure_priority_and_sched_fifo( 33, true );
-configuration cnx_filter2.configure_affinity( B );
+configuration cnx_filter2.configure_affinity( ? );
 
 
 connection( asynchronous ) cnx_out1 filter1.output main.input_slice1;
 configuration cnx_out1.configure_priority_and_sched_fifo( 32, true );
-configuration cnx_out1.configure_affinity( ? );
+configuration cnx_out1.configure_affinity( 1 );
 connection( asynchronous ) cnx_out2 filter2.output main.input_slice2;
 configuration cnx_out2.configure_priority_and_sched_fifo( 32, true );
 configuration cnx_out2.configure_affinity( ? );
@@ -60,7 +60,7 @@ configuration cnx_generator10111132.configure_priority_and_sched_fifo( 30, true 
 configuration cnx_generator10111132.configure_affinity( ? );
 connection( asynchronous ) cnx_generator1051188 main.output1051188 generator.input1051188;
 configuration cnx_generator1051188.configure_priority_and_sched_fifo( 29, true );
-configuration cnx_generator1051188.configure_affinity( ? );
+configuration cnx_generator1051188.configure_affinity( 1 );
 connection( asynchronous ) cnx_generator12111132 main.output12111132 generator.input12111132;
 configuration cnx_generator12111132.configure_priority_and_sched_fifo( 28, true );
 configuration cnx_generator12111132.configure_affinity( ? );
@@ -73,7 +73,7 @@ configuration cnx_cypher10111132.configure_priority_and_sched_fifo( 37, true );
 configuration cnx_cypher10111132.configure_affinity( ? );
 connection( asynchronous ) cnx_cypher1051188 generator.output1051188 cypher.input1051188;
 configuration cnx_cypher1051188.configure_priority_and_sched_fifo( 37, true );
-configuration cnx_cypher1051188.configure_affinity( ? );
+configuration cnx_cypher1051188.configure_affinity( 1 );
 connection( asynchronous ) cnx_cypher12111132 generator.output12111132 cypher.input12111132;
 configuration cnx_cypher12111132.configure_priority_and_sched_fifo( 37, true );
 configuration cnx_cypher12111132.configure_affinity( ? );
@@ -86,7 +86,7 @@ configuration cnx_coder10111132.configure_priority_and_sched_fifo( 38, true );
 configuration cnx_coder10111132.configure_affinity( ? );
 connection( asynchronous ) cnx_coder1051188 cypher.output1051188 coder.input1051188;
 configuration cnx_coder1051188.configure_priority_and_sched_fifo( 38, true );
-configuration cnx_coder1051188.configure_affinity( ? );
+configuration cnx_coder1051188.configure_affinity( 1 );
 connection( asynchronous ) cnx_coder12111132 cypher.output12111132 coder.input12111132;
 configuration cnx_coder12111132.configure_priority_and_sched_fifo( 38, true );
 configuration cnx_coder12111132.configure_affinity( ? );
@@ -99,7 +99,7 @@ configuration cnx_modulator10111132.configure_priority_and_sched_fifo( 39, true 
 configuration cnx_modulator10111132.configure_affinity( ? );
 connection( asynchronous ) cnx_modulator1051188 coder.output1051188 modulator.input1051188;
 configuration cnx_modulator1051188.configure_priority_and_sched_fifo( 39, true );
-configuration cnx_modulator1051188.configure_affinity( ? );
+configuration cnx_modulator1051188.configure_affinity( 1 );
 connection( asynchronous ) cnx_modulator12111132 coder.output12111132 modulator.input12111132;
 configuration cnx_modulator12111132.configure_priority_and_sched_fifo( 39, true );
 configuration cnx_modulator12111132.configure_affinity( ? );
@@ -112,7 +112,7 @@ configuration cnx_snk10111132.configure_priority_and_sched_fifo( 40, true );
 configuration cnx_snk10111132.configure_affinity( ? );
 connection( asynchronous ) cnx_snk1051188 modulator.output1051188 snk.input1051188;
 configuration cnx_snk1051188.configure_priority_and_sched_fifo( 40, true );
-configuration cnx_snk1051188.configure_affinity( ? );
+configuration cnx_snk1051188.configure_affinity( 1 );
 connection( asynchronous ) cnx_snk12111132 modulator.output12111132 snk.input12111132;
 configuration cnx_snk12111132.configure_priority_and_sched_fifo( 40, true );
 configuration cnx_snk12111132.configure_affinity( ? );

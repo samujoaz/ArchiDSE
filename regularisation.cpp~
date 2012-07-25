@@ -321,7 +321,7 @@ offset_frequence=50;
 	    i=0;j=1;
 	    CalculTBC(ListFerme, cpu_access);
 	    getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
-	    if(cpuload_cur[0]<LoadMax){cout<<"cpuLoad_"<<0<<" < "<<LoadMax<<endl;return numerodossier; }
+	  // if(cpuload_cur[0]<LoadMax){cout<<"cpuLoad_"<<0<<" < "<<LoadMax<<endl;return numerodossier; }
 	    /// on va changer l'affinity de NbMaxCpu en parallèle si le ticktimer n'est pas trop élévé 
 	    ///et le reste se fera de façon sequentielle s'il reste encore des  threads
 	/*  for(uint t=0;t<=SIZE_MIXTE && ListOuvert !=NULL;t++)
@@ -487,7 +487,7 @@ offset_frequence=50;
 	{	
 	    for(indice=0; indice<nb_cpu && max>0;indice++)/// on regardera tout les niveaux de chargement des CPU qui fonctionnent !
 	    {
-		if(cpuload_cur[indice]>LoadMax && frequence[indice]<=(AccessToCPU(cpu_access,indice)->end_frequency))
+		if(cpuload_cur[indice]>LoadMax && frequence[indice]<(AccessToCPU(cpu_access,indice)->end_frequency))
 		{
 		    if(max<=nb_cpu+1) {max++;}
 		    cpu_tmp =AccessToCPU(cpu_access,indice);
@@ -501,7 +501,7 @@ offset_frequence=50;
 		}
 		else
 		{
-		    if(cpuload_cur[indice]>30.0 && cpuload_cur[indice]<LoadMin && frequence[indice]>=(AccessToCPU(cpu_access,indice)->start_frequency))
+		    if(cpuload_cur[indice]>30.0 && cpuload_cur[indice]<LoadMin && frequence[indice]>(AccessToCPU(cpu_access,indice)->start_frequency))
 		    {
 
 			if(max<=nb_cpu+1) {max++;}
@@ -524,7 +524,7 @@ offset_frequence=50;
 	    }
 	}
 	
-//  	coucou();coucou();e();
+  	coucou();coucou();e();
 	/// maintenant on va vérifier les cas où le cpu_0  a un chargement inférieur à 40%
 	for(i=0;i<nb_cpu-1;i++) { tabcpuload[i]=cpuload_cur[i+1];}
 	getMinMaxCpuLoad( tabcpuload,NULL,nb_cpu-1,  0,&MaxCpuload, &MinCpuload,&indice_cpuMax, &indice_cpuMin); /// recherche min et max  
@@ -535,7 +535,7 @@ offset_frequence=50;
 	      GenerateCompCpuFile(composition_copie,compositionfile,includeListe,componentListe,&nb_affinity,&nb_component);
 	      CalculTBC(ListFerme, cpu_access);
 
-	      while(notComprisEntre(cpuload_cur[0],LoadMin,LoadMax) && frequence[0]<(AccessToCPU(cpu_access,0)->end_frequency) && frequence[0]>=(AccessToCPU(cpu_access,0)->start_frequency))
+	      while(notComprisEntre(cpuload_cur[0],LoadMin,LoadMax) && frequence[0]<(AccessToCPU(cpu_access,0)->end_frequency) && frequence[0]>(AccessToCPU(cpu_access,0)->start_frequency))
 	      {
 		
 		getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
@@ -549,7 +549,7 @@ offset_frequence=50;
 		  }
 		  else
 		  {
-		      if(cpuload_cur[0]>30.0 && cpuload_cur[0]<LoadMin && frequence[0]>=(AccessToCPU(cpu_access,0)->start_frequency))
+		      if(cpuload_cur[0]>30.0 && cpuload_cur[0]<LoadMin && frequence[0]>(AccessToCPU(cpu_access,0)->start_frequency))
 		      {
 			  SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency-25);
 			  frequence[0]=cpu_tmp->work_frequency;
@@ -575,7 +575,7 @@ offset_frequence=50;
 	      indice=indice_cpuMin;
 	      getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
 
-	      while(notComprisEntre(cpuload_cur[indice],LoadMin,LoadMax) && frequence[indice]<=(AccessToCPU(cpu_access,indice)->end_frequency) && frequence[indice]>(AccessToCPU(cpu_access,indice)->start_frequency))
+	      while(notComprisEntre(cpuload_cur[indice],LoadMin,LoadMax) && frequence[indice]<(AccessToCPU(cpu_access,indice)->end_frequency) && frequence[indice]>(AccessToCPU(cpu_access,indice)->start_frequency))
 	      {
 		getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
 		if(cpuload_cur[indice]>LoadMax && frequence[indice]<=(AccessToCPU(cpu_access,indice)->end_frequency))
@@ -588,7 +588,7 @@ offset_frequence=50;
 		  }
 		  else
 		  {
-		      if(cpuload_cur[indice]>30.0 && cpuload_cur[indice]<LoadMin && frequence[indice]>=(AccessToCPU(cpu_access,indice)->start_frequency))
+		      if(cpuload_cur[indice]>30.0 && cpuload_cur[indice]<LoadMin && frequence[indice]>(AccessToCPU(cpu_access,indice)->start_frequency))
 		      {
 			  SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency-25);
 			  frequence[indice]=cpu_tmp->work_frequency;

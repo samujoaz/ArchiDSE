@@ -37,13 +37,13 @@ void getAllCpuLoad(uint nb_cpu, int numerodossier, float cpuload[], int frequenc
     int i=0;
     size_t pos;
     
-    sprintf(c,". ./get_allcpuload.sh a  \" cnx_write_buffer -cpu 0 CPU0 \" %d",numerodossier);
+    sprintf(c,"./get_allcpuload.sh a  \" cnx_write_buffer -cpu 0 CPU0 \" %d",numerodossier);
     cmd=c;/// par défaut!
     
     if(numerodossier>0)
     {
       cmd.clear();
-      cmd = ". ./get_allcpuload.sh a  \"cnx_write_buffer -cpu ";
+      cmd = "./get_allcpuload.sh a  \"cnx_write_buffer -cpu ";
 
       for(i=0; i<nb_cpu;i++)  
       {
