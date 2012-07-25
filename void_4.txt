@@ -1,0 +1,22 @@
+
+component void_comp_4
+{
+  provides Runnable input;
+};
+
+behaviour void_behaviour_4 of void_comp_4
+{
+  input.run
+  {
+    (1) 0 { none.none } 
+  }
+};
+
+characteristics( Timing_in_ms ) void_timing_characs_4 of void_behaviour_4
+{
+  input.run
+  {
+    (1) { 0 0 } 
+  }
+
+};

@@ -625,7 +625,7 @@ void GenerateCpuFile(string output,string input,CPU C,char *indice){
 /// on génrérer le fichier composition 
 /// savoir les includes à mettre on lira les mot après le include.
 /// cette focntion doit retourner n fichier a générer
-void GenerateCompCpuFile(string input,string output,string includeListe[], string componentListe[],  uint* N_affinity,uint* N_include)
+void GenerateCompCpuFile(string input,string output,string includeListe[], string componentListe[],  uint* N_affinity,uint* NB_COMPONENT)
 {
   ofstream outputfile(output.c_str());
   string ListeFileToGenerate[TSIZE], component_type[TSIZE],component_inst[TSIZE];
@@ -699,7 +699,9 @@ void GenerateCompCpuFile(string input,string output,string includeListe[], strin
 	   uint incr=0;
 
 	  nb_component=i;i=0; /// penser à changer nb_aff en nb_fichier a créér
+	  *NB_COMPONENT=nb_component;
 	  j=0;
+	 
 	  ifstream in3(input.c_str());uint o=0;
 // 	  for(i;i<nb_component;i++)
 // 	  {
@@ -780,8 +782,6 @@ void GenerateCompCpuFile(string input,string output,string includeListe[], strin
 // 		}
 	      }
 // 	  } 
-// 	  cout << incr<<" == "<<j<<endl;
-//  	  e(); coucou();
 	  in3.close();
 	  nb_affinity=j;
 	  if(once)/// cette partie est faite une seule fois, tout au début de l'algo.
@@ -830,7 +830,7 @@ void GenerateCompCpuFile(string input,string output,string includeListe[], strin
 	  fin=1;
 // 	  string SaveListeName[TSIZE];
 // 	  int id_listeName=0;
-	  *N_include=0;
+// 	  *N_include=0;
 	  while(getline(in4,line)&&fin) ///  lecture des qu'on arrive au premier include
 	  {
 		
@@ -880,7 +880,7 @@ void GenerateCompCpuFile(string input,string output,string includeListe[], strin
 	      
 	  }
 
-	  *N_include = count;
+// 	  *N_include = count;
 /// on va ecrire la suite du fichier de composition de sortie 
 	  in4.close();
 	  i=0;
@@ -1490,8 +1490,8 @@ void FindAndReplaceAffinity(string compositionfile, string compositionfile_temp,
 
 // void RegenerateCpuFile(CPU MesCPU, string includeListe[],string componentListe[], uint nb_component)
 // void RegenerateCpuFile(CPU MesCPU,string includeListe[], string componentListe[], uint nb_affinity, uint nb_include)
-
-void RegenerateCpuFile(CPU MesCPU,string includeListe[], string componentListe[], uint nb_affinity, uint nb_include)
+///fonction non utilisée
+void RegenerateCpuFile(CPU MesCPU,string includeListe[], string componentListe[], uint nb_affinity, uint NB_COMPONENT)
 {
   string tmp,name;
   uint i=0,indice=0, j=0, nb_cpu=0,n=0;
@@ -1504,7 +1504,7 @@ void RegenerateCpuFile(CPU MesCPU,string includeListe[], string componentListe[]
  // nbTBC=0;
   
  // for(int l =0;l<nb_affinity;l++) cout <<componentListe[l]<<endl;
-  for(int l =0;l<nb_include;l++) cout <<includeListe[l]<<endl;
+  for(int l =0;l<NB_COMPONENT;l++) cout <<includeListe[l]<<endl;
  
   for(int j=0;j<nb_cpu;j++)
 	{  

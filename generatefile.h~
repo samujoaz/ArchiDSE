@@ -61,7 +61,7 @@ int getValAffinity(char x);
 void GenerateCpuFile(string output,string input,CPU C,char *indice);
 void GenerateDspFile(char *output,string input, COMPONENTDSP C);
 void GenerateCompositionFile(const char* output,const char* input,const char* newmain, const char* newslice,string indice);
-void GenerateCompCpuFile(string input,string output,string includeListe[], string componentListe[], uint* N_affinity,uint* N_include);
+void GenerateCompCpuFile(string input,string output,string includeListe[], string componentListe[], uint* N_affinity,uint* NB_COMPONENT);
 void ReadCompositionFile(string compositionfile);
 void ChangeAffinity(string compositionfile, string compositionfile_temp,string component,uint NewAffinity);
 int getAffinityOf(string inputfile, string componentname);
