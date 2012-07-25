@@ -13,5 +13,6 @@ rm cypher_*
 rm composition*
 rm modulator_*
 rm listeTBC.txt 
-
+rm void_*
+rm timer_manager_*
 clear
