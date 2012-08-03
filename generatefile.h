@@ -65,6 +65,7 @@ void GenerateCompCpuFile(string input,string output,string includeListe[], strin
 void ReadCompositionFile(string compositionfile);
 void ChangeAffinity(string compositionfile, string compositionfile_temp,string component,uint NewAffinity);
 int  getAffinityOf(string inputfile, string componentname);
+void FindAndReplaceOneAffinity(string compositionfile, string compositionfile_temp,uint OldAffinity,uint NewAffinity);
 void FindAndReplaceAffinity(string compositionfile, string compositionfile_temp,uint OldAffinity,uint NewAffinity);
 void RegenerateCpuFile(CPU MesCPU,string includeListe[], string componentListe[], uint nb_affinity, uint nb_include);
 //void RegenerateCpuFile(CPU MesCPU,string includeListe[], string componentListe[],  string includeNoAffinity[], uint nb_affinity, uint nb_include,uint nb_NoAffinity);

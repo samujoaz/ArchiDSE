@@ -54,6 +54,7 @@ void getAllCpuLoad(uint nb_cpu, int numerodossier, float cpuload[], int frequenc
       sprintf(c," \" %d",numerodossier);
       cmd = cmd+ c;
     }
+   
     i=0;
     system(cmd.c_str());/// execution d'une ligne de commade :: on aura le % chargement des cpu
     sprintf(c,"cpuloadfile%d/cpuload.txt",numerodossier);
@@ -151,6 +152,27 @@ void getAllCpuLoad(uint nb_cpu, int numerodossier, float cpuload[], int frequenc
     in2.close();
    fichierHDW.close();
    outHDW.close();
+   /*
+     sprintf(c,"cpuloadfile%d",numerodossier);
+     buffer = c;
+     buffer = buffer+"/includeliste.txt";
+     ofstream out_includefile(buffer.c_str()); 
+    for(int u=0; u<nb_component;u++)/// on va recopier tout les fichiers de l'application (main, slife, filter, generator...)
+    {
+//       string cp;
+//       cp = "cp  "+includeListe[u] + "  "+ c;
+//       system(cp.c_str());
+      out_includefile<<includeListe[u]<<endl;
+    }
+    out_includefile.close();
+    
+     sprintf(c,"cpuloadfile%d",numerodossier);
+     buffer = c;
+     buffer = buffer+"/origine.txt";
+     ofstream pp(buffer.c_str()); 
+     ifstream  tt("composition.txt");
+     while(getline(tt,buffer))pp<<buffer<<endl;
+    */
 }
 
 void getMinMaxCpuLoad(float cpuload[], uint except[], uint nb_cpu, uint nb_except, float *Max, float *Min, uint *indice_cpuMax, uint *indice_cpuMin)
@@ -162,13 +184,13 @@ bool inclut;
   for(i=0;i<nb_cpu;i++)
   {
     inclut=true;
-   /* for(j=0;j<nb_except;j++)
+    for(j=0;j<nb_except;j++)
     {
       if(i==except[j]) 
       {
 	inclut=false;
       } 
-    }*/
+    }
     
     if(monMax<cpuload[i] && inclut)
     {

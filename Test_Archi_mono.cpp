@@ -10,17 +10,23 @@
 
 #include "fonctionsUtils.h"
 #include "generatefile.h"
-#include "regularisation.h"
+// #include "regularisation.h"
  float LoadMax;
  float LoadMin;
 
+ 
 
 using namespace std;
 
 extern CPU thisMesCPU;
 extern uint TSIZE;
 string BufferFreqHisto;
+extern GROUP_TBC GroupAffinity;
+extern bool once;
+char **_argv;
 
+void coucou()
+{cout<<" Free egg : ^_^ coucou @_@ "<<endl;}
 bool notFindName(string listename[] ,string index,int taille)
 {
   
@@ -52,52 +58,75 @@ void GenScriptHistogram(uint nb_cpu)
 
 int main (int argc,char* argv[])
 {
-  uint nb_component=0,nb_cpu;
-  string includeListe[TSIZE], componentListe[TSIZE],tmp;    
-ostringstream convert;
+  uint nb_component=0,nb_cpu,nb_affinity;
+  string includeListe[TSIZE], componentListe[TSIZE],tmp,line;    
+  ostringstream convert;
   time_t start,end;
+  CPU cpu_tmp=NULL;
+   GROUP_TBC ListFerme=NULL;
   double dif;
-
-    if (argc == 6 && strcmp(argv[1],"DSE")==0)
+  G_TBC_InitListe(&GroupAffinity);
+    if (argc == 8 && strcmp(argv[1],"DSE")==0)
     {  
+	_argv =argv;
 	tmp =  argv[argc-1];
         LoadMax=atof(tmp.c_str()); 
 	tmp =  argv[argc-2];
-	LoadMin=atof(tmp.c_str()); 
+	LoadMin=atof(tmp.c_str());      
 	time (&start);
+	tmp =  string(argv[3])+string(argv[4]);
+	ReadCompositionFile(tmp);
 	string buffer;
-	 size_t pos;	
-	 ReadCompositionFile(argv[2]);
-	ifstream in_compositionfile(argv[3]);
+	size_t pos;	
+	tmp = string(argv[3])+string(argv[5]);
+	ifstream in_compositionfile(tmp.c_str());
+	tmp = "listeinclude.txt";
+	ifstream cp_include(tmp.c_str());
+	int i=0;
 	if(in_compositionfile)
 	{
-	ofstream out_compositionfile("composition.txt",ios::trunc); 
-	ofstream out_composition_tmp("composition_temp.txt",ios::trunc); 
-	buffer="include main.txt;\ninclude slice.txt;\ninclude filter.txt;\ninclude write_buffer.txt;\n\n";
-	out_composition_tmp<<buffer;
-	 while(getline(in_compositionfile,buffer))
-	 {
-	    out_compositionfile<<buffer<<endl;
-	    pos=buffer.find("include");
-	    if (pos==-1) out_composition_tmp<<buffer<<endl;
+	ofstream out_compositionfile("composition_temp.txt"); 
+	while(getline(in_compositionfile,line))
+	{
+	  pos=line.find("include");
+ 	    if (pos!=-1  && i==0)
+	    {
+	      while(getline(cp_include,buffer))
+	      {
+	      out_compositionfile<<"include " << buffer<<";"<<endl;
+	      }
+	      i=111;
+	    }
+	    else {
+	      if(pos==-1)out_compositionfile<<line<<endl;
+	    }
 	    
-	 }
+	}
+
 	nb_cpu=NB_CPU(CloneCPU(thisMesCPU));
+	once=true;
+  	GenerateCompCpuFile("composition_temp.txt","composition.txt",includeListe,componentListe,&nb_affinity,&nb_component);
+	CalculTBC(GroupAffinity, CloneCPU(thisMesCPU));	
+	once=false;
 	
-	nb_component = GenerateCompCpuFile("composition_temp.txt","composition_copie.txt",includeListe,componentListe);
- 	RegenerateCpuFile(thisMesCPU,includeListe,componentListe,nb_component); 
-	buffer = ". ./get_monocpuload.sh a  \"cnx_write_buffer -cpu ";
+	
+	tmp = string(argv[3])+ string(argv[5]);
+ 	ifstream in_compo(tmp.c_str());
+	ofstream out_compo("composition.txt");
+ 	while(getline(in_compo,buffer)) out_compo<<buffer<<endl;
+ 	
+	buffer = "./get_monocpuload.sh a  \"cnx_write_buffer -cpu ";
 	char c[256];
 	for(int i=0; i<nb_cpu;i++)  
 	{
 	  sprintf(c," %d CPU%d ",i,i);
 	  buffer = buffer+ c;
-	  
+
 	  convert.str(""); convert.clear();
-      convert<<thisMesCPU->work_frequency;
-      
-      thisMesCPU=thisMesCPU->next;
-      BufferFreqHisto=BufferFreqHisto+convert.str()+"  ";
+	  convert<<thisMesCPU->work_frequency;
+
+	  thisMesCPU=thisMesCPU->next;
+	  BufferFreqHisto=BufferFreqHisto+convert.str()+"  ";
 	}
     
 	GenScriptHistogram(nb_cpu); 
@@ -113,9 +142,7 @@ ostringstream convert;
 	  in>>buffer;
 	  in>>buffer;
 	  in>> cpuload[i];
-// 	  if(cpuload[i]>0.0) 
-	    histogram<<cpuload[i]<< "  ";
-// 	  else histogram<< "0.5  ";
+	  histogram<<cpuload[i]<< "  ";
 	}
 	histogram<< "\n";
     }
@@ -126,7 +153,7 @@ ostringstream convert;
     }
     else 
     {
-        cout<<"\noption d'execution : DSE <inputArchi> <inputComposition> <ouput folder name> "<<endl;         
+        cout<<"\noption d'execution : ./exec_mono_archi.sh <dossier des fichiers avec TBC> <numero du dossier cpuload  à tester> "<<endl;         
     }
         
   return 0;

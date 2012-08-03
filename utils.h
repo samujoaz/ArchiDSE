@@ -14,7 +14,7 @@ using namespace std;
 
 void DownFreqCpu(CPU C, uint delta);
 void UpFreqCpu(CPU C, uint delta);
-void getAllCpuLoad(uint nb_cpu, int numerodossier,float cpuload[], int frequence[]);
+void getAllCpuLoad(uint nb_cpu, int numerodossier,float cpuload[], int frequence[]) ;
 void CopieCompositionFile(string file, string destination);
 void tri_bulle( float *tab, int n);
 void afficheTBC( float * tab, int longeur);

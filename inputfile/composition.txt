@@ -21,7 +21,7 @@ component_instance modulator_behaviour modulator modulator_timing_characs;
 component_instance snk_behaviour snk snk_timing_characs;
 
 component_instance Timer_impl t1 timer;
-configuration t1->configure_timerspec_and_sched_fifo( 0, 100000, 0, 80000000, true, 99 );
+configuration t1->configure_timerspec_and_sched_fifo( 0, 100000, 0, 40000000, true, 99 );
 
 connection( asynchronous ) cnx_main t1.tick main.input_timer;
 configuration cnx_main.configure_priority_and_sched_fifo( 99, true );

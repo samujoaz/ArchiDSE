@@ -476,7 +476,7 @@ void GenerateCpuFileMultiInput(string output,string input,CPU MesCPU,GROUP_TBC L
     
   } 
 //    cout<<"fichier d'entrée "<<input<<endl;
-//        cout<<output<<" \thas been generate2"<<endl;
+//         cout<<output<<" \thas been generate2"<<endl;
       
    outputfile.close();
 
@@ -644,9 +644,11 @@ void GenerateCompCpuFile(string input,string output,string includeListe[], strin
     }
     ifstream in1(input.c_str());
     if(in1)
+      
     {
       for(int r=0 ; r<TSIZE; r++) affinity[r]=0;
       i=0;
+      ofstream out_includefile("listeinclude.txt"); 
       /// lecture des includes pour savoir les fichiers à ouvrir
       	while(getline(in1,line)) /// si au out de 15 itérations on ne trouve plus d'include on arrete de chercher
 	{	    
@@ -659,6 +661,8 @@ void GenerateCompCpuFile(string input,string output,string includeListe[], strin
 	    pos=line.find("include");
 	    if (pos!=-1)
 	    ListeFileToGenerate[i] = Stmp.substr(0,Stmp.size()-1);
+	    if(once)
+	    out_includefile<<ListeFileToGenerate[i]<<endl;
 // 	    cout<<ListeFileToGenerate[i]<<endl;
 	    Stmp.clear();
 	    i++;
@@ -869,7 +873,7 @@ void GenerateCompCpuFile(string input,string output,string includeListe[], strin
 			    Stmp= Stmp.substr(0,(int)(Stmp.size()-1));
 			    outputfile<<Stmp<<endl;  /// on ecrit dans le fichier composition de sortie
 			  }
-			  else {coucou(); cout<<line<<endl;}
+			  else {/*coucou()*/; cout<<line<<endl;}
 			  
 			  Stmp.clear();	
 			
@@ -1423,7 +1427,7 @@ int getAffinityOf(string inputfile, string componentname)
 
 
 void FindAndReplaceAffinity(string compositionfile, string compositionfile_temp,uint OldAffinity,uint NewAffinity)
-{
+{/// cette fonction change toute les affinités
   
    string line,tmp;
   size_t pos=-1;
@@ -1468,6 +1472,71 @@ void FindAndReplaceAffinity(string compositionfile, string compositionfile_temp,
   {
     cout<<"ERREUR exit("<<6<<")fichier inexistant ou ouverture impossible: "<<compositionfile<<endl;
     cout<<"voir fonction : FindAndReplaceAffinity(,,,) "<<endl;
+    exit(6);
+    
+  }
+  
+    /// on ferme les  fichiers puis on fait une recopie
+  outputfile.close(); 
+  readingfile.close();
+  
+  ofstream write(compositionfile.c_str(),ios::trunc);   
+  ifstream read(compositionfile_temp.c_str());
+  while(getline(read,line))
+  {
+    write<<line<<endl;
+  }
+  read.close(); 
+  write.close();
+  tmp.clear();
+  
+}
+
+
+void FindAndReplaceOneAffinity(string compositionfile, string compositionfile_temp,uint OldAffinity,uint NewAffinity)
+{/// cette fonction change une seule affinité
+  
+  string line,tmp;
+  size_t pos=-1;
+  ostringstream convert;
+  ofstream outputfile(compositionfile_temp.c_str(),ios::trunc);   
+  bool found =true;
+  if(!outputfile)
+  {
+    cout<<"ERREUR exit("<<5<<")impossible de crée le fichier: "<<compositionfile_temp<<endl;
+    cout<<"voir fonction : FindAndReplaceOneAffinity(,,,) "<<endl;
+    exit(5);
+  }
+
+  ifstream readingfile(compositionfile.c_str());   
+  if(readingfile)
+  {
+    while(getline(readingfile,line)) 
+      {
+	convert.str(""); convert.clear();
+	 convert<<OldAffinity; 
+	 tmp="configure_affinity( "+convert.str();
+	  pos=line.find(tmp);
+	  if (pos!=-1  &&found)
+	  {
+	    convert.str(""); convert.clear();
+	    convert<<NewAffinity; 
+	    line.replace(pos+tmp.size()-1,convert.str().size(),convert.str());
+	    outputfile<<line<<endl;
+	    found= false;
+	  }
+	  else 
+	  {
+	    outputfile<<line<<endl;
+	  }
+	
+      }
+    
+  }
+  else 
+  {
+    cout<<"ERREUR exit("<<6<<")fichier inexistant ou ouverture impossible: "<<compositionfile<<endl;
+    cout<<"voir fonction : FindAndReplaceOneAffinity(,,,) "<<endl;
     exit(6);
     
   }
