@@ -119,15 +119,16 @@ uint setCpuLoadLevel(CPU MesCPU,uint nb_cpu,string includeListe[],string compone
   {
 
       SIZE_MIXTE=NbThread/nb_cpu;
-      SIZE_RESTE=NbThread%nb_cpu;
+//       SIZE_RESTE=NbThread%nb_cpu;
       NbMaxCpu=nb_cpu;
+//       cout << SIZE_MIXTE <<endl<< SIZE_RESTE <<endl;e();
   }
   else
   { 
     if(nb_cpu>4)
     {
       SIZE_MIXTE=NbThread/nb_cpu/2;
-      SIZE_RESTE=NbThread%nb_cpu;
+//       SIZE_RESTE=NbThread%nb_cpu;
       NbMaxCpu=nb_cpu-2;
       
     }
@@ -201,7 +202,7 @@ uint setCpuLoadLevel(CPU MesCPU,uint nb_cpu,string includeListe[],string compone
 	    }
 
 	}	    
-	else								///				/// sinon on sait que la liste des threads n'est pas encore vide !
+	else								  				/// sinon on sait que la liste des threads n'est pas encore vide !
 	    {
 	    indice=1;
 	    sortie = true;

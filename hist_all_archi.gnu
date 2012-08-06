@@ -9,6 +9,6 @@ set style fill solid border -1
 set boxwidth 1.0 
 set xtics border in scale 0,0 nomirror rotate by 90  offset character 1.7,-1, 0
 set xtics  norangelimit font ",9"
- set xtics (  "150\n" 0,  "150\n150\n150\n" 1,  "250\n250\n250\n" 2,  "350\n350\n350\n" 3,  "400\n450\n450\n" 4,  "400\n550\n550\n" 5,  "350\n600\n550\n" 6,  "325\n600\n550\n" 7,  "375\n600\n550\n" 8,  "375\n350\n550\n" 9)
-plot 'all_cpu_hist.dat' using 1 title "cpu_0", '' using 2 title "cpu_1", '' using 3 title "cpu_2", 85 with lines linecolor rgb "red"  title "Max", 70  with lines linecolor rgb "red" title "Min";
+ set xtics (  "200\n" 0,  "200\n200\n200\n200\n" 1,  "300\n300\n300\n300\n" 2,  "400\n400\n400\n400\n" 3,  "500\n500\n500\n500\n" 4,  "600\n600\n600\n600\n" 5,  "700\n700\n700\n700\n" 6,  "800\n700\n700\n700\n" 7,  "875\n700\n700\n700\n" 8)
+plot 'all_cpu_hist.dat' using 1 title "cpu_0", '' using 2 title "cpu_1", '' using 3 title "cpu_2", '' using 4 title "cpu_3", 85 with lines linecolor rgb "red"  title "Max", 70  with lines linecolor rgb "red" title "Min";
 pause -1 

@@ -54,7 +54,7 @@ uint setCpuLoadLevel(CPU MesCPU,uint nb_cpu,string includeListe[],string compone
   float cpuload_cur[nb_cpu];
   float MaxCpuload,MinCpuload, tabcpuload[nb_cpu-1];
   uint indice_cpuMax, indice_cpuMin;
-  bool sortie=true;
+  bool sortie=true,quit=true;
      string Group_cnxname[TSIZE]; 
    int taille,Group_Aff[TSIZE];
   string compositionfile="composition.txt", composition_copie=string(_argv[2])+"composition_copie.txt",compositionfile_temp="composition_temp.txt";
@@ -69,10 +69,13 @@ uint setCpuLoadLevel(CPU MesCPU,uint nb_cpu,string includeListe[],string compone
   
   once=true;
   GenerateCompCpuFile(composition_copie,compositionfile,includeListe,componentListe,&nb_affinity,&nb_component);
+//    for (int u=0; u<nb_component;u++) cout <<componentListe[u]<<endl;
+ 
   once=false;
+//    e();
   ListOuvert=CloneG_TBC(GroupAffinity);
   ListFerme =CloneG_TBC(GroupAffinity);
-  LoadMax= LoadMax+0.7;
+//   LoadMax= LoadMax;
 //   G_TBC_Afficher(GroupAffinity);
 //     CalculTBC(ListFerme, cpu_access);
 //    e();
@@ -114,13 +117,11 @@ uint setCpuLoadLevel(CPU MesCPU,uint nb_cpu,string includeListe[],string compone
    
   if( nb_cpu <=4 || NbThread <LIMIT )
   {
-//       if(!(NbThread%nb_cpu) )
-//       {
+
       SIZE_MIXTE=NbThread/nb_cpu;
       SIZE_RESTE=NbThread%nb_cpu;
       NbMaxCpu=nb_cpu;
-     // ALGO = SEQUENTIEL; /// /Mixte_1
-//       }
+//       cout << SIZE_MIXTE <<endl<< SIZE_RESTE <<endl;e();
   }
   else
   { 
@@ -129,384 +130,165 @@ uint setCpuLoadLevel(CPU MesCPU,uint nb_cpu,string includeListe[],string compone
       SIZE_MIXTE=NbThread/nb_cpu/2;
       SIZE_RESTE=NbThread%nb_cpu;
       NbMaxCpu=nb_cpu-2;
-     // ALGO = SEQUENTIEL;/// MIxte_2
       
     }
   }
  
-//FindGroupCpuFix(ListOuvert, Group_Aff, &nb_priority);
 
-//  for(int h=0; h<nb_priority;h++) cout <<Group_Aff[h]<<endl;e();
-//switch (ALGO)
-//{
-//case SEQUENTIEL: 
-  /*
-	    if(TYPE==IS_HYPER_LOW) offset_frequence=50;
-	    else 
+	offset_frequence=50;
+	for(i=0; i<nb_cpu ;i++) /// copie des frequences des cpu pour l'écriture  dans les fichiers de sortie
+	{
+	    if(cpu_tmp->work_frequency<200)
 	    {
-	      if(TYPE == IS_HYPER_HIGH) offset_frequence=50;
-	      else{
-		  if(TYPE==IS_LOW) offset_frequence=50;
-		  else {
-			if(TYPE==IS_MEDIUM) offset_frequence=25;
-			else offset_frequence=0;
-			}
-	      }
-	    }*/
-  
-// 	    offset_frequence=50;
-// 	    for(i=0; i<nb_cpu ;i++) /// copie des frequences des cpu pour l'écriture  dans les fichiers de sortie
-// 	    {
-// 		if(cpu_tmp->work_frequency<200)
-// 		{
-// 		    cout << " tbc bas + low " << endl;
-// 		    SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency+offset_frequence);
-// 		    AccessToCPU(cpu_access,i)->work_frequency=cpu_tmp->work_frequency;
-// 		}
-// 		frequence[i]=cpu_tmp->work_frequency;
-// 		cpu_tmp=cpu_tmp->next;
-// 	    }
-// 	   // coucou();
-// 	    CalculTBC(ListFerme, cpu_access);
-// 	    
-//   	   /* for(int h=0; h<3;h++)	    
-// 	    for(uint u=0; u<nb_priority;u++)
-// 	    {
-// 	      indice = Group_Aff[u];
-// 	       for(uint X=0; X<ListOuvert->nb_input;X++)
-// 		  {
-// 		      if(getValAffinity(ListOuvert->TypeAff[X])==AFF_GROUP && ListOuvert->affinity[X]==0)/// pour les affinité en Groupe : type( A,B,C,....Z)
-// 		      {
-// 			FindSimilarGroup(ListFerme, ListOuvert->TypeAff[X], Group_cnxname, &taille); 
-// 			for( int p=0; p<taille;p++)
-// 			{
-// 			  ChangeAffinity(composition_copie,compositionfile_temp,Group_cnxname[p],indice);
-// 			  ListOuvert->affinity[p]=indice;
-// 			}
-// 		      }
-// 		      else
-// 		      {
-// 			if(getValAffinity(ListOuvert->TypeAff[X])==AFF_VAR && ListOuvert->affinity[X]==0)
-// 			{
-// 			  ChangeAffinity(composition_copie,compositionfile_temp,ListOuvert->cnx_name[X],indice);
-// 			  ListOuvert->affinity[X]=indice;
-// 			}
-//  		      }
-// 		  }
-// // 		  GenerateCompCpuFile(composition_copie,compositionfile,includeListe,componentListe,&nb_affinity,&nb_component);
-// 		  ListOuvert=ListOuvert->next;
-// 	    }*/
-// 	  //GenerateCompCpuFile(composition_copie,compositionfile,includeListe,componentListe,&nb_affinity,&nb_component);
-// 	  
-// 	  getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
-// 	  indice=1;
-// 	  sortie=false;
-// 	    while(ListOuvert !=NULL && indice<nb_cpu &&  cpuload_cur[0]>LoadMax)/// tant que la liste n'est pas vide ou bien  qu'on pas au cpu_0
-// 	    {
-// 	      
-// 		if(sortie){getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);sortie=false;}
-// 		for(i=1; i<nb_cpu;i++)/// augmentation de la fréquence de tous les cpu dont le cpuload_cur[]>LoadMax 80.0
-// 		{
-// 		    cpu_tmp = AccessToCPU(cpu_access,i);
-// 		    if(cpuload_cur[i]>LoadMax)
-// 		    {			
-// 		      if(TYPE==IS_HYPER_LOW && cpu_tmp->work_frequency<200) { SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency+75); }
-// 		      else {
-// 			      if(TYPE==IS_LOW && cpu_tmp->work_frequency<250) { SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency+75); }
-// 			      else { 
-// 				    if(TYPE==IS_MEDIUM && cpu_tmp->work_frequency<250 )SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency+50); 
-// 				    else SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency+25); 
-// 				   }
-// 			   }
-// 			AccessToCPU(cpu_access,i)->work_frequency=cpu_tmp->work_frequency;	
-// 		    }
-// 		    frequence[i]=cpu_tmp->work_frequency;
-// 		}
-// 		CalculTBC(ListFerme, cpu_access);
-// 		getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
-// 		
-// 		///modification seulement de l'affinité de la liste ! :D
-// 		if(cpuload_cur[indice]<LoadMin  && ListOuvert!=NULL && cpuload_cur[0]>LoadMax ) ///si le cpu courant n'est pas assez chargé on lui rajoute des threads
-// 		{
-// 		 for(uint X=0; X<ListOuvert->nb_input;X++)
-// 		 {
-// 		      if(getValAffinity(ListOuvert->TypeAff[X])==AFF_GROUP && ListOuvert->affinity[X]==0)/// pour les affinité en Groupe : type( A,B,C,....Z)
-// 		      {
-// 			FindSimilarGroup(ListFerme, ListOuvert->TypeAff[X], Group_cnxname, &taille); 
-// 			for( int p=0; p<taille;p++)
-// 			{
-// 			  ChangeAffinity(composition_copie,compositionfile_temp,Group_cnxname[p],indice);
-// 			  ListOuvert->affinity[p]=indice;
-// 			}
-// 		      }
-// 		      else
-// 		      {
-// 			if(getValAffinity(ListOuvert->TypeAff[X])==AFF_VAR && ListOuvert->affinity[X]==0)
-// 			{
-// 			  ChangeAffinity(composition_copie,compositionfile_temp,ListOuvert->cnx_name[X],indice);
-// 			  ListOuvert->affinity[X]=indice;
-// 			}
-// 		      }
-// 		 }
-// 		  GenerateCompCpuFile(composition_copie,compositionfile,includeListe,componentListe,&nb_affinity,&nb_component);
-// 		  ListOuvert=ListOuvert->next;
-// 		  sortie=true;    
-// 		}
-// 		else
-// 		{
-// 		  indice++;
-// 		  //if(indice>nb_cpu) indice=1;
-// // 		  if(findnotint(Group_Aff, indice, nb_priority))
-// // 		  {
-// // 		  }
-// // 		  if(sortie) indice++;
-// // 		  if(j++<nb_priority){ indice = Group_Aff[j];sortie=false;}
-// // 		   else 
-// // 		   {
-// // 		     if(!sortie)
-// // 		      {sortie =true;indice=1;}
-// // 		   }
-// 		}
-// 	    }/// end while
-    
-//break;
-
-//case MIXTE:
-//   coucou();e();
-/*	    if(TYPE==IS_HYPER_LOW)
-	    {
-	       SIZE_MIXTE=2;/// nombre de SLICE/FILTRE par CPU
-		    NbMaxCpu =nb_cpu-1;/// nombre de CPU en parallèle
-		    offset_frequence=100;//50
+		SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency+ offset_frequence);
+		AccessToCPU(cpu_access,i)->work_frequency=cpu_tmp->work_frequency;
 	    }
-	    else
-	    {
-		if(TYPE==IS_LOW)
-		{
-		    SIZE_MIXTE=3;/// nombre de SLICE/FILTRE par CPU
-		    NbMaxCpu =nb_cpu/2+1;/// nombre de CPU en parallèle
-		    offset_frequence=50;//50
-		}
-		else
-		{
-		    if(TYPE==IS_MEDIUM)
+	    
+	    frequence[i]=cpu_tmp->work_frequency;
+	    cpu_tmp=cpu_tmp->next;
+	}
+	i=0;j=1;
+	CalculTBC(ListFerme, cpu_access);
+	getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
+      // if(cpuload_cur[0]<LoadMax){cout<<"cpuLoad_"<<0<<" < "<<LoadMax<<endl;return numerodossier; }
+	/// on va changer l'affinity de NbMaxCpu en parallèle si le ticktimer n'est pas trop élévé 
+	///et le reste se fera de façon sequentielle s'il reste encore des  threads
+
+	for(uint t=0;t<=SIZE_MIXTE && ListOuvert !=NULL;t++)
+	{
+	    for(indice=0;indice<NbMaxCpu && ListOuvert !=NULL;indice++)
+	    {   
+	      for(uint X=0; X<ListOuvert->nb_input;X++)/// nombre de branchement par composant (generator, snk...)
+	      {
+		  if(getValAffinity(ListOuvert->TypeAff[X])==AFF_GROUP && ListOuvert->affinity[X]==0)/// pour les affinité en Groupe : type( A,B,C,....Z)
+		  {
+		    FindSimilarGroup(ListFerme, ListOuvert->TypeAff[X], Group_cnxname, &taille); 
+		    for( int p=0; p<taille;p++)
 		    {
-			SIZE_MIXTE=3;/// ou 4+/-:1
-			NbMaxCpu=nb_cpu/2;
-			offset_frequence=25;//25
+		      ChangeAffinity(composition_copie,compositionfile_temp,Group_cnxname[p],indice);
+		      ListOuvert->affinity[p]=indice;
+		    }
+		  }
+		  else
+		  {
+		    if(getValAffinity(ListOuvert->TypeAff[X])==AFF_VAR && ListOuvert->affinity[X]==0)
+		    {
+		      ChangeAffinity(composition_copie,compositionfile_temp,ListOuvert->cnx_name[X],indice);
+		      ListOuvert->affinity[X]=indice;
+		    }
+		  }
+	      }
+		ListOuvert=ListOuvert->next;
+	    }
+	}
+	GenerateCompCpuFile(composition_copie,compositionfile,includeListe,componentListe,&nb_affinity,&nb_component);
+	indice=1;
+	cpu_tmp = AccessToCPU(cpu_access,indice);
+	/// fin de la partie parallèle on regarde d'abord s'il n'y plus de threads dans notre liste !
+	if(ListOuvert==NULL)/// si liste vide 
+	{
+	    getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
+	    /// maintenant on va vérifier les cas où le cpu_0  a un chargement inférieur à 5%
+	    for(i=0;i<nb_cpu-1;i++) { tabcpuload[i]=cpuload_cur[i+1];}
+	    getMinMaxCpuLoad( tabcpuload,NULL,nb_cpu-1,  0,&MaxCpuload, &MinCpuload,&indice_cpuMax, &indice_cpuMin); /// recherche min et max  
+	    if(cpuload_cur[0]<30.0)
+	    {
+		cpu_tmp=AccessToCPU(cpu_access,0);
+		FindAndReplaceAffinity(composition_copie,compositionfile_temp,indice_cpuMin+1,0);
+		GenerateCompCpuFile(composition_copie,compositionfile,includeListe,componentListe,&nb_affinity,&nb_component);
+		CalculTBC(ListFerme, cpu_tmp);
+		getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
+
+	    }
+
+	}	    
+	else								  				/// sinon on sait que la liste des threads n'est pas encore vide !
+	    {
+	    indice=1;
+	    sortie = true;
+	    while(ListOuvert !=NULL && indice<nb_cpu &&  cpuload_cur[0]>LoadMax)/// tant que la liste n'est pas vide ou bien  qu'on pas au cpu_0
+		{
+		    if(sortie )
+		    {
+			getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence); sortie=false;	 
+		    }
+
+		    for(i=0; i<nb_cpu;i++)/// augementation de la fréquence de tous les cpu dont le cpuload_cur[]>LoadMax 80.0
+		    {
+			cpu_tmp = AccessToCPU(cpu_access,i);
+			if(cpuload_cur[i]>LoadMax)
+			{
+			   if(cpuload_cur[indice]>LoadMax+5.0) offset_frequence =100;
+			    else offset_frequence =25;
+			  SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency+offset_frequence); 
+			    AccessToCPU(cpu_access,i)->work_frequency=cpu_tmp->work_frequency;
+			    CalculTBC(ListFerme, cpu_access);
+			    sortie=true;
+			}
+			frequence[i]=cpu_tmp->work_frequency;
+		    }
+
+		    if(sortie) 
+		    {
+			getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence); sortie=false;	 
+		    }
+		    if(cpuload_cur[indice]<LoadMin  && ListOuvert!=NULL && cpuload_cur[0]>LoadMax) ///si le cpu courant n'est pas assez chargé on lui rajoute des threads
+		    {
+			for(uint X=0; X<ListOuvert->nb_input;X++)
+			{
+			      if(getValAffinity(ListOuvert->TypeAff[X])==AFF_GROUP && ListOuvert->affinity[X]==0)/// pour les affinité en Groupe : type( A,B,C,....Z)
+			      {
+				FindSimilarGroup(ListFerme, ListOuvert->TypeAff[X], Group_cnxname, &taille); 
+				for( int p=0; p<taille;p++)
+				{
+				  ChangeAffinity(composition_copie,compositionfile_temp,Group_cnxname[p],indice);
+				  ListOuvert->affinity[p]=indice;
+				}
+			      }
+			      else
+			      {
+				if(getValAffinity(ListOuvert->TypeAff[X])==AFF_VAR && ListOuvert->affinity[X]==0)
+				{
+				  ChangeAffinity(composition_copie,compositionfile_temp,ListOuvert->cnx_name[X],indice);
+				  ListOuvert->affinity[X]=indice;
+				}
+			      }
+			}
+			GenerateCompCpuFile(composition_copie,compositionfile,includeListe,componentListe,&nb_affinity,&nb_component);
+			ListOuvert=ListOuvert->next;
 		    }
 		    else
 		    {
-		      if(TYPE==IS_HIGH)
-		      {
-			SIZE_MIXTE=5;/// ou 5
-			NbMaxCpu =nb_cpu/2;
-			offset_frequence=0;//0
-		      }
+			indice++;
 		    }
-		}
-	    }*/
-offset_frequence=50;
-	    for(i=0; i<nb_cpu ;i++) /// copie des frequences des cpu pour l'écriture  dans les fichiers de sortie
-	    {
-		if(cpu_tmp->work_frequency<200)
-		{
-		    SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency+ offset_frequence);
-		    AccessToCPU(cpu_access,i)->work_frequency=cpu_tmp->work_frequency;
-		}
-		
-		frequence[i]=cpu_tmp->work_frequency;
-		cpu_tmp=cpu_tmp->next;
-	    }
-	    i=0;j=1;
-	    CalculTBC(ListFerme, cpu_access);
-	    getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
-	  // if(cpuload_cur[0]<LoadMax){cout<<"cpuLoad_"<<0<<" < "<<LoadMax<<endl;return numerodossier; }
-	    /// on va changer l'affinity de NbMaxCpu en parallèle si le ticktimer n'est pas trop élévé 
-	    ///et le reste se fera de façon sequentielle s'il reste encore des  threads
-	/*  for(uint t=0;t<=SIZE_MIXTE && ListOuvert !=NULL;t++)
-	  {
-	    for(uint u=0; u<nb_priority;u++)
-	    {
-	      indice = Group_Aff[u];
-	       for(uint X=0; X<ListOuvert->nb_input;X++)
-		  {
-		      if(getValAffinity(ListOuvert->TypeAff[X])==AFF_GROUP && ListOuvert->affinity[X]==0)/// pour les affinité en Groupe : type( A,B,C,....Z)
-		      {
-			FindSimilarGroup(ListFerme, ListOuvert->TypeAff[X], Group_cnxname, &taille); 
-			for( int p=0; p<taille;p++)
-			{
-			  ChangeAffinity(composition_copie,compositionfile_temp,Group_cnxname[p],indice);
-			  ListOuvert->affinity[p]=indice;
-			}
-		      }
-		      else
-		      {
-			if(getValAffinity(ListOuvert->TypeAff[X])==AFF_VAR && ListOuvert->affinity[X]==0)
-			{
-			  ChangeAffinity(composition_copie,compositionfile_temp,ListOuvert->cnx_name[X],indice);
-			  ListOuvert->affinity[X]=indice;
-			}
-		      }
-		  }
-		  ListOuvert=ListOuvert->next;
-	    }
-	    
-	  }*/
-	 // GenerateCompCpuFile(composition_copie,compositionfile,includeListe,componentListe,&nb_affinity,&nb_component);
 
-	    for(uint t=0;t<=SIZE_MIXTE && ListOuvert !=NULL;t++)
-	    {
-		for(indice=0;indice<NbMaxCpu && ListOuvert !=NULL;indice++)
-		{   
-		  for(uint X=0; X<ListOuvert->nb_input;X++)/// nombre de branchement par composant (generator, snk...)
-		  {
-		      if(getValAffinity(ListOuvert->TypeAff[X])==AFF_GROUP && ListOuvert->affinity[X]==0)/// pour les affinité en Groupe : type( A,B,C,....Z)
-		      {
-			FindSimilarGroup(ListFerme, ListOuvert->TypeAff[X], Group_cnxname, &taille); 
-			for( int p=0; p<taille;p++)
-			{
-			  ChangeAffinity(composition_copie,compositionfile_temp,Group_cnxname[p],indice);
-			  ListOuvert->affinity[p]=indice;
-			}
-		      }
-		      else
-		      {
-			if(getValAffinity(ListOuvert->TypeAff[X])==AFF_VAR && ListOuvert->affinity[X]==0)
-			{
-			  ChangeAffinity(composition_copie,compositionfile_temp,ListOuvert->cnx_name[X],indice);
-			  ListOuvert->affinity[X]=indice;
-			}
-		      }
-		  }
-		    ListOuvert=ListOuvert->next;
-		}
-	    }
-	    GenerateCompCpuFile(composition_copie,compositionfile,includeListe,componentListe,&nb_affinity,&nb_component);
-	    indice=1;
-	    cpu_tmp = AccessToCPU(cpu_access,indice);
-	    /// fin de la partie parallèle on regarde d'abord s'il n'y plus de threads dans notre liste !
-	    if(ListOuvert==NULL)/// si liste vide 
-	    {
-		getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
-		/// maintenant on va vérifier les cas où le cpu_0  a un chargement inférieur à 5%
-		for(i=0;i<nb_cpu-1;i++) { tabcpuload[i]=cpuload_cur[i+1];}
-		getMinMaxCpuLoad( tabcpuload,NULL,nb_cpu-1,  0,&MaxCpuload, &MinCpuload,&indice_cpuMax, &indice_cpuMin); /// recherche min et max  
-		if(cpuload_cur[0]<30.0)
-		{
-		    cpu_tmp=AccessToCPU(cpu_access,0);
-		    FindAndReplaceAffinity(composition_copie,compositionfile_temp,indice_cpuMin+1,0);
-		    GenerateCompCpuFile(composition_copie,compositionfile,includeListe,componentListe,&nb_affinity,&nb_component);
-		    CalculTBC(ListFerme, cpu_tmp);
-		    getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
-
-		}
-
-	    }	    
-	    else								///				/// sinon on sait que la liste des threads n'est pas encore vide !
-		{
-		indice=1;
-		sortie = true;
-		while(ListOuvert !=NULL && indice<nb_cpu &&  cpuload_cur[0]>LoadMax)/// tant que la liste n'est pas vide ou bien  qu'on pas au cpu_0
-		    {
-			if(sortie )
-			{
-			    getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence); sortie=false;	 
-			}
-
-			for(i=0; i<nb_cpu;i++)/// augementation de la fréquence de tous les cpu dont le cpuload_cur[]>LoadMax 80.0
-			{
-			    cpu_tmp = AccessToCPU(cpu_access,i);
-			    if(cpuload_cur[i]>LoadMax)
-			    {
-			      SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency+25); 
-// 				if(TYPE==IS_HYPER_LOW || cpu_tmp->work_frequency<300) { SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency+100); }
-// 				else
-// 				{
-// 				    if(TYPE==IS_LOW && cpu_tmp->work_frequency<300) { SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency+75); }
-// 				    else { 
-// 					if(TYPE==IS_MEDIUM && cpu_tmp->work_frequency<300 )SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency+50); 
-// 					else SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency+25); 
-// 					}
-// 				}
-				AccessToCPU(cpu_access,i)->work_frequency=cpu_tmp->work_frequency;
-				CalculTBC(ListFerme, cpu_access);
-
-				sortie=true;
-			    }
-			    frequence[i]=cpu_tmp->work_frequency;
-			}
-
-			if(sortie) 
-			{
-			    getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence); sortie=false;	 
-			}
-			if(cpuload_cur[indice]<LoadMin  && ListOuvert!=NULL && cpuload_cur[0]>LoadMax) ///si le cpu courant n'est pas assez chargé on lui rajoute des threads
-			{
-			    for(uint X=0; X<ListOuvert->nb_input;X++)
-			    {
-				  if(getValAffinity(ListOuvert->TypeAff[X])==AFF_GROUP && ListOuvert->affinity[X]==0)/// pour les affinité en Groupe : type( A,B,C,....Z)
-				  {
-				    FindSimilarGroup(ListFerme, ListOuvert->TypeAff[X], Group_cnxname, &taille); 
-				    for( int p=0; p<taille;p++)
-				    {
-				      ChangeAffinity(composition_copie,compositionfile_temp,Group_cnxname[p],indice);
-				      ListOuvert->affinity[p]=indice;
-				    }
-				  }
-				  else
-				  {
-				    if(getValAffinity(ListOuvert->TypeAff[X])==AFF_VAR && ListOuvert->affinity[X]==0)
-				    {
-				      ChangeAffinity(composition_copie,compositionfile_temp,ListOuvert->cnx_name[X],indice);
-				      ListOuvert->affinity[X]=indice;
-				    }
-				  }
-			    }
-			    GenerateCompCpuFile(composition_copie,compositionfile,includeListe,componentListe,&nb_affinity,&nb_component);
-			    ListOuvert=ListOuvert->next;
-			}
-			else
-			{
-			    indice++;
-			}
-
-		    }/// end while
-	    }/// end else
-
-//break;
-
-//default:
- //  cout << "partie de d'algo non implémentée " << endl;  break;
-    
-//}/// fin du Switch
-
+		}/// end while
+	}/// end else
 	max=nb_cpu;
-	//getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
-	while(max>0) /// tant qu'il y en aura un cpuload superieur à 83-85%  on augementera la fréquence 
+	while(max> 1 && numerodossier<20) /// tant qu'il y en aura un cpuload superieur à 83-85%  on augementera la fréquence 
 	{	
-	    for(indice=0; indice<nb_cpu && max>0;indice++)/// on regardera tout les niveaux de chargement des CPU qui fonctionnent !
+	    for(indice=0; indice<nb_cpu && max>0 && numerodossier<20;indice++)/// on regardera tout les niveaux de chargement des CPU qui fonctionnent !
 	    {
 		if(cpuload_cur[indice]>LoadMax && frequence[indice]<(AccessToCPU(cpu_access,indice)->end_frequency))
 		{
 		    if(max<=nb_cpu+1) {max++;}
+		    if(cpuload_cur[indice]>LoadMax+5.0) offset_frequence =100;
+		    else offset_frequence =50;
 		    cpu_tmp =AccessToCPU(cpu_access,indice);
-		   /* if(TYPE==IS_HYPER_LOW) SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency+50);
-		    if(TYPE==IS_HIGH) SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency+25);
-		    if(TYPE==IS_MEDIUM || TYPE ==IS_LOW) */
-		      SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency+50);
+		    SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency+offset_frequence);
 		    frequence[indice]=cpu_tmp->work_frequency;
 		    AccessToCPU(cpu_access,indice)->work_frequency=cpu_tmp->work_frequency;
-
 		}
 		else
 		{
-		    if(cpuload_cur[indice]>30.0 && cpuload_cur[indice]<LoadMin && frequence[indice]>(AccessToCPU(cpu_access,indice)->start_frequency))
+		    if(cpuload_cur[indice]<LoadMin && frequence[indice]>(AccessToCPU(cpu_access,indice)->start_frequency))
 		    {
 
 			if(max<=nb_cpu+1) {max++;}
+			if(cpuload_cur[indice]<LoadMin-5.0) offset_frequence =50;
+			else offset_frequence =25;
 			cpu_tmp =AccessToCPU(cpu_access,indice);
-			SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency-25);
+			SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency-offset_frequence);
 			frequence[indice]=cpu_tmp->work_frequency;
 			AccessToCPU(cpu_access,indice)->work_frequency=cpu_tmp->work_frequency;
 
@@ -516,95 +298,109 @@ offset_frequence=50;
 		}
 	    }
 	    CalculTBC(ListFerme, cpu_access);
-	   if(max>0)///0
+	   if(max>1)///0
 	    {
-	      
 		getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
 		max--;
 	    }
 	}
-	
-  	coucou();coucou();e();
-	/// maintenant on va vérifier les cas où le cpu_0  a un chargement inférieur à 40%
-	for(i=0;i<nb_cpu-1;i++) { tabcpuload[i]=cpuload_cur[i+1];}
-	getMinMaxCpuLoad( tabcpuload,NULL,nb_cpu-1,  0,&MaxCpuload, &MinCpuload,&indice_cpuMax, &indice_cpuMin); /// recherche min et max  
-	if( cpuload_cur[0]<40.0 )
-	{
-	      cpu_tmp=AccessToCPU(cpu_access,0);
-	      FindAndReplaceAffinity(composition_copie,compositionfile_temp,indice_cpuMin+1,0);
-	      GenerateCompCpuFile(composition_copie,compositionfile,includeListe,componentListe,&nb_affinity,&nb_component);
-	      CalculTBC(ListFerme, cpu_access);
 
-	      while(notComprisEntre(cpuload_cur[0],LoadMin,LoadMax) && frequence[0]<(AccessToCPU(cpu_access,0)->end_frequency) && frequence[0]>(AccessToCPU(cpu_access,0)->start_frequency))
-	      {
-		
-		getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
-		if(cpuload_cur[0]>LoadMax && frequence[0]<=(AccessToCPU(cpu_access,0)->end_frequency))
+	
+	/// s'il y a un cpu qui dépasse la limite on enlève un threads puis un autre s'il le faut pour le mettre sur celui qui est le moins charger
+/*
+quit =true; 
+sortie = false;
+// uint except[nb_cpu];
+// int taille_except=0;
+while(quit && numerodossier<20 )
+{
+for(indice=0; indice<nb_cpu && !sortie;indice++)
+{
+  sortie = notComprisEntre(cpuload_cur[indice],LoadMin,LoadMax);
+  if(indice==nb_cpu-1) quit = false;
+}	     
+	for(i=0;i<nb_cpu;i++) { tabcpuload[i]=cpuload_cur[i];}
+	getMinMaxCpuLoad( tabcpuload,NULL,nb_cpu,0,&MaxCpuload, &MinCpuload,&indice_cpuMax, &indice_cpuMin); /// recherche min et max  
+// 	except[0]=indice_cpuMin;
+// 	taille_except=1;
+	if(MaxCpuload>(LoadMax+5.0) && cpuload_cur[indice]<(LoadMin-5.0) )
+	{
+	  FindAndReplaceOneAffinity(composition_copie,compositionfile_temp,indice_cpuMax,indice_cpuMin);
+	  GenerateCompCpuFile(composition_copie,compositionfile,includeListe,componentListe,&nb_affinity,&nb_component);
+	  CalculTBC(ListFerme,cpu_access);
+	  getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
+	}
+	else quit=false;
+	
+	
+	for(indice=0;indice<nb_cpu;indice++) 
+	 { 
+		if(cpuload_cur[indice]>LoadMax && frequence[indice]<(AccessToCPU(cpu_access,indice)->end_frequency))
 		  {
-		      SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency+25);
-		      frequence[0]=cpu_tmp->work_frequency;
-		      AccessToCPU(cpu_access,0)->work_frequency=cpu_tmp->work_frequency;
+		      if(cpuload_cur[indice]>LoadMax+5.0) offset_frequence =50;
+			else offset_frequence =25;
+		      SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency+offset_frequence);
+		      frequence[indice]=cpu_tmp->work_frequency;
+		      AccessToCPU(cpu_access,indice)->work_frequency=cpu_tmp->work_frequency;
 		      CalculTBC(ListFerme, cpu_access);
+		      getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
 
 		  }
 		  else
 		  {
-		      if(cpuload_cur[0]>30.0 && cpuload_cur[0]<LoadMin && frequence[0]>(AccessToCPU(cpu_access,0)->start_frequency))
+		      if(cpuload_cur[indice]<LoadMin && frequence[indice]>(AccessToCPU(cpu_access,indice)->start_frequency))
 		      {
-			  SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency-25);
-			  frequence[0]=cpu_tmp->work_frequency;
-			  AccessToCPU(cpu_access,0)->work_frequency=cpu_tmp->work_frequency;
+			if(cpuload_cur[indice]<LoadMin-5.0) offset_frequence =50;
+			else offset_frequence =25;
+			  SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency-offset_frequence);
+			  frequence[indice]=cpu_tmp->work_frequency;
+			  AccessToCPU(cpu_access,indice)->work_frequency=cpu_tmp->work_frequency;
 			  CalculTBC(ListFerme, cpu_access);
+			  getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
 		      }
 		    
 		  }
-	      }
-	}
+   
+	   
+	  }
+	
 
-	for(indice=0;indice<nb_cpu;indice++) 
-	 { max=0;
-	   if(cpuload_cur[indice]>1.0 && cpuload_cur[indice]<50.0)
-	   {
-	      for(i=0;i<nb_cpu;i++) { if(i!=indice && cpuload_cur[i]!=0.0) tabcpuload[max++]=cpuload_cur[i];}
-	      getMinMaxCpuLoad( tabcpuload,NULL,max,  0,&MaxCpuload, &MinCpuload,&indice_cpuMax, &indice_cpuMin);
-	      cpu_tmp=AccessToCPU(cpu_access,indice_cpuMin);
-	      FindAndReplaceAffinity(composition_copie,compositionfile_temp,indice,indice_cpuMin);
-	      GenerateCompCpuFile(composition_copie,compositionfile,includeListe,componentListe,&nb_affinity,&nb_component);
-	      CalculTBC(ListFerme, cpu_access);
+}
+*/
 
-	      indice=indice_cpuMin;
-	      getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
+/// ICI ON NE FAIT QU'UNE DERNIERE VERIFICATION DES CPULOAD 
+	for(indice=0;indice<nb_cpu && numerodossier<20;indice++) 
+	 { 
 
-	      while(notComprisEntre(cpuload_cur[indice],LoadMin,LoadMax) && frequence[indice]<(AccessToCPU(cpu_access,indice)->end_frequency) && frequence[indice]>(AccessToCPU(cpu_access,indice)->start_frequency))
+	      while(notComprisEntre(cpuload_cur[indice],LoadMin,LoadMax)  && frequence[indice]<(AccessToCPU(cpu_access,indice)->end_frequency) && frequence[indice]>(AccessToCPU(cpu_access,indice)->start_frequency))
 	      {
-		getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
-		if(cpuload_cur[indice]>LoadMax && frequence[indice]<=(AccessToCPU(cpu_access,indice)->end_frequency))
+		if(cpuload_cur[indice]>LoadMax && frequence[indice]<(AccessToCPU(cpu_access,indice)->end_frequency))
 		  {
-		      SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency+25);
+		    if(cpuload_cur[indice]>LoadMax+5.0) offset_frequence =50;
+		    else offset_frequence =25;
+		      SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency+offset_frequence);
 		      frequence[indice]=cpu_tmp->work_frequency;
 		      AccessToCPU(cpu_access,indice)->work_frequency=cpu_tmp->work_frequency;
-		      
+		      getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
+
 
 		  }
 		  else
 		  {
-		      if(cpuload_cur[indice]>30.0 && cpuload_cur[indice]<LoadMin && frequence[indice]>(AccessToCPU(cpu_access,indice)->start_frequency))
+		      if(cpuload_cur[indice]<LoadMin && frequence[indice]>(AccessToCPU(cpu_access,indice)->start_frequency))
 		      {
+			  if(cpuload_cur[indice]<LoadMin-5.0) offset_frequence =50;
+			  else offset_frequence =25;
 			  SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency-25);
 			  frequence[indice]=cpu_tmp->work_frequency;
 			  AccessToCPU(cpu_access,indice)->work_frequency=cpu_tmp->work_frequency;
-
+			  getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
 		      }
 		    
 		  }
-		  CalculTBC(ListFerme, cpu_access);
 	      }
-	      indice=0;
-	   }
 	   
 	  }
-
-
 
       thisMesCPU=NULL;
     coucou();
