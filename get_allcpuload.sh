@@ -17,4 +17,8 @@ sudo ./test.exe 2> $1
 #dot -Tps graph.dot -o graph.ps
 cp a cpuloadfile$3
 cp graph.dot cpuloadfile$3
+cp slice_1.txt cpuloadfile$3
+cp slice_2.txt cpuloadfile$3
+cp slice_3.txt cpuloadfile$3
+cp slice_4.txt cpuloadfile$3
 #okular graph.ps & 

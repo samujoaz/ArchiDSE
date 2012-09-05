@@ -1,0 +1,45 @@
+dans le dossier: cpuloadfile0/
+mean CPU0: 99.1102	Frequence du cpu: 200 Mhz
+*****
+dans le dossier: cpuloadfile1/
+mean CPU0: 99.1141	Frequence du cpu: 200 Mhz
+*****
+dans le dossier: cpuloadfile2/
+mean CPU0: 99.1158	Frequence du cpu: 200 Mhz
+*****
+dans le dossier: cpuloadfile3/
+mean CPU0: 99.0905	Frequence du cpu: 250 Mhz
+*****
+dans le dossier: cpuloadfile4/
+mean CPU0: 99.0855	Frequence du cpu: 300 Mhz
+*****
+dans le dossier: cpuloadfile5/
+mean CPU0: 99.0968	Frequence du cpu: 350 Mhz
+*****
+dans le dossier: cpuloadfile6/
+mean CPU0: 99.1132	Frequence du cpu: 400 Mhz
+*****
+dans le dossier: cpuloadfile7/
+mean CPU0: 99.1124	Frequence du cpu: 450 Mhz
+*****
+dans le dossier: cpuloadfile8/
+mean CPU0: 99.0972	Frequence du cpu: 500 Mhz
+*****
+dans le dossier: cpuloadfile9/
+mean CPU0: 99.111	Frequence du cpu: 550 Mhz
+*****
+dans le dossier: cpuloadfile10/
+mean CPU0: 99.0788	Frequence du cpu: 600 Mhz
+*****
+dans le dossier: cpuloadfile11/
+mean CPU0: 99.0833	Frequence du cpu: 650 Mhz
+*****
+dans le dossier: cpuloadfile12/
+mean CPU0: 99.1063	Frequence du cpu: 700 Mhz
+*****
+dans le dossier: cpuloadfile13/
+mean CPU0: 99.1066	Frequence du cpu: 750 Mhz
+*****
+dans le dossier: cpuloadfile14/
+mean CPU0: 99.1079	Frequence du cpu: 800 Mhz
+*****

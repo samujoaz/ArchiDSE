@@ -1,0 +1,18 @@
+component PU CPU0 HardWareComponent/cortexA9.txt 200
+component PU CPU1 HardWareComponent/cortexA9.txt 200
+component PU CPU2 HardWareComponent/cortexA9.txt 200
+component PU CPU3 HardWareComponent/cortexA9.txt 200
+component CACHE L1_0 32 32 4
+component CACHE L1_1 32 32 4
+component CACHE L1_2 32 32 4
+component CACHE L1_3 32 32 4
+component CACHE L2_0 1024 32 8
+connection CPU0 -> L1_0
+connection CPU1 -> L1_1 
+connection CPU2 -> L1_2
+connection CPU3 -> L1_3
+connection L1_0 -> L2_0
+connection L1_1 -> L2_0 
+connection L1_2 -> L2_0
+connection L1_3 -> L2_0
+

@@ -1,0 +1,30 @@
+
+component slice_comp
+{
+  provides Runnable input;
+  uses Runnable output;
+};
+
+behaviour slice_behaviour of slice_comp
+{
+  _var_ { int counter; };
+  _init_ { counter = 0; };
+  _state_ { SA };
+  _initial_state_ { SA };
+
+  input.run
+  {
+    (1) SA -[ ( this_->counter < 3 )  ]-> SA 1 { output.run } ! { this_->counter++; }
+    (2) SA -[ ( this_->counter == 3 ) ]-> SA 1 { output.run } ! { this_->counter = 0; }
+  }
+};
+
+characteristics( Architecture_parameters ) slice_timing_characs of slice_behaviour
+{
+  input.run
+  {
+    (1) { TBC 0 } [ 15039303 3235056 1623677 10500 6470 3247 270 1617 811 ]
+    (2) { TBC 0 } [ 12000000 3035056 1323677 10000 6000 3000 260 1500 800 ]
+  }
+
+};

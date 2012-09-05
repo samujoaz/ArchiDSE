@@ -17,7 +17,7 @@ characteristics( Architecture_parameters ) filter_timing_characs of filter_behav
 {
   input.run
   {
-    (1) { TBC 0 } [ 17000000 3235056 1623677 10500 6470 3247 270 1617 811 ]
+    (1) { TBC 0 } [ 90 17000000 3235056 1623677 10500 6470 3247 270 1617 811 66816 ]
   }
 
 };

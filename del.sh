@@ -12,7 +12,8 @@ rm snk_*
 rm cypher_*
 rm composition*
 rm modulator_*
-3rm listeTBC.txt 
+#rm listeTBC.txt 
+rm cnx_*
 rm void_*
 rm timer_manager_*
 clear

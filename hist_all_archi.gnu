@@ -9,6 +9,6 @@ set style fill solid border -1
 set boxwidth 1.0 
 set xtics border in scale 0,0 nomirror rotate by 90  offset character 1.7,-1, 0
 set xtics  norangelimit font ",9"
- set xtics (  "200\n" 0,  "200\n200\n200\n200\n" 1,  "300\n300\n300\n300\n" 2,  "400\n400\n400\n400\n" 3,  "500\n500\n500\n500\n" 4,  "600\n600\n600\n600\n" 5,  "700\n700\n700\n700\n" 6,  "800\n700\n700\n700\n" 7,  "875\n700\n700\n700\n" 8)
+ set xtics (  "200\n" 0,  "200\n200\n200\n200\n" 1,  "150\n150\n150\n150\n" 2,  "175\n175\n175\n175\n" 3,  "200\n200\n200\n200\n" 4,  "225\n225\n225\n225\n" 5,  "250\n250\n250\n250\n" 6,  "275\n275\n275\n275\n" 7,  "300\n300\n300\n300\n" 8,  "325\n325\n325\n325\n" 9,  "350\n350\n350\n350\n" 10,  "375\n375\n375\n375\n" 11,  "400\n400\n400\n400\n" 12,  "425\n425\n425\n425\n" 13,  "450\n450\n450\n450\n" 14,  "475\n475\n475\n475\n" 15,  "500\n500\n500\n500\n" 16,  "525\n525\n525\n525\n" 17,  "550\n550\n550\n550\n" 18,  "575\n575\n575\n575\n" 19,  "600\n600\n600\n600\n" 20,  "625\n625\n625\n625\n" 21,  "650\n650\n650\n650\n" 22,  "675\n675\n675\n675\n" 23,  "700\n700\n700\n700\n" 24,  "725\n725\n725\n725\n" 25,  "750\n750\n750\n750\n" 26,  "775\n750\n750\n775\n" 27,  "800\n775\n775\n800\n" 28,  "825\n775\n775\n825\n" 29,  "825\n775\n775\n825\n" 30)
 plot 'all_cpu_hist.dat' using 1 title "cpu_0", '' using 2 title "cpu_1", '' using 3 title "cpu_2", '' using 4 title "cpu_3", 85 with lines linecolor rgb "red"  title "Max", 70  with lines linecolor rgb "red" title "Min";
 pause -1 

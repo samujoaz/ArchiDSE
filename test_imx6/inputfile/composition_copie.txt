@@ -50,13 +50,13 @@ configuration cnx_filter4.configure_affinity( 0 );
 
 connection( asynchronous ) cnx_out1 filter1.output main.input_slice1;
 configuration cnx_out1.configure_priority_and_sched_fifo( 6, true );
-configuration cnx_out1.configure_affinity( 1 );
+configuration cnx_out1.configure_affinity( 0 );
 connection( asynchronous ) cnx_out2 filter2.output main.input_slice2;
 configuration cnx_out2.configure_priority_and_sched_fifo( 6, true );
-configuration cnx_out2.configure_affinity( 2 );
+configuration cnx_out2.configure_affinity( 0 );
 connection( asynchronous ) cnx_out3 filter3.output main.input_slice3;
 configuration cnx_out3.configure_priority_and_sched_fifo( 6, true );
-configuration cnx_out3.configure_affinity( 3 );
+configuration cnx_out3.configure_affinity( 0 );
 connection( asynchronous ) cnx_out4 filter4.output main.input_slice4;
 configuration cnx_out4.configure_priority_and_sched_fifo( 5, true );
 configuration cnx_out4.configure_affinity( 0 );

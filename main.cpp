@@ -7,12 +7,18 @@
 #include <fstream>
 #include <stdlib.h>
 #include <time.h>
+#include <map>
+#include <list>
+#include <utility>
+#include <algorithm>
+#include <vector>
 
 
 #include "fonctionsUtils.h"
 #include "generatefile.h"
 #include "utils.h"
 #include "regularisation.h"
+#include "regression.h"
 #define NbBoucle 1
 
 using namespace std;
@@ -20,42 +26,69 @@ using namespace std;
 extern COMPONENTDSP thisComposantsDSP;
 extern COMPONENTCPU thisComposantsCPU;
 extern CPU thisMesCPU;
-extern LISTE_TBC thisTBC;
-extern LISTE_TBC thisTBC2;
+// extern LISTE_TBC thisTBC;
+// extern LISTE_TBC thisTBC2;
 extern GROUP_TBC GroupAffinity;
 
 
 extern uint TSIZE;
-extern float TableTBC[100];
+extern double TableTBC[100];
 extern uint nbTBC;
 char **_argv;
-extern float LoadMax;
-extern float LoadMin;
+extern double LoadMax;
+extern double LoadMin;
+extern list <pair < string,double> > selected_connections;
+extern list < pair < string,double > > max_time_connections;
 
 
 int main (int argc,char* argv[])
 {
-  uint nb_cpu,nb_component=0,indice_cpu,i=0,frequence;
-  uint numerodossier=0;
-  char folder[100];
+  uint nb_cpu, numerodossier=0;
   string includeListe[TSIZE], componentListe[TSIZE],tmp;    
   cpu *cpu_tmp=NULL,*cpu_nb=NULL,*access_cpu=NULL;
   
-  TBC_InitListe(&thisTBC);/// à faire une seule fois
-  TBC_InitListe(&thisTBC2);
+//   TBC_InitListe(&thisTBC);/// à faire une seule fois
+//   TBC_InitListe(&thisTBC2);
   G_TBC_InitListe(&GroupAffinity);
   time_t start,end;
   char szInput [256];
   double dif;
-
  
-    if (argc == 8 && strcmp(argv[1],"DSE")==0)
+ 
+    if (argc >= 8 && strcmp(argv[1],"DSE")==0)
     {  
 	_argv =argv;
+	if(argc==8)
+	{
 	tmp =  argv[argc-1];
         LoadMax=atof(tmp.c_str()); 
 	tmp =  argv[argc-2];
-	LoadMin=atof(tmp.c_str());      
+	LoadMin=atof(tmp.c_str());   
+	}
+	else
+	{
+	  if(!(argc%2))
+	  {
+	    
+	    tmp =  argv[7];
+	    LoadMax=atof(tmp.c_str()); 
+	    tmp =  argv[6];
+	    LoadMin=atof(tmp.c_str());
+	    for(int i=0;i+8<argc;)
+	    {
+	      tmp = argv[i+9];	   
+// 	      cout<<  argv[i+8]<<endl;
+	      selected_connections.push_back(pair < string, double >(string(argv[i+8]),double(atof(tmp.c_str()))));
+// 	      time_connections[string(argv[i+8])].push_back(0.0);
+	      i+=2;
+	    }
+	  }
+	  else { cout<<"manque d'arguments  "<<endl ;  goto  here; }
+	  
+	}
+	
+
+// 	e();
 	time (&start);
 	tmp = string(argv[2])+string(argv[3]);
 	ReadCompositionFile(tmp);
@@ -67,8 +100,11 @@ int main (int argc,char* argv[])
 // 	for(int o=0;o<NbBoucle;o++) 
 // 	{ TabCPU[o]=CloneCPU(thisMesCPU); 
 // 	}
-// 	
-	
+// 	string S2 = "bonjour", S3= "bah";
+// 	S2=S2.substr(3,4);
+// 	cout<<S2<<endl;
+	cout<<"LoadMin :"<<LoadMin<<endl<<"LoadMax :"<<LoadMax<<endl;
+// 	e();
 // 	cout <<int('a')<< endl;e();
  	for(int o=0;o<NbBoucle;o++)
  	{	
@@ -95,13 +131,20 @@ int main (int argc,char* argv[])
 	}
 	
 	time (&end);
-	cout<<"Elapsed time: " << int(difftime(end,start))/60 <<" min "<<int(difftime(end,start))%60<<" sec.\n";
-
+	cout<<"Elapsed time process : " << int(difftime(end,start))/60 <<" min "<<int(difftime(end,start))%60<<" sec.\n";
+	for (list < pair < string, double > >::iterator iter = max_time_connections.begin(); iter != max_time_connections.end(); iter++) 
+	{
+	   cout<<"max time for " <<iter->first<< ": "<<iter->second<<" ms "<<endl;
+	}
+ 	//double coeff[3];
+ 	//affiche_regression(compute_regression("consoleak.txt"));
 
     }
     else 
     {
-        cout<<"\noption d'execution : DSE <inputArchi> <inputComposition> <ouput folder name> "<<endl;         
+ here:     cout<< "usage :\n<./executable> < DSE >   < folder_component_name/ > < Description_Architecture_file.txt> < Description_composition.txt> < cpuloadfile> <LoadMin>  <LoadMax> [<cnx_1> <value1>  <cnx_2> <value2> ......] "<<endl;
+  
+	exit(0);
     }
         
         
@@ -163,7 +206,7 @@ int main (int argc,char* argv[])
 	ReadCompositionFile(argv[2]);
         nb_component = GenerateCompCpuFile(argv[3],"composition.txt",includeListe,componentListe);
 	nb_cpu=NB_CPU(thisMesCPU);
-	float CPULOAD[nb_cpu], cpuload_ref=80.0, cpuload_prec=80.0, cpuload_cur=0.0f, cpuload_err=0.0f;
+	double CPULOAD[nb_cpu], cpuload_ref=80.0, cpuload_prec=80.0, cpuload_cur=0.0f, cpuload_err=0.0f;
 	
 	bool sortir=true;
 

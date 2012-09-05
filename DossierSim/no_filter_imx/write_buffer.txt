@@ -1,0 +1,23 @@
+
+component write_buffer_comp 
+{ 
+  provides Runnable input;
+};
+
+behaviour write_buffer_behaviour of write_buffer_comp
+{
+  input.run 
+  {
+    (1) 0 { none.none }
+  }  
+};
+
+characteristics( Timing_in_ms ) write_buffer_timing_characs of write_buffer_behaviour
+{
+  input.run
+  {
+    (1) { 0.01 0 }
+  }
+
+};
+

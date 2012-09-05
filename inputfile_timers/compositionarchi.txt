@@ -1,6 +1,6 @@
-component PU CPU0 HardWareComponent/cortexA8.txt 100
-component PU CPU1 HardWareComponent/cortexA8.txt 100
-component PU CPU2 HardWareComponent/cortexA8.txt 100
+component PU CPU0 HardWareComponent/cortexA9.txt 500
+component PU CPU1 HardWareComponent/cortexA9.txt 300
+component PU CPU2 HardWareComponent/cortexA9.txt 300
 component CACHE L1_0 32 32 4
 component CACHE L1_1 32 32 4
 component CACHE L1_2 32 32 4

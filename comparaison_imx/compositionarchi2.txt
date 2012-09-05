@@ -1,0 +1,12 @@
+component PU CPU0 inputfile/cortexA9.txt 200
+component PU CPU1 inputfile/cortexA9.txt 200
+component CACHE L1_0 32 32 4
+component CACHE L1_1 32 32 4
+component CACHE L2_0 1024 32 8
+connection CPU1 -> L1_1
+connection CPU0 -> L1_0 
+connection L1_0 -> L2_0 
+connection L1_1 -> L2_0
+
+
+

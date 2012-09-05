@@ -5,8 +5,8 @@
 
 
 
-uint TSIZE=100;
-float TableTBC[100];
+uint TSIZE=1024;
+double TableTBC[100];
 // uint nbTBC=0;
 COMPONENTDSP thisComposantsDSP=NULL;
 COMPONENTCPU thisComposantsCPU=NULL;
@@ -121,7 +121,7 @@ void TBC_InitListe(LISTE_TBC *L){
          }      
      }             
    
-void TBC_Ajouter(LISTE_TBC *L,string name,uint affinity,float valeur){
+void TBC_Ajouter(LISTE_TBC *L,string name,uint affinity,double valeur){
        Liste_TBC *tmp = *L;
        Liste_TBC *nouveau =new Liste_TBC;
        if(nouveau == NULL){
@@ -167,7 +167,7 @@ void TBC_Ajouter2(LISTE_TBC *L,string name){
  void TBC_Trier(LISTE_TBC *L){
        Liste_TBC *tmp1, *tmp2;
        Liste_TBC *Min;
-       float valeur_temp;
+       double valeur_temp;
        string name_temp;
        int affinity_temp;
        tmp1 = *L;
@@ -297,7 +297,7 @@ void CalculTBC(GROUP_TBC Liste, CPU MesCPU){
 // 		sleep(1.0);	     
 	      }
 	      else { 
-		cout<< "timer output "<<endl;
+		//cout<< "timer output "<<endl;
 		include_name = Liste_tmp->include_name;
 		//S3 = Liste_tmp->component_name[0].substr(include_name.size(),include_name.size());
 		sprintf(carac,"_%d",0); 
@@ -325,17 +325,18 @@ void GenerateCpuFileMultiInput(string output,string input,CPU MesCPU,GROUP_TBC L
   size_t pos;
   string stringtemp;
   uint i=0, fin=1;
-  float T_RWDATA;	//temps passé à lire et écrire des datas
-  float T_Inst;  	//temps passé dans les instructions (ms)
-  float T_Total; 	//temps total
-  float T_OneDATA;  	//ms pour lire ou écrire une data
-  float MissPred;	//MissPred
-  float Pen_L1;  	//penalité pour un miss L1
-  float Pen_L2;  	//penalité pour un miss L2
+  double T_RWDATA;	//temps passé à lire et écrire des datas
+  double T_Inst;  	//temps passé dans les instructions (ms)
+  double T_Total; 	//temps total
+  double T_OneDATA;  	//ms pour lire ou écrire une data
+  double MissPred;	//MissPred
+  double Pen_L1;  	//penalité pour un miss L1
+  double Pen_L2;  	//penalité pour un miss L2
   ostringstream oss;
   bool sortie=true;
   uint Nb_instr, load, store, instrL1,R_L1_Miss,W_L1_Miss,instrL2,R_L2_Miss,W_L2_Miss;
-  
+    uint Alfa, Branch_Miss;
+
   CPU Cpu=NULL;
 
   if(outputfile)
@@ -414,20 +415,32 @@ void GenerateCpuFileMultiInput(string output,string input,CPU MesCPU,GROUP_TBC L
 				while(mot!="]"&&sortie)
 				{
 				Cpu=AccessToCPU(MesCPU,Liste->affinity[p]);
+				inputfile>>Alfa;
 				inputfile>>Nb_instr;	inputfile>>load;  		inputfile>>store;
 				inputfile>>instrL1;		inputfile>>R_L1_Miss;		inputfile>>W_L1_Miss;
 				inputfile>>instrL2;		inputfile>>R_L2_Miss;		inputfile>>W_L2_Miss;
+				inputfile>>Branch_Miss;
 
 				T_OneDATA=1.0/(Cpu->work_frequency*1000.0);
 				Pen_L1=10.0/(Cpu->work_frequency*1000.0);
 				Pen_L2=100.0/(Cpu->work_frequency*1000.0);
-				T_Inst=Nb_instr/(Cpu->work_frequency*Cpu->dmips*1000.0)+instrL1*Pen_L1+instrL2*Pen_L2;
+				T_Inst=(Alfa/100.0)*Nb_instr/(Cpu->work_frequency*Cpu->dmips*1000.0)+instrL1*Pen_L1+instrL2*Pen_L2;
+// 				T_Inst=Nb_instr/(Cpu->work_frequency*Cpu->dmips*1000.0)+instrL1*Pen_L1+instrL2*Pen_L2;
 				T_RWDATA=(store+load)*(T_OneDATA)+(R_L2_Miss*Pen_L2+W_L2_Miss*Pen_L2)+(R_L1_Miss*Pen_L1+W_L1_Miss*Pen_L1);
-				MissPred=(77066983.0/(1500*5.0))*Cpu->pipeline*T_OneDATA;
+// 				MissPred=(77066983.0/(1500*5.0))*Cpu->pipeline*T_OneDATA;/// ancienne méthode :D
+				MissPred=1.0*Branch_Miss*Cpu->pipeline*T_OneDATA;
 				T_Total=MissPred+T_RWDATA+T_Inst;
 				//cout<<"TBC = "<<T_Total<<" pour  "<<input<<endl;
 			      
 				inputfile>>mot;
+				if(mot!="]") 
+				{
+				  cout <<endl<<"EXECUTION : FAIL !!"<<endl;
+				  cout<<"Arret dans la fonction : \n void GenerateCpuFileMultiInput(string output,string input,CPU MesCPU,GROUP_TBC Liste,char *indice)" <<endl;
+				  cout <<"Que faire ? "<<endl<<"ERROR(13.01) voir le fichier: "<<input<< endl; 
+				  cout <<"la ligne suivante n'est pas correcte: \n"<<line<<endl<<endl; 
+				  exit(13);
+				}
 				oss<<T_Total;
 
 				}		    
@@ -435,6 +448,17 @@ void GenerateCpuFileMultiInput(string output,string input,CPU MesCPU,GROUP_TBC L
 				if(pos<=line.size()){ line.replace(pos,3, oss.str());}
 				oss.str(""); oss.clear();
 				sortie=false;
+// 				cout<<line<<endl;
+				 pos=line.find("[");
+				 if(pos !=-1)
+				  {
+				    
+				    oss << "[ " << Nb_instr <<" "<<load<<" "<<store<<" "<<instrL1<<" "<<R_L1_Miss<<" "<<W_L1_Miss<<" "<<instrL2<<" "<<R_L2_Miss<<" "<<W_L2_Miss<<" ]           ";//<<endl;
+				    line.replace(pos,oss.str().size(), oss.str());
+				  }
+// 				  cout<<"fichier "<<input<<endl;
+// 				  cout<<line<<endl;
+				  oss.str(""); oss.clear();
 				}
 
 				}
@@ -492,21 +516,23 @@ void GenerateCpuFile(string output,string input,CPU C,char *indice){
   string S1="_comp",S2="_behaviour",S3="_timing_characs";
   string stringtemp;
   uint i=0;
-  float T_RWDATA;	//temps passé à lire et écrire des datas
-  float T_Inst;  	//temps passé dans les instructions (ms)
-  float T_Total; 	//temps total
-  float T_OneDATA;  	//ms pour lire ou écrire une data
-  float MissPred;	//MissPred
-  float Pen_L1;  	//penalité pour un miss L1
-  float Pen_L2;  	//penalité pour un miss L2
+  double T_RWDATA;	//temps passé à lire et écrire des datas
+  double T_Inst;  	//temps passé dans les instructions (ms)
+  double T_Total; 	//temps total
+  double T_OneDATA;  	//ms pour lire ou écrire une data
+  double MissPred;	//MissPred
+  double Pen_L1;  	//penalité pour un miss L1
+  double Pen_L2;  	//penalité pour un miss L2
   ostringstream oss;
   bool sortie=true;
   uint Nb_instr, load, store, instrL1,R_L1_Miss,W_L1_Miss,instrL2,R_L2_Miss,W_L2_Miss;
+  uint Alfa, Branch_Miss;
   
 
   if(outputfile)
   {
     ifstream inputfile(input.c_str());
+    
     if(inputfile)
     {
       string ListeName[TSIZE];
@@ -558,24 +584,38 @@ void GenerateCpuFile(string output,string input,CPU C,char *indice){
 		    }
 		    
 		  } 
-		  while(mot!="]"&&sortie)
+		  i=0;
+		  while(mot!="]"&&sortie )
 		  {
+ 		    inputfile>>Alfa;
 		    inputfile>>Nb_instr;	inputfile>>load;  		inputfile>>store;
 		    inputfile>>instrL1;		inputfile>>R_L1_Miss;		inputfile>>W_L1_Miss;
 		    inputfile>>instrL2;		inputfile>>R_L2_Miss;		inputfile>>W_L2_Miss;
-		    
+ 		    inputfile>>Branch_Miss;
+
 		    T_OneDATA=1.0/(C->work_frequency*1000.0);
 		    Pen_L1=10.0/(C->work_frequency*1000.0);
 		    Pen_L2=100.0/(C->work_frequency*1000.0);
-		    T_Inst=Nb_instr/(C->work_frequency*C->dmips*1000.0)+instrL1*Pen_L1+instrL2*Pen_L2;
+		    T_Inst=(Alfa/100.0)* Nb_instr/(C->work_frequency*C->dmips*1000.0)+instrL1*Pen_L1+instrL2*Pen_L2;
+// 		    T_Inst=Nb_instr/(C->work_frequency*C->dmips*1000.0)+instrL1*Pen_L1+instrL2*Pen_L2;
 		    T_RWDATA=(store+load)*(T_OneDATA)+(R_L2_Miss*Pen_L2+W_L2_Miss*Pen_L2)+(R_L1_Miss*Pen_L1+W_L1_Miss*Pen_L1);
-		    MissPred=(77066983.0/(1500*5.0))*C->pipeline*T_OneDATA;
+// 		    MissPred=(77066983.0/(1500*5.0))*C->pipeline*T_OneDATA;
+		    MissPred=1.0*Branch_Miss*C->pipeline*T_OneDATA;
 		    T_Total=MissPred+T_RWDATA+T_Inst;
 		    //cout<<"TBC = "<<T_Total<<" pour  "<<input<<endl;
 		    //TableTBC[nbTBC++]=T_Total;
+		    //cout <<" T_Total " <<T_Total<<endl;
+		    //e();
 		    inputfile>>mot;
+		    if(mot!="]") 
+				{
+				  cout <<endl<<"EXECUTION : FAIL !!"<<endl;
+				  cout<<"Arret dans la fonction : \n void GenerateCpuFile(string output,string input,CPU C,char *indice)" <<endl;
+				  cout <<"Que faire ? "<<endl<<"ERROR(13.01) voir le fichier: "<<input<< endl; 
+				  cout <<"la ligne suivante n'est pas correcte: \n"<<line<<endl<<endl; 
+				  exit(13);
+				}
 		    		    
-
 		    oss<<T_Total;
 // 		    ListeName[o++]=name;
 		    //if(once && notFindName(ListeName,name,o-1)  )
@@ -588,8 +628,21 @@ void GenerateCpuFile(string output,string input,CPU C,char *indice){
 		  }		    
 
 		  if(pos<=line.size()){ line.replace(pos,3, oss.str());}
+		  
 		  oss.str(""); oss.clear();
 		  sortie=false;
+		   pos=line.find("[");
+// 		   cout<<line<<endl;
+		   if(pos !=-1)
+		   {
+		    
+		     oss << "[ " << Nb_instr <<" "<<load<<" "<<store<<" "<<instrL1<<" "<<R_L1_Miss<<" "<<W_L1_Miss<<" "<<instrL2<<" "<<R_L2_Miss<<" "<<W_L2_Miss<<" ]             ";//   "<<endl;
+		     line.replace(pos,oss.str().size(), oss.str());
+		   }
+// 		  cout<<"fichier "<<input<<endl;
+// 		  cout<<line<<endl;
+		  oss.str(""); oss.clear();
+// 		  e();
 		}
 	    }
 	    inputfile.seekg((int)(-3*mot.size())+2,ios::cur);	    
@@ -648,7 +701,7 @@ void GenerateCompCpuFile(string input,string output,string includeListe[], strin
     {
       for(int r=0 ; r<TSIZE; r++) affinity[r]=0;
       i=0;
-      ofstream out_includefile("listeinclude.txt"); 
+//       ofstream out_includefile("listeinclude.txt"); 
       /// lecture des includes pour savoir les fichiers à ouvrir
       	while(getline(in1,line)) /// si au out de 15 itérations on ne trouve plus d'include on arrete de chercher
 	{	    
@@ -661,8 +714,8 @@ void GenerateCompCpuFile(string input,string output,string includeListe[], strin
 	    pos=line.find("include");
 	    if (pos!=-1)
 	    ListeFileToGenerate[i] = Stmp.substr(0,Stmp.size()-1);
-	    if(once)
-	    out_includefile<<ListeFileToGenerate[i]<<endl;
+// 	    if(once)
+// 	    out_includefile<<ListeFileToGenerate[i]<<endl;
 // 	    cout<<ListeFileToGenerate[i]<<endl;
 	    Stmp.clear();
 	    i++;
@@ -737,7 +790,7 @@ void GenerateCompCpuFile(string input,string output,string includeListe[], strin
 			  if( notFindName(ListeName,Stmp,o-1))
 			  {
 			    inputName[incr++]=Stmp.substr(0,(int)(Stmp.size()-1));
-			    //cout <<inputName[incr-1]<<endl;
+// 			    cout <<inputName[incr-1]<<endl;
 			    //cout<<line<<endl;
 			  }
 		       }
@@ -968,9 +1021,10 @@ void GenerateCompCpuFile(string input,string output,string includeListe[], strin
       cout<<"voir fonction : GenerateCompCpuFile(,,,)"<<endl;
       exit(10);}
     
-    //  cout<<output<<" \thas been generate"<<endl;
+      cout<<output<<" \thas been generate"<<endl;
   //   return nb_affinity;
   *N_affinity =nb_affinity;
+ 
 }
 
 
@@ -982,13 +1036,13 @@ void GenerateDspFile(const char *output,string input, COMPONENTDSP C)
   string line,mot;
   size_t pos;
   uint i=0;
-  float T_RWDATA;	//temps passé à lire et écrire des datas
-  float T_Inst;  	//temps passé dans les instructions (ms)
-  float T_Total; 	//temps total
-  float T_OneDATA;  	//ms pour lire ou écrire une data
-  float MissPred;	//MissPred
-  float Pen_L1;  	//penalité pour un miss L1
-  float Pen_L2;  	//penalité pour un miss L2
+  double T_RWDATA;	//temps passé à lire et écrire des datas
+  double T_Inst;  	//temps passé dans les instructions (ms)
+  double T_Total; 	//temps total
+  double T_OneDATA;  	//ms pour lire ou écrire une data
+  double MissPred;	//MissPred
+  double Pen_L1;  	//penalité pour un miss L1
+  double Pen_L2;  	//penalité pour un miss L2
   ostringstream oss;
   bool sortie=true;
   uint Nb_instr, load, store, instrL1,R_L1_Miss,W_L1_Miss,instrL2,R_L2_Miss,W_L2_Miss;
@@ -1513,6 +1567,7 @@ void FindAndReplaceOneAffinity(string compositionfile, string compositionfile_te
   {
     while(getline(readingfile,line)) 
       {
+// 	cout<< " .............. avant   "<< line<<endl;
 	convert.str(""); convert.clear();
 	 convert<<OldAffinity; 
 	 tmp="configure_affinity( "+convert.str();
@@ -1529,7 +1584,7 @@ void FindAndReplaceOneAffinity(string compositionfile, string compositionfile_te
 	  {
 	    outputfile<<line<<endl;
 	  }
-	
+// 	cout<<line<<endl;
       }
     
   }

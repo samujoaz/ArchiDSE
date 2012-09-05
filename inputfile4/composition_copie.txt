@@ -1,0 +1,291 @@
+include main.txt;
+include slice.txt;
+include filter.txt;
+include write_buffer.txt;
+include generator.txt;
+include cypher.txt;
+include coder.txt;
+include modulator.txt;
+include snk.txt;
+include void.txt;
+include timer_manager.txt;
+
+component_instance main_behaviour main main_timing_characs;
+component_instance slice_behaviour slice1 slice_timing_characs;
+component_instance slice_behaviour slice2 slice_timing_characs;
+component_instance filter_behaviour filter1 filter_timing_characs;
+component_instance filter_behaviour filter2 filter_timing_characs;
+component_instance write_buffer_behaviour write_buffer write_buffer_timing_characs;
+component_instance generator_behaviour generator1 generator_timing_characs;
+component_instance cypher_behaviour cypher1 cypher_timing_characs;
+component_instance coder_behaviour coder1 coder_timing_characs;
+component_instance modulator_behaviour modulator1 modulator_timing_characs;
+component_instance generator_behaviour generator2 generator_timing_characs;
+component_instance cypher_behaviour cypher2 cypher_timing_characs;
+component_instance coder_behaviour coder2 coder_timing_characs;
+component_instance modulator_behaviour modulator2 modulator_timing_characs;
+component_instance void_behaviour void1 void_timing_characs;
+component_instance void_behaviour void2 void_timing_characs;
+component_instance void_behaviour void3 void_timing_characs;
+component_instance void_behaviour void4 void_timing_characs;
+component_instance snk_behaviour snk1 snk_timing_characs;
+component_instance void_behaviour void5 void_timing_characs;
+component_instance void_behaviour void6 void_timing_characs;
+component_instance void_behaviour void7 void_timing_characs;
+component_instance void_behaviour void8 void_timing_characs;
+component_instance snk_behaviour snk2 snk_timing_characs;
+component_instance timer_manager_behaviour timer_manager timer_manager_timing_characs;
+
+
+component_instance Timer_impl t1 timer;
+configuration t1->configure_timerspec_and_sched_fifo( 0, 100000, 0, 125000000, true, 99 );
+
+component_instance Timer_impl t2 timer;
+configuration t2->configure_timerspec_and_sched_fifo( 0, 110000, 0, 82000000, true, 99 );
+component_instance Timer_impl t3 timer;
+configuration t3->configure_timerspec_and_sched_fifo( 0, 22000000, 0, 62000000, true, 99 );
+component_instance Timer_impl t4 timer;
+configuration t4->configure_timerspec_and_sched_fifo( 0, 42000000, 0, 72000000, true, 99 );
+component_instance Timer_impl t5 timer;
+configuration t5->configure_timerspec_and_sched_fifo( 0, 62000000, 0, 92000000, true, 99 );
+component_instance Timer_impl t6 timer;
+configuration t6->configure_timerspec_and_sched_fifo( 0, 110000, 0, 82000000, true, 99 );
+component_instance Timer_impl t7 timer;
+configuration t7->configure_timerspec_and_sched_fifo( 0, 22000000, 0, 62000000, true, 99 );
+component_instance Timer_impl t8 timer;
+configuration t8->configure_timerspec_and_sched_fifo( 0, 42000000, 0, 72000000, true, 99 );
+component_instance Timer_impl t9 timer;
+configuration t9->configure_timerspec_and_sched_fifo( 0, 62000000, 0, 92000000, true, 99 );
+
+connection( synchronous ) cnx_1 timer_manager.timer_1_start t1.start ;
+
+connection( synchronous ) cnx_2 timer_manager.timer_2_start t2.start ;
+
+connection( synchronous ) cnx_3 timer_manager.timer_3_start t3.start ;
+
+connection( synchronous ) cnx_4 timer_manager.timer_4_start t4.start ;
+
+connection( synchronous ) cnx_5 timer_manager.timer_5_start t5.start ;
+
+connection( synchronous ) cnx_6 timer_manager.timer_6_start t6.start ;
+
+connection( synchronous ) cnx_7 timer_manager.timer_7_start t7.start ;
+
+connection( synchronous ) cnx_8 timer_manager.timer_8_start t8.start ;
+
+connection( synchronous ) cnx_9 timer_manager.timer_9_start t9.start ;
+
+
+connection( synchronous ) cnx_1_stop timer_manager.timer_1_stop t1.stop ;
+
+connection( synchronous ) cnx_2_stop timer_manager.timer_2_stop t2.stop ;
+
+connection( synchronous ) cnx_3_stop timer_manager.timer_3_stop t3.stop ;
+
+connection( synchronous ) cnx_4_stop timer_manager.timer_4_stop t4.stop ;
+
+connection( synchronous ) cnx_5_stop timer_manager.timer_5_stop t5.stop ;
+
+connection( synchronous ) cnx_6_stop timer_manager.timer_6_stop t6.stop ;
+
+connection( synchronous ) cnx_7_stop timer_manager.timer_7_stop t7.stop ;
+
+connection( synchronous ) cnx_8_stop timer_manager.timer_8_stop t8.stop ;
+
+connection( synchronous ) cnx_9_stop timer_manager.timer_9_stop t9.stop ;
+
+
+connection( asynchronous ) cnx_main t1.tick main.input_timer;
+configuration cnx_main.configure_priority_and_sched_fifo( 99, true );
+configuration cnx_main.configure_affinity( 1 );
+
+
+connection( asynchronous ) cnx_slice1 main.comm_slice1 slice1.input;
+configuration cnx_slice1.configure_priority_and_sched_fifo( 34, true );
+configuration cnx_slice1.configure_affinity( 1 );
+connection( asynchronous ) cnx_slice2 main.comm_slice2 slice2.input;
+configuration cnx_slice2.configure_priority_and_sched_fifo( 34, true );
+configuration cnx_slice2.configure_affinity( 2 );
+
+connection( asynchronous ) cnx_filter1 slice1.output filter1.input;
+configuration cnx_filter1.configure_priority_and_sched_fifo( 33, true );
+configuration cnx_filter1.configure_affinity( 3 );
+connection( asynchronous ) cnx_filter2 slice2.output filter2.input;
+configuration cnx_filter2.configure_priority_and_sched_fifo( 33, true );
+configuration cnx_filter2.configure_affinity( 2 );
+
+
+connection( asynchronous ) cnx_out1 filter1.output main.input_slice1;
+configuration cnx_out1.configure_priority_and_sched_fifo( 32, true );
+configuration cnx_out1.configure_affinity( 3 );
+connection( asynchronous ) cnx_out2 filter2.output main.input_slice2;
+configuration cnx_out2.configure_priority_and_sched_fifo( 32, true );
+configuration cnx_out2.configure_affinity( 4 );
+
+connection( asynchronous ) cnx_write_buffer main.comm_write_buffer write_buffer.input;
+configuration cnx_write_buffer.configure_priority_and_sched_fifo( 31, true );
+configuration cnx_write_buffer.configure_affinity( 1 );
+
+
+connection( asynchronous ) cnx_main2 t2.tick generator1.input1051188;
+configuration cnx_main2.configure_priority_and_sched_fifo( 99, true );
+configuration cnx_main2.configure_affinity( 2 );
+connection( asynchronous ) cnx_main3 t3.tick generator1.input10111132;
+configuration cnx_main3.configure_priority_and_sched_fifo( 99, true );
+configuration cnx_main3.configure_affinity( 2 );
+connection( asynchronous ) cnx_main4 t4.tick generator1.input12111132;
+configuration cnx_main4.configure_priority_and_sched_fifo( 99, true );
+configuration cnx_main4.configure_affinity( 2 );
+connection( asynchronous ) cnx_main5 t5.tick generator1.input1221118;
+configuration cnx_main5.configure_priority_and_sched_fifo( 99, true );
+configuration cnx_main5.configure_affinity( 2 );
+
+
+connection( asynchronous ) cnx_main6 t6.tick generator2.input1051188;
+configuration cnx_main6.configure_priority_and_sched_fifo( 99, true );
+configuration cnx_main6.configure_affinity( 3 );
+connection( asynchronous ) cnx_main7 t7.tick generator2.input10111132;
+configuration cnx_main7.configure_priority_and_sched_fifo( 99, true );
+configuration cnx_main7.configure_affinity( 3 );
+connection( asynchronous ) cnx_main8 t8.tick generator2.input12111132;
+configuration cnx_main8.configure_priority_and_sched_fifo( 99, true );
+configuration cnx_main8.configure_affinity( 3 );
+connection( asynchronous ) cnx_main9 t9.tick generator2.input1221118;
+configuration cnx_main9.configure_priority_and_sched_fifo( 99, true );
+configuration cnx_main9.configure_affinity( 3 );
+
+
+
+connection( asynchronous ) cnx_cypher110111132 generator1.output10111132 cypher1.input10111132;
+configuration cnx_cypher110111132.configure_priority_and_sched_fifo( 37, true );
+configuration cnx_cypher110111132.configure_affinity( 1 );
+connection( asynchronous ) cnx_cypher11051188 generator1.output1051188 cypher1.input1051188;
+configuration cnx_cypher11051188.configure_priority_and_sched_fifo( 37, true );
+configuration cnx_cypher11051188.configure_affinity( 1 );
+connection( asynchronous ) cnx_cypher112111132 generator1.output12111132 cypher1.input12111132;
+configuration cnx_cypher112111132.configure_priority_and_sched_fifo( 37, true );
+configuration cnx_cypher112111132.configure_affinity( 1 );
+connection( asynchronous ) cnx_cypher11221118 generator1.output1221118 cypher1.input1221118;
+configuration cnx_cypher11221118.configure_priority_and_sched_fifo( 37, true );
+configuration cnx_cypher11221118.configure_affinity( 1 );
+
+connection( asynchronous ) cnx_cypher210111132 generator2.output10111132 cypher2.input10111132;
+configuration cnx_cypher210111132.configure_priority_and_sched_fifo( 37, true );
+configuration cnx_cypher210111132.configure_affinity( 1 );
+connection( asynchronous ) cnx_cypher21051188 generator2.output1051188 cypher2.input1051188;
+configuration cnx_cypher21051188.configure_priority_and_sched_fifo( 37, true );
+configuration cnx_cypher21051188.configure_affinity( 1 );
+connection( asynchronous ) cnx_cypher212111132 generator2.output12111132 cypher2.input12111132;
+configuration cnx_cypher212111132.configure_priority_and_sched_fifo( 37, true );
+configuration cnx_cypher212111132.configure_affinity( 1 );
+connection( asynchronous ) cnx_cypher21221118 generator2.output1221118 cypher2.input1221118;
+configuration cnx_cypher21221118.configure_priority_and_sched_fifo( 37, true );
+configuration cnx_cypher21221118.configure_affinity( 1 );
+
+connection( asynchronous ) cnx_coder110111132 cypher1.output10111132 coder1.input10111132;
+configuration cnx_coder110111132.configure_priority_and_sched_fifo( 38, true );
+configuration cnx_coder110111132.configure_affinity( 2 );
+connection( asynchronous ) cnx_coder11051188 cypher1.output1051188 coder1.input1051188;
+configuration cnx_coder11051188.configure_priority_and_sched_fifo( 38, true );
+configuration cnx_coder11051188.configure_affinity( 2 );
+connection( asynchronous ) cnx_coder112111132 cypher1.output12111132 coder1.input12111132;
+configuration cnx_coder112111132.configure_priority_and_sched_fifo( 38, true );
+configuration cnx_coder112111132.configure_affinity( 2 );
+connection( asynchronous ) cnx_coder11221118 cypher1.output1221118 coder1.input1221118;
+configuration cnx_coder11221118.configure_priority_and_sched_fifo( 38, true );
+configuration cnx_coder11221118.configure_affinity( 2 );
+
+connection( asynchronous ) cnx_coder210111132 cypher2.output10111132 coder2.input10111132;
+configuration cnx_coder210111132.configure_priority_and_sched_fifo( 38, true );
+configuration cnx_coder210111132.configure_affinity( 0 );
+connection( asynchronous ) cnx_coder21051188 cypher2.output1051188 coder2.input1051188;
+configuration cnx_coder21051188.configure_priority_and_sched_fifo( 38, true );
+configuration cnx_coder21051188.configure_affinity( 1 );
+connection( asynchronous ) cnx_coder212111132 cypher2.output12111132 coder2.input12111132;
+configuration cnx_coder212111132.configure_priority_and_sched_fifo( 38, true );
+configuration cnx_coder212111132.configure_affinity( 2 );
+connection( asynchronous ) cnx_coder21221118 cypher2.output1221118 coder2.input1221118;
+configuration cnx_coder21221118.configure_priority_and_sched_fifo( 38, true );
+configuration cnx_coder21221118.configure_affinity( 3 );
+
+connection( asynchronous ) cnx_modulator110111132 coder1.output10111132 modulator1.input10111132;
+configuration cnx_modulator110111132.configure_priority_and_sched_fifo( 39, true );
+configuration cnx_modulator110111132.configure_affinity( 4 );
+connection( asynchronous ) cnx_modulator11051188 coder1.output1051188 modulator1.input1051188;
+configuration cnx_modulator11051188.configure_priority_and_sched_fifo( 39, true );
+configuration cnx_modulator11051188.configure_affinity( 4 );
+connection( asynchronous ) cnx_modulator112111132 coder1.output12111132 modulator1.input12111132;
+configuration cnx_modulator112111132.configure_priority_and_sched_fifo( 39, true );
+configuration cnx_modulator112111132.configure_affinity( 4 );
+connection( asynchronous ) cnx_modulator11221118 coder1.output1221118 modulator1.input1221118;
+configuration cnx_modulator11221118.configure_priority_and_sched_fifo( 39, true );
+configuration cnx_modulator11221118.configure_affinity( 4 );
+
+connection( asynchronous ) cnx_modulator210111132 coder2.output10111132 modulator2.input10111132;
+configuration cnx_modulator210111132.configure_priority_and_sched_fifo( 39, true );
+configuration cnx_modulator210111132.configure_affinity( 4 );
+connection( asynchronous ) cnx_modulator21051188 coder2.output1051188 modulator2.input1051188;
+configuration cnx_modulator21051188.configure_priority_and_sched_fifo( 39, true );
+configuration cnx_modulator21051188.configure_affinity( 4 );
+connection( asynchronous ) cnx_modulator212111132 coder2.output12111132 modulator2.input12111132;
+configuration cnx_modulator212111132.configure_priority_and_sched_fifo( 39, true );
+configuration cnx_modulator212111132.configure_affinity( 4 );
+connection( asynchronous ) cnx_modulator21221118 coder2.output1221118 modulator2.input1221118;
+configuration cnx_modulator21221118.configure_priority_and_sched_fifo( 39, true );
+configuration cnx_modulator21221118.configure_affinity( 4 );
+
+connection( asynchronous ) cnx_snk110111132 modulator1.output10111132 snk1.input10111132;
+configuration cnx_snk110111132.configure_priority_and_sched_fifo( 40, true );
+configuration cnx_snk110111132.configure_affinity( 4 );
+connection( asynchronous ) cnx_snk11051188 modulator1.output1051188 snk1.input1051188;
+configuration cnx_snk11051188.configure_priority_and_sched_fifo( 40, true );
+configuration cnx_snk11051188.configure_affinity( 4 );
+connection( asynchronous ) cnx_snk112111132 modulator1.output12111132 snk1.input12111132;
+configuration cnx_snk112111132.configure_priority_and_sched_fifo( 40, true );
+configuration cnx_snk112111132.configure_affinity( 4 );
+connection( asynchronous ) cnx_snk11221118 modulator1.output1221118 snk1.input1221118;
+configuration cnx_snk11221118.configure_priority_and_sched_fifo( 40, true );
+configuration cnx_snk11221118.configure_affinity( 4 );
+
+connection( asynchronous ) cnx_snk210111132 modulator2.output10111132 snk2.input10111132;
+configuration cnx_snk210111132.configure_priority_and_sched_fifo( 40, true );
+configuration cnx_snk210111132.configure_affinity( 4 );
+connection( asynchronous ) cnx_snk21051188 modulator2.output1051188 snk2.input1051188;
+configuration cnx_snk21051188.configure_priority_and_sched_fifo( 40, true );
+configuration cnx_snk21051188.configure_affinity( 4 );
+connection( asynchronous ) cnx_snk212111132 modulator2.output12111132 snk2.input12111132;
+configuration cnx_snk212111132.configure_priority_and_sched_fifo( 40, true );
+configuration cnx_snk212111132.configure_affinity( 4 );
+connection( asynchronous ) cnx_snk21221118 modulator2.output1221118 snk2.input1221118;
+configuration cnx_snk21221118.configure_priority_and_sched_fifo( 40, true );
+configuration cnx_snk21221118.configure_affinity( 4 );
+
+connection( asynchronous ) cnx_end110111132 snk1.output10111132 void1.input;
+configuration cnx_end110111132.configure_priority_and_sched_fifo( 41, true );
+configuration cnx_end110111132.configure_affinity( 4 );
+connection( asynchronous ) cnx_end11051188 snk1.output1051188 void2.input;
+configuration cnx_end11051188.configure_priority_and_sched_fifo( 41, true );
+configuration cnx_end11051188.configure_affinity( 4 );
+connection( asynchronous ) cnx_end112111132 snk1.output12111132 void3.input;
+configuration cnx_end112111132.configure_priority_and_sched_fifo( 41, true );
+configuration cnx_end112111132.configure_affinity( 4 );
+connection( asynchronous ) cnx_end11221118 snk1.output1221118 void4.input;
+configuration cnx_end11221118.configure_priority_and_sched_fifo( 41, true );
+configuration cnx_end11221118.configure_affinity( 4 );
+
+connection( asynchronous ) cnx_end210111132 snk2.output10111132 void5.input;
+configuration cnx_end210111132.configure_priority_and_sched_fifo( 41, true );
+configuration cnx_end210111132.configure_affinity( 4 );
+connection( asynchronous ) cnx_end21051188 snk2.output1051188 void6.input;
+configuration cnx_end21051188.configure_priority_and_sched_fifo( 41, true );
+configuration cnx_end21051188.configure_affinity( 4 );
+connection( asynchronous ) cnx_end212111132 snk2.output12111132 void7.input;
+configuration cnx_end212111132.configure_priority_and_sched_fifo( 41, true );
+configuration cnx_end212111132.configure_affinity( 4 );
+connection( asynchronous ) cnx_end21221118 snk2.output1221118 void8.input;
+configuration cnx_end21221118.configure_priority_and_sched_fifo( 41, true );
+configuration cnx_end21221118.configure_affinity( 4 );
+
+
+entry_point timer_manager.start.run;
+final_point timer_manager.stop.run;

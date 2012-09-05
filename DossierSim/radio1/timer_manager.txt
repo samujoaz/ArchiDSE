@@ -1,0 +1,46 @@
+
+component timer_manager
+{
+  provides Runnable start;
+  provides Runnable stop;
+  uses     Runnable timer_1_start;
+  uses     Runnable timer_2_start;
+  uses     Runnable timer_3_start;
+  uses     Runnable timer_4_start;
+  uses     Runnable timer_5_start;
+  uses     Runnable timer_1_stop;
+  uses     Runnable timer_2_stop;
+  uses     Runnable timer_3_stop;
+  uses     Runnable timer_4_stop;
+  uses     Runnable timer_5_stop;
+};
+
+behaviour timer_manager_behaviour of timer_manager
+{
+  start.run
+  {
+    (1) 1 { timer_1_start.run } 1 { timer_2_start.run } 1 { timer_3_start.run
+    } 1 { timer_4_start.run } 1 { timer_5_start.run }
+    
+  }
+
+  stop.run
+  {
+   (1) 1 { timer_1_stop.run } 1 { timer_2_stop.run } 1 { timer_3_stop.run } 1
+   { timer_4_stop.run } 1 { timer_5_stop.run }
+
+  }
+};
+
+characteristics( Timing_in_ms ) timer_manager_timing_characs of timer_manager_behaviour
+{
+  start.run
+  {
+    (1) { 0 0 0 0 0 0 }
+  }
+
+  stop.run
+  {
+   (1) { 0 0 0 0 0 0 }
+  }
+};

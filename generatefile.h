@@ -20,7 +20,7 @@ enum {AFF_FIXE,AFF_VAR,AFF_GROUP};
 typedef struct Liste_TBC{
   string name;
   uint affinity;
-  float valeur;
+  double valeur;
   struct Liste_TBC *next;
 }Liste_TBC;
 typedef Liste_TBC *LISTE_TBC;
@@ -48,7 +48,7 @@ GROUP_TBC CloneG_TBC(GROUP_TBC mon_tbc);
 bool TBC_estVide(LISTE_TBC L);
 void TBC_Afficher(LISTE_TBC L);
 void TBC_InitListe(LISTE_TBC *L);
-void TBC_Ajouter(LISTE_TBC *L, string name,uint affinity,float valeur);
+void TBC_Ajouter(LISTE_TBC *L, string name,uint affinity,double valeur);
 void TBC_Ajouter2(LISTE_TBC *L,string name);
 void TBC_Trier(LISTE_TBC *L);
 LISTE_TBC CloneListeTBC(LISTE_TBC mon_tbc);

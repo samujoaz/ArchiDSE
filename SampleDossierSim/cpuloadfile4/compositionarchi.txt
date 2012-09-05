@@ -1,0 +1,5 @@
+component PU CPU0 HardWareComponent/cortexA8.txt 300
+component CACHE L1_0 32 32 32
+component CACHE L2_0 1024 32 32
+connection CPU0 -> L1_0
+connection L1_0 -> L2_0 

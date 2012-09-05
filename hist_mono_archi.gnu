@@ -10,5 +10,5 @@ set boxwidth 1.0
 set xtics border in scale 0,0 nomirror rotate by 0  offset character 0,0, 0
 set xtics  norangelimit font ",10"
 
-plot 'mono_archi_hist.dat' using 1:xticlabels("800  800  800  800  ") title "cpu_0", '' using 2 title "cpu_1", '' using 3 title "cpu_2", '' using 4 title "cpu_3", 85 with lines linecolor rgb "red"  title "Max", 70  with lines linecolor rgb "red" title "Min";
+plot 'mono_archi_hist.dat' using 1:xticlabels("600  475  525  550  ") title "cpu_0", '' using 2 title "cpu_1", '' using 3 title "cpu_2", '' using 4 title "cpu_3", 85 with lines linecolor rgb "red"  title "Max", 70  with lines linecolor rgb "red" title "Min";
 pause -1 

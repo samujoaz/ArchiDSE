@@ -1,12 +1,14 @@
-
+#include <list>
+#include <vector>
 #include "utils.h"
+extern list <pair < string,double> > selected_connections;
 
 extern COMPONENTDSP thisComposantsDSP;
 extern COMPONENTCPU thisComposantsCPU;
 extern CPU thisMesCPU;
 extern char **_argv;
-extern float LoadMax;
-extern float LoadMin;
+extern double LoadMax;
+extern double LoadMin;
 
 using namespace std;
 
@@ -28,37 +30,45 @@ void UpFreqCpu(CPU C, uint delta)
 //   else cout<<"frequence too high, can not increase"<<endl;
 }
 
-void getAllCpuLoad(uint nb_cpu, int numerodossier, float cpuload[], int frequence[])  /// dans cette fonctuion on fait la trace dans un dossier numéroter j 
+void getAllCpuLoad(uint nb_cpu, int numerodossier, double cpuload[], int frequence[])  /// dans cette fonctuion on fait la trace dans un dossier numéroter j 
 {				       ///  puis on va lire la valeur du ième CPU load souhaitée.
     char c[256],nomdudossier[100];
-    string buffer,line,cmd;
+    string buffer,line,cmd, cnx_name_file;
     ostringstream convert;
 
     int i=0;
     size_t pos;
-    
+    for (list < pair < string, double > >::iterator iter = selected_connections.begin(); iter != selected_connections.end(); iter++) 
+    {
+      cnx_name_file += iter->first + " ";
+    }
+//     cmd =  "./get_allcpuload.sh a  \"cnx_write_buffe " 
     sprintf(c,"./get_allcpuload.sh a  \" cnx_write_buffer -cpu 0 CPU0 \" %d",numerodossier);
     cmd=c;/// par défaut!
+    
     
     if(numerodossier>0)
     {
       cmd.clear();
-      cmd = "./get_allcpuload.sh a  \"cnx_write_buffer -cpu ";
+      cmd = "./get_allcpuload.sh a  \"cnx_write_buffer " + cnx_name_file + " -cpu";
 
       for(i=0; i<nb_cpu;i++)  
       {
-	sprintf(c," %d CPU%d ",i,i);
+	sprintf(c,"  %d CPU%d ",i,i);
 	cmd = cmd+ c;
       }
 
       sprintf(c," \" %d",numerodossier);
       cmd = cmd+ c;
+//       cout<< cmd <<endl;  exit(0);
     }
    
     i=0;
     system(cmd.c_str());/// execution d'une ligne de commade :: on aura le % chargement des cpu
     sprintf(c,"cpuloadfile%d/cpuload.txt",numerodossier);
+    
     ifstream in(c);
+   
     
     /// écriture d'un fichier historic.txt qui contient tout les cpuload et les fréquences de fonctionement des cpu!
     ofstream out("historic.txt",ios::app); /// ecriture de l'historique des cpuloads
@@ -81,11 +91,18 @@ void getAllCpuLoad(uint nb_cpu, int numerodossier, float cpuload[], int frequenc
     out<<"*****\n";
     /// fin historic.txt
     ifstream in2(c); /// ouverture du fichier créer par format_trace.cpp  on va récupérer les valeurs des cpuload 
+    
+    char c2[256];
+    sprintf(c2,"cpuloadfile%d/pie.dat",numerodossier);
+     ofstream out2(c2);
     for(i=0; i<nb_cpu;i++)
     {
-	in2>>buffer;//cout<<buffer;
-	in2>>buffer;//cout<<buffer;
-	in2>> cpuload[i];//cout<<cpuload[i]<<endl; 
+	in2>>buffer;cout<<buffer;
+	in2>>buffer;cout<<buffer;
+	in2>> cpuload[i];cout<<cpuload[i]<<endl; 
+	out2<<buffer<<"("<<cpuload[i]<<") "<<cpuload[i]<<endl;
+	
+	
     }
     
   /// copie du fichier Software
@@ -175,10 +192,10 @@ void getAllCpuLoad(uint nb_cpu, int numerodossier, float cpuload[], int frequenc
     */
 }
 
-void getMinMaxCpuLoad(float cpuload[], uint except[], uint nb_cpu, uint nb_except, float *Max, float *Min, uint *indice_cpuMax, uint *indice_cpuMin)
+void getMinMaxCpuLoad(double cpuload[], uint except[], uint nb_cpu, uint nb_except, double *Max, double *Min, uint *indice_cpuMax, uint *indice_cpuMin)
 {/// pour avoir le Min et MAx ainsi  que les indices des cpu correspondantes
 uint i=0,j=0; 
-float monMin=101, monMax=0;
+double monMin=101, monMax=0;
 bool inclut;
 
   for(i=0;i<nb_cpu;i++)
@@ -221,10 +238,10 @@ void CopieCompositionFile(string file, string destination)
 }
 
 
- void  tri_bulle( float *tab, int n)
+ void  tri_bulle( double *tab, int n)
  {
   int i =0;
-  float x =0.0;
+  double x =0.0;
   while(i<n-1)
   {
     if(tab[i] > tab[i+1])
@@ -240,7 +257,7 @@ void CopieCompositionFile(string file, string destination)
   }
 }
 
-void afficheTBC( float * tab, int longeur)
+void afficheTBC( double * tab, int longeur)
 {
 for(int y=0; y<longeur; y++) cout<<" " <<tab[y];
 cout<<endl;		
@@ -249,7 +266,7 @@ cout<<endl;
 
 void coucou()
 {cout<<" Free egg : ^_^ coucou @_@ "<<endl;}
-void write_Data_histogram(float cpuload[], int nb_cpu)
+void write_Data_histogram(double cpuload[], int nb_cpu)
 {
     ofstream histogram("all_cpu_hist.dat",ios::app);
 

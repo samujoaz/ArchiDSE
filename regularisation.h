@@ -25,10 +25,10 @@ enum {TYPE1,TYPE2,TYPE3,TYPE4};/// pour le type d'algo qu'on choisira!
 using namespace std;
 void e();
 bool notFindName(string listename[] ,string index,int taille);
-bool notComprisEntre(float valeur,float x, float y);
+bool notComprisEntre(double valeur,double x, double y);
 uint setCpuLoadLevel(CPU MesCPU,uint nb_cpu,string includeListe[],string componentListe[],uint num);
 int getSpeedTickTimer(string intput);
-bool ComprisEntre(float valeur,float x, float y);
+bool ComprisEntre(double valeur,double x, double y);
 
 
 #endif

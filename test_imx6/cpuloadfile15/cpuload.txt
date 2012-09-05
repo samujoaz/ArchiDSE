@@ -1,4 +1,0 @@
-mean CPU0: 97.9597
-mean CPU1: 82.197
-mean CPU2: 72.9567
-mean CPU3: 73.8792

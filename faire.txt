@@ -1,0 +1,2 @@
+
+modifier la fonction compute pour le calcul de conso pour plusieurs 

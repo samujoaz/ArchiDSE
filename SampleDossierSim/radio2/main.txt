@@ -1,0 +1,34 @@
+component main_comp 
+{ 
+  provides Runnable input_timer;
+  uses Runnable comm_write_buffer;
+};
+
+behaviour main_behaviour of main_comp
+{
+  _var_ { int counter; };
+  _init_ { counter = 0; };
+  _state_ { SA };
+  _initial_state_ { SA };
+
+input_timer.run 
+  {
+    (1) 0 { nono.run }  
+  }  
+
+
+
+};
+
+characteristics( Architecture_parameters ) main_timing_characs of main_behaviour
+{
+input_timer.run
+  {
+    (1) { TBC 0} [ 1000 120 50 10 12 5 1 2 2 ]
+  }
+
+
+
+};
+
+

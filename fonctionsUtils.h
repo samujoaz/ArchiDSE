@@ -16,7 +16,7 @@ typedef struct cpu{
   uint start_frequency;
   uint work_frequency;
   uint end_frequency;
-  float dmips;
+  double dmips;
   uint pipeline;
   uint indice_cache_L1;
   uint indice_CPU;
@@ -41,7 +41,7 @@ typedef struct dsp{
   uint start_frequency;
   uint work_frequency;
   uint end_frequency;
-  float dmips;
+  double dmips;
   uint pipeline;
   uint indice_cache_L1;
   uint indice_DSP;

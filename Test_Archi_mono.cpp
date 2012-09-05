@@ -80,13 +80,13 @@ int main (int argc,char* argv[])
 	size_t pos;	
 	tmp = string(argv[3])+string(argv[5]);
 	ifstream in_compositionfile(tmp.c_str());
-	tmp = "listeinclude.txt";
-	ifstream cp_include(tmp.c_str());
+// 	tmp = "listeinclude.txt";
+// 	ifstream cp_include(tmp.c_str());
 	int i=0;
 	if(in_compositionfile)
 	{
 	ofstream out_compositionfile("composition_temp.txt"); 
-	while(getline(in_compositionfile,line))
+	/*while(getline(in_compositionfile,line))
 	{
 	  pos=line.find("include");
  	    if (pos!=-1  && i==0)
@@ -101,7 +101,7 @@ int main (int argc,char* argv[])
 	      if(pos==-1)out_compositionfile<<line<<endl;
 	    }
 	    
-	}
+	}*/
 
 	nb_cpu=NB_CPU(CloneCPU(thisMesCPU));
 	once=true;

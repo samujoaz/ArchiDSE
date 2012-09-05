@@ -1,0 +1,54 @@
+
+component snk_comp
+{
+  provides Runnable input10111132;
+  provides Runnable input1051188;
+  provides Runnable input12111132;
+  provides Runnable input1221118;
+
+  uses Runnable output10111132;
+  uses Runnable output1051188;
+  uses Runnable output12111132;
+  uses Runnable output1221118;
+};
+
+behaviour snk_behaviour of snk_comp
+{
+  input10111132.run
+  {
+    (1) 1 { output10111132.run } 
+  }
+  input1051188.run
+  {
+    (1) 1 { output1051188.run } 
+  }
+  input12111132.run
+  {
+    (1) 1 { output12111132.run } 
+  }
+  input1221118.run
+  {
+    (1) 1 { output1221118.run } 
+  }
+};
+
+characteristics( Architecture_parameters ) snk_timing_characs of snk_behaviour
+{
+  input10111132.run
+  {
+    (1) { TBC 0 } [ 90 471887 102913 65317 107 309 523 51 60 150 2000 ]
+  }
+  input1051188.run
+  {
+    (1) { TBC 0 } [ 90 426629 94107 56843 8 282 57 4 3 1 2000 ]
+  }
+  input12111132.run
+  {
+    (1) { TBC 0 } [ 90 470855 103271 65926 108 310 527 51 60 150 2000 ]
+  }
+  input1221118.run
+  {
+    (1) { TBC 0 } [ 80 295661 72324 48081 23 216 48 12 2 1 2000 ]
+  }
+
+};

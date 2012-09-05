@@ -1,0 +1,83 @@
+include main.txt;
+include slice.txt;
+include write_buffer.txt;
+include void.txt;
+include timer_manager.txt;
+
+component_instance main_behaviour main main_timing_characs;
+component_instance slice_behaviour slice1 slice_timing_characs;
+component_instance slice_behaviour slice2 slice_timing_characs;
+component_instance slice_behaviour slice3 slice_timing_characs;
+component_instance slice_behaviour slice4 slice_timing_characs;
+component_instance write_buffer_behaviour write_buffer write_buffer_timing_characs;
+
+component_instance void_behaviour void void_timing_characs;
+component_instance timer_manager_behaviour timer_manager timer_manager_timing_characs;
+
+component_instance Timer_impl t1 timer;
+configuration t1->configure_timerspec_and_sched_fifo( 0, 20000, 0, 15000000, true, 10 );
+
+component_instance Timer_impl t2 timer;
+configuration t2->configure_timerspec_and_sched_fifo( 0, 10000, 0, 180000000, true, 10 );
+
+
+connection( asynchronous ) cnx_t1 timer_manager.timer_1_start t1.start;
+configuration cnx_t1.configure_priority_and_sched_fifo( 99, true );
+configuration cnx_t1.configure_affinity( 2 );
+connection( asynchronous ) cnx_t2 timer_manager.timer_2_start t2.start;
+configuration cnx_t2.configure_priority_and_sched_fifo( 99, true );
+configuration cnx_t2.configure_affinity( 1 );
+
+connection( asynchronous ) cnx_t1s timer_manager.timer_1_stop t1.stop;
+configuration cnx_t1s.configure_priority_and_sched_fifo( 99, true );
+configuration cnx_t1s.configure_affinity( 2 );
+connection( asynchronous ) cnx_t2s timer_manager.timer_2_stop t2.stop;
+configuration cnx_t2s.configure_priority_and_sched_fifo( 99, true );
+configuration cnx_t2s.configure_affinity( 1 );
+
+
+
+connection( asynchronous ) cnx_void t2.tick void.input;
+configuration cnx_void.configure_priority_and_sched_fifo( 98, true );
+configuration cnx_void.configure_affinity( 2 );
+
+
+
+connection( asynchronous ) cnx_main t1.tick main.input_timer;
+configuration cnx_main.configure_priority_and_sched_fifo( 15, true );
+configuration cnx_main.configure_affinity( 0 );
+
+connection( asynchronous ) cnx_slice1 main.comm_slice1 slice1.input;
+configuration cnx_slice1.configure_priority_and_sched_fifo( 14, true );
+configuration cnx_slice1.configure_affinity( 0 );
+connection( asynchronous ) cnx_slice2 main.comm_slice2 slice2.input;
+configuration cnx_slice2.configure_priority_and_sched_fifo( 14, true );
+configuration cnx_slice2.configure_affinity( 3 );
+connection( asynchronous ) cnx_slice3 main.comm_slice3 slice3.input;
+configuration cnx_slice3.configure_priority_and_sched_fifo( 13, true );
+configuration cnx_slice3.configure_affinity( 2 );
+connection( asynchronous ) cnx_slice4 main.comm_slice4 slice4.input;
+configuration cnx_slice4.configure_priority_and_sched_fifo( 13, true );
+configuration cnx_slice4.configure_affinity( 1 );
+
+connection( asynchronous ) cnx_filter1 slice1.output main.input_slice1;
+configuration cnx_filter1.configure_priority_and_sched_fifo( 10, true );
+configuration cnx_filter1.configure_affinity( 0 );
+connection( asynchronous ) cnx_filter2 slice2.output main.input_slice2;
+configuration cnx_filter2.configure_priority_and_sched_fifo( 10, true );
+configuration cnx_filter2.configure_affinity( 3 );
+connection( asynchronous ) cnx_filter3 slice3.output main.input_slice3;
+configuration cnx_filter3.configure_priority_and_sched_fifo( 10, true );
+configuration cnx_filter3.configure_affinity( 2 );
+connection( asynchronous ) cnx_filter4 slice4.output main.input_slice4;
+configuration cnx_filter4.configure_priority_and_sched_fifo( 8, true );
+configuration cnx_filter4.configure_affinity( 1 );
+
+
+connection( asynchronous ) cnx_write_buffer main.comm_write_buffer write_buffer.input;
+configuration cnx_write_buffer.configure_priority_and_sched_fifo( 15, true );
+configuration cnx_write_buffer.configure_affinity( 1 );
+
+
+entry_point timer_manager.start.run;
+final_point timer_manager.stop.run;

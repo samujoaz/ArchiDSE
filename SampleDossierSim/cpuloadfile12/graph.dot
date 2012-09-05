@@ -1,0 +1,14 @@
+digraph my_graph {
+  overlap = scale;
+   main[label="main"];
+   slice1[label="slice1"];
+   slice2[label="slice2"];
+   write_buffer[label="write_buffer"];
+   t1[label="t1",shape=box ];
+   t1 -> main[label="PU0", color=blue];
+   main -> slice1[label="PU0", color=blue];
+   main -> slice2[label="PU0", color=blue];
+   slice1 -> main[label="PU0", color=blue];
+   slice2 -> main[label="PU0", color=blue];
+   main -> write_buffer[label="PU0", color=blue];
+}
