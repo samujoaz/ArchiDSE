@@ -1,0 +1,24 @@
+
+component filter_comp 
+{ 
+  provides Runnable input;
+  uses Runnable output;
+};
+
+behaviour filter_behaviour of filter_comp
+{
+  input.run 
+  {
+    (1) 1 { output.run }
+  }  
+};
+
+characteristics( Architecture_parameters ) filter_timing_characs of filter_behaviour
+{
+  input.run
+  {
+    (1) { TBC 0 } [ 90 17000000 3235056 1623677 10500 6470 3247 270 1617 811 66816 ]
+  }
+
+};
+

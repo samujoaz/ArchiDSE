@@ -1,0 +1,10 @@
+dans le dossier: cpuloadfile0/
+mean CPU0: 0	Frequence du cpu: 200 Mhz
+*****
+dans le dossier: cpuloadfile1/
+mean CPU0: 0	Frequence du cpu: 200 Mhz
+mean CPU1: 0	Frequence du cpu: 200 Mhz
+mean CPU2: 0	Frequence du cpu: 200 Mhz
+mean CPU3: 0	Frequence du cpu: 200 Mhz
+*****
+dans le dossier: cpuloadfile2/

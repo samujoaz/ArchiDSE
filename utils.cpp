@@ -29,9 +29,18 @@ void UpFreqCpu(CPU C, uint delta)
 //   if (C->work_frequency+delta<=C->end_frequency)  C->work_frequency=C->work_frequency+delta;
 //   else cout<<"frequence too high, can not increase"<<endl;
 }
-
-void getAllCpuLoad(uint nb_cpu, int numerodossier, double cpuload[], int frequence[])  /// dans cette fonctuion on fait la trace dans un dossier numéroter j 
-{				       ///  puis on va lire la valeur du ième CPU load souhaitée.
+/** dans cette fonctuion on fait la trace dans un dossier numéroter  "numerodossier" 
+*  puis on va lire la valeur du ième CPU load souhaitée.
+* les valeur pointeur cpuload seront modiffiées et numerodossier sera incrementer
+* 
+* dans cette fonction  on fait tout d'abord la trace de l'application en fonction du nombre de cpu
+*  puis on ecrit le taux de chargement et la fréquence de chaque cpu dans le fichier "historic.txt"
+* et le fichier pie?dat est généré c'est ppour voir la repartition des cpu sur un camembert
+* ensuite on fait une copie de l'architecture complete ( matérielle et logicielle ) dans le dossier cpuloafileX
+* 
+* */
+void getAllCpuLoad(uint nb_cpu, int numerodossier, double cpuload[], int frequence[])  
+{				     
     char c[256],nomdudossier[100];
     string buffer,line,cmd, cnx_name_file;
     ostringstream convert;
@@ -42,7 +51,6 @@ void getAllCpuLoad(uint nb_cpu, int numerodossier, double cpuload[], int frequen
     {
       cnx_name_file += iter->first + " ";
     }
-//     cmd =  "./get_allcpuload.sh a  \"cnx_write_buffe " 
     sprintf(c,"./get_allcpuload.sh a  \" cnx_write_buffer -cpu 0 CPU0 \" %d",numerodossier);
     cmd=c;/// par défaut!
     
@@ -60,7 +68,6 @@ void getAllCpuLoad(uint nb_cpu, int numerodossier, double cpuload[], int frequen
 
       sprintf(c," \" %d",numerodossier);
       cmd = cmd+ c;
-//       cout<< cmd <<endl;  exit(0);
     }
    
     i=0;
@@ -80,8 +87,6 @@ void getAllCpuLoad(uint nb_cpu, int numerodossier, double cpuload[], int frequen
     {
       convert.str(""); convert.clear();
       convert<<frequence[i];
-      //strcat (BufferFreqHisto,convert.str()+"\\n");
-
       line=line+convert.str()+"\\n";
       out<<buffer<<"\tFrequence du cpu: "<<frequence[i++] <<" Mhz"<<endl;
     }
@@ -101,8 +106,6 @@ void getAllCpuLoad(uint nb_cpu, int numerodossier, double cpuload[], int frequen
 	in2>>buffer;cout<<buffer;
 	in2>> cpuload[i];cout<<cpuload[i]<<endl; 
 	out2<<buffer<<"("<<cpuload[i]<<") "<<cpuload[i]<<endl;
-	
-	
     }
     
   /// copie du fichier Software
@@ -162,38 +165,19 @@ void getAllCpuLoad(uint nb_cpu, int numerodossier, double cpuload[], int frequen
 	exit(405);
     }
     write_Data_histogram(cpuload,nb_cpu);
-//     if (numerodossier==2) { GenScriptHistogram(nb_cpu); exit(0);}
     /// fermeture des fichiers !  pas obligatoire mais bon !
     in.close();
     out.close();
     in2.close();
    fichierHDW.close();
    outHDW.close();
-   /*
-     sprintf(c,"cpuloadfile%d",numerodossier);
-     buffer = c;
-     buffer = buffer+"/includeliste.txt";
-     ofstream out_includefile(buffer.c_str()); 
-    for(int u=0; u<nb_component;u++)/// on va recopier tout les fichiers de l'application (main, slife, filter, generator...)
-    {
-//       string cp;
-//       cp = "cp  "+includeListe[u] + "  "+ c;
-//       system(cp.c_str());
-      out_includefile<<includeListe[u]<<endl;
-    }
-    out_includefile.close();
-    
-     sprintf(c,"cpuloadfile%d",numerodossier);
-     buffer = c;
-     buffer = buffer+"/origine.txt";
-     ofstream pp(buffer.c_str()); 
-     ifstream  tt("composition.txt");
-     while(getline(tt,buffer))pp<<buffer<<endl;
-    */
 }
 
+
+
+/// pour avoir le Min et MAx ainsi  que les indices des cpu correspondantes
 void getMinMaxCpuLoad(double cpuload[], uint except[], uint nb_cpu, uint nb_except, double *Max, double *Min, uint *indice_cpuMax, uint *indice_cpuMin)
-{/// pour avoir le Min et MAx ainsi  que les indices des cpu correspondantes
+{
 uint i=0,j=0; 
 double monMin=101, monMax=0;
 bool inclut;
@@ -225,8 +209,9 @@ bool inclut;
   }
 }
 
+/// copie de quelconque fichier en rajoutant l'extension _copie.txt
 void CopieCompositionFile(string file, string destination)
-{/// copie de quelconque fichier en rajoutant l'extension _copie.txt
+{
   ifstream in(file.c_str());
   string buffer; 
   buffer= destination+"composition_copie.txt";
@@ -237,7 +222,7 @@ void CopieCompositionFile(string file, string destination)
   in.close();
 }
 
-
+/// fionction de tri d'un tableu de n valeur
  void  tri_bulle( double *tab, int n)
  {
   int i =0;
@@ -266,27 +251,24 @@ cout<<endl;
 
 void coucou()
 {cout<<" Free egg : ^_^ coucou @_@ "<<endl;}
+
+
+/**
+ * Ecriture des data et du script de l'histogramme pour chaque itération de l'exploration
+ * */
 void write_Data_histogram(double cpuload[], int nb_cpu)
 {
     ofstream histogram("all_cpu_hist.dat",ios::app);
 
   for(int i=0; i<nb_cpu;i++)  
   {
-    //if(cpuload[i]>0.0)
-   // {
       histogram<<cpuload[i]<< "  ";
-//       histogram<<" ";
-//     }
-//     else
-//     { 
-//       histogram<< "0.5  ";
-//     }
   }
   histogram<< "\n";
 }
 
 
-void GenScriptHistogram(uint nb_cpu)
+void GenScriptHistogram(uint nb_cpu) /// script histogramme .gnu
 {
  ofstream output("hist_all_archi.gnu",ios::trunc);
  output<<"reset\nset yrange [0:100]\nset xrange [-1:]\nset ylabel \"Taux de chargement des CPU (%)\"\n";

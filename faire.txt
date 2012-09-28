@@ -1,2 +1,5 @@
 
 modifier la fonction compute pour le calcul de conso pour plusieurs 
+
+exemple de fonction à modifier 
+compute_iL1_cache()

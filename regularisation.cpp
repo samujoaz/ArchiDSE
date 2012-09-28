@@ -8,21 +8,17 @@
 #include <map>
 #include <sstream>
 
+#define iterMax 40
+#define  LIMIT 7
 
-// extern LISTE_TBC thisTBC;
-// extern LISTE_TBC thisTBC2;
 extern CPU thisMesCPU;
 extern GROUP_TBC GroupAffinity;
-//extern uint NbMaxCpu;
 extern uint TSIZE;
-// extern uint nbTBC;
 double LoadMax;
 double LoadMin;
-double MinTolere =20.0;
+double MinTolere =30.0;
 list < pair < string,double > > selected_connections;
 list < pair < string,double > > max_time_connections;
-uint LIMIT=7;
-int ALGO;
 extern bool once;
 extern char **_argv;
 
@@ -50,107 +46,85 @@ bool notComprisEntre(double valeur,double x, double y)
   return true;
 }
 
-bool ComprisEntre(double valeur,double x, double y)
-{
-  if((valeur>=x && valeur<=y))
-    return true;
-  return false;
-}
-void e(){cout<<endl<<"Program under construction..... "<<endl;exit(0);}
+
+void e(){coucou();cout<<endl<<"Program under construction..... "<<endl;exit(0);}///meilleure fonction d'exit() \o/
+
+/**
+ * uint setCpuLoadLevel(CPU MesCPU,uint nb_cpu,string includeListe[],string componentListe[],uint num)
+ * esl la fonction qui fait l'exploration des architectures
+ * Etapes : 
+ * 1) on calcul le nombre de cpu qu'il faut mettre en parallèle (SIZE_MIXTE) 
+ * 2)augmentaation de la frequence de tous les cpu en dessous de 200MHz
+ * 3)on place sur les differents processeurs les threads parallèles ( en même temps) avant de faire une trace et de regarder le cpuload. 
+ * 4) ensuite on regarde les cpuloads de tous les processeurs. s'il reste encore des threads a placer on les met sur les cpu dont les taux de chargement est inferieur à la borne minimum
+ * qu'on s'est fixé. sinon on chage de processeur ou bien on augmente la fréquence. 
+ * 5)un fois le boucle et la repartition des threads sont terminés on on verifie cpu par cpu le taux de chargement pis la durée des connections.
+ * */
 uint setCpuLoadLevel(CPU MesCPU,uint nb_cpu,string includeListe[],string componentListe[],uint num)
 {
   uint i=0,j=0,o,nb_component=0,nb_affinity =0,numerodossier,indice=0,offset_frequence;
   int frequence[nb_cpu],NbThread,NbMaxCpu,TYPE=509,SIZE_MIXTE=0,SIZE_RESTE=0, max,nb_priority;
   char str_indice[100];
-  //string  name,component,output, input;
   double cpuload_cur[nb_cpu];
   double MaxCpuload,MinCpuload, tabcpuload[nb_cpu-1];
   uint indice_cpuMax, indice_cpuMin;
   bool sortie=true,quit=true;
   bool stop =true;
-     string Group_cnxname[TSIZE]; 
-   int taille,Group_Aff[TSIZE];
+  string Group_cnxname[TSIZE]; 
+  int taille,Group_Aff[TSIZE];
   string compositionfile="composition.txt", composition_copie=string(_argv[2])+"composition_copie.txt",compositionfile_temp="composition_temp.txt";
   CPU cpu_tmp=NULL,cpu_access=NULL;
-  LISTE_TBC copieListeTBC=NULL;
 
-  ///  on fare deux copie de la liste une pour la convergence(while !=NUL) et l'autre pour le parcours et research
+  ///  on fait deux clone de la liste cpu une pour la convergence(while(nb_element) !=NUL) et l'autre pour le parcours et la research des caractéristiques des cpu
+  /// le clonage permet aux nouvelles listes d'avoir une adresse propre les deux seront indépendantes
   GROUP_TBC ListOuvert=NULL,ListFerme=NULL;
   /// init variables 
   cpu_tmp = CloneCPU(MesCPU);
   cpu_access=CloneCPU(MesCPU);
   
-  once=true;
+  once=true;/// c'est une variable globale à ce fichier et à generatefile.cpp once permet de faire une boucle une seule  une des boucles dans GenerateCompCpuFile(...)
+  /// cette boucle en question doit remplir la liste des TBC qui corespond au nombres de threads et ses caractéristiques (nom, affinity, cnx_name...)
   GenerateCompCpuFile(composition_copie,compositionfile,includeListe,componentListe,&nb_affinity,&nb_component);
 //    for (int u=0; u<nb_component;u++) cout <<componentListe[u]<<endl;
  
   once=false;
-//    e();
-  ListOuvert=CloneG_TBC(GroupAffinity);
-  ListFerme =CloneG_TBC(GroupAffinity);
-//     CalculTBC(ListFerme, cpu_access);
+
+  ListOuvert=CloneG_TBC(GroupAffinity);/// pour le bouclage et la condition de fin de boucle 
+  ListFerme =CloneG_TBC(GroupAffinity);/// pour le calcul et la génération des fichiers avec  TBC. 
+// CalculTBC(ListFerme, cpu_access);
 // G_TBC_Afficher(GroupAffinity); e();
-//   LoadMax= LoadMax;
-//   G_TBC_Afficher(GroupAffinity);
-//     CalculTBC(ListFerme, cpu_access);
-//    e();
-//   CalculTBC(ListFerme, cpu_access);
-//    FindGroupCpuFix(ListFerme, Group_Aff, &taille);
-//    for(int u=0; u<taille;u++) cout<<Group_Aff[u]<<endl;
-
-   
-//    FindSimilarGroup(ListFerme, 'C', Group_cnxname, &taille); 
-//      for(int u=0; u<taille;u++) ChangeAffinity(composition_copie,compositionfile_temp,Group_cnxname[u],3);
-//      e();
-//     GenerateCompCpuFile(composition_copie,compositionfile,includeListe,componentListe,&nb_affinity,&nb_component);
-
- // copieListeTBC=CloneListeTBC(thisTBC);/// on fait un clone pour pouvoir modifier les valeurs sans modifier l'originale (pointeur)
   NbThread = nb_component;
-   numerodossier=num;
-//    cout<<"nb_affinity "<<nb_affinity<<endl;
-//    e();
-    
-//    for(i=0; i<nb_cpu ;i++) /// copie des frequences des cpu pour l'écriture  dans les fichiers de sortie
-// 	    {
-// 		if(cpu_tmp->work_frequency<200)
-// 		{
-// 		    cout << " tbc bas + low " << endl;
-// 		    SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency+offset_frequence);
-// 		    AccessToCPU(cpu_access,i)->work_frequency=cpu_tmp->work_frequency;
-// 		}
-// 		frequence[i]=cpu_tmp->work_frequency;
-// 		cpu_tmp=cpu_tmp->next;
-// 	    }
-//    getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
-//     getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
+  numerodossier=num; /// pour les itérations
 
-  /// fin init variables 
-   
-  
-  /// determination du type d'algo :
-   
-   
+/**
+ * Calcul du taux de paralélisme : nombre de cou à mettre en parallèle.
+ * */
   if( nb_cpu <=4 || NbThread <LIMIT )
   {
 
       SIZE_MIXTE=NbThread/nb_cpu;
-//       SIZE_RESTE=NbThread%nb_cpu;
       NbMaxCpu=nb_cpu;
-//         cout << "hehehe  "<<SIZE_MIXTE <<endl<< NbThread <<endl;e();
   }
   else
   { 
-    if(nb_cpu>4)
+    if(nb_cpu>4 && nb_cpu<6)
     {
       SIZE_MIXTE=(NbThread/nb_cpu)/2;
-//       SIZE_RESTE=NbThread%nb_cpu;
-//         cout << SIZE_MIXTE <<endl<< NbThread <<endl;e();
       NbMaxCpu=nb_cpu-1;
       
     }
+     else
+    {
+        if(nb_cpu>=6)
+    {
+      SIZE_MIXTE=NbThread/2;
+      NbMaxCpu=nb_cpu-1;
+    }
+    }
   }
- 
-
+  
+  
+/// augmentation des fréquences inférieurs à 200 MHz
 	offset_frequence=100;
 	for(i=0; i<nb_cpu ;i++) /// copie des frequences des cpu pour l'écriture  dans les fichiers de sortie
 	{
@@ -159,16 +133,17 @@ uint setCpuLoadLevel(CPU MesCPU,uint nb_cpu,string includeListe[],string compone
 		SetWorkFrequencyCPU(cpu_tmp,cpu_tmp->work_frequency+ offset_frequence);
 		AccessToCPU(cpu_access,i)->work_frequency=cpu_tmp->work_frequency;
 	    }
-	    
-	    frequence[i]=cpu_tmp->work_frequency;
+
+	    frequence[i]=cpu_tmp->work_frequency;/// pour pouvoir écrire dans le fichier histoiric.txt la fréquence des cpu lors des tests des architectures
 	    cpu_tmp=cpu_tmp->next;
 	}
 	i=0;j=1;
 	CalculTBC(ListFerme, cpu_access);
+	
 // 	cpuload_cur[0]=90;
 	//getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
 //        if(cpuload_cur[0]<LoadMax){cout<<"cpuLoad_"<<0<<" < "MinTolere<<LoadMax<<endl;return numerodossier; }
-	/// on va changer l'affinity de NbMaxCpu en parallèle si le ticktimer n'est pas trop élévé 
+	/// on va charger l'affinity de NbMaxCpu en parallèle 
 	///et le reste se fera de façon sequentielle s'il reste encore des  threads
 
 	for(uint t=0;t<SIZE_MIXTE && ListOuvert !=NULL;t++)
@@ -201,21 +176,18 @@ uint setCpuLoadLevel(CPU MesCPU,uint nb_cpu,string includeListe[],string compone
 	}
 	
 	GenerateCompCpuFile(composition_copie,compositionfile,includeListe,componentListe,&nb_affinity,&nb_component);
-	getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
+	getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);/// exécution de la première trace 
 	indice=0;
-	cpu_tmp = AccessToCPU(cpu_access,indice);
-// 	 G_TBC_Afficher(ListOuvert);e();
+	cpu_tmp = AccessToCPU(cpu_access,indice);/// on se place sur le premier processeur
 // 	 
 	/// fin de la partie parallèle on regarde d'abord s'il n'y plus de threads dans notre liste !
 	if(ListOuvert==NULL)/// si liste vide 
 	{
-	/// cette partie est à revoir  : genre unn prend un thread du max seulement
 	    getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
-// 	    goto ici;
-	    /// maintenant on va vérifier les cas où le cpu_0  a un chargement inférieur à 5%
+	    /// maintenant on va vérifier les cas où le cpu_0  a un chargement inférieur à MinTolere
 	    for(i=0;i<nb_cpu-1;i++) { tabcpuload[i]=cpuload_cur[i+1];}
 	    getMinMaxCpuLoad( tabcpuload,NULL,nb_cpu-1,  0,&MaxCpuload, &MinCpuload,&indice_cpuMax, &indice_cpuMin); /// recherche min et max  
-	    if(cpuload_cur[0]<30.0)
+	    if(cpuload_cur[0]<MinTolere)
 	    {
 		cpu_tmp=AccessToCPU(cpu_access,0);
 		FindAndReplaceAffinity(composition_copie,compositionfile_temp,indice_cpuMin+1,0);
@@ -226,11 +198,11 @@ uint setCpuLoadLevel(CPU MesCPU,uint nb_cpu,string includeListe[],string compone
 
 
 	}	    
-	else								  				/// sinon on sait que la liste des threads n'est pas encore vide !
+	else	/// sinon on sait que la liste des threads n'est pas encore vide !
 	    {
 	    indice=1;
 	    sortie = true;
-	    while(ListOuvert !=NULL && indice<nb_cpu &&  cpuload_cur[0]>LoadMax )/// tant que la liste n'est pas vide ou bien  qu'on pas au cpu_0
+	    while(ListOuvert !=NULL && indice<nb_cpu &&  cpuload_cur[0]>LoadMax )/// tant que la liste n'est pas vide ou bien  qu'on au cpu_0 >LoadMax
 		{
 		 
 		    if(sortie)
@@ -292,7 +264,7 @@ uint setCpuLoadLevel(CPU MesCPU,uint nb_cpu,string includeListe[],string compone
 		}/// end while
 	}/// end else
 	
-	while(ListOuvert!=NULL)
+	while(ListOuvert!=NULL) /// par precaution on tester si on a vraiment vider la liste!
 	{
 	 for(indice=0;indice<nb_cpu && ListOuvert!=NULL;indice++)
 	 {
@@ -324,7 +296,7 @@ uint setCpuLoadLevel(CPU MesCPU,uint nb_cpu,string includeListe[],string compone
 	sortie = true;
 	max=nb_cpu;
 	
-	while(max> 1 && numerodossier<20 ) /// tant qu'il y en aura un cpuload superieur à 83-85%  on augementera la fréquence 
+	while(max> 1 && numerodossier<iterMax-20 ) /// tant qu'il y en aura un cpuload superieur à CPULOADMAX  on augementera la fréquence 
 	{	
 	    for(indice=0; indice<nb_cpu ;indice++)/// on regardera tout les niveaux de chargement des CPU qui fonctionnent !
 	    {
@@ -368,8 +340,7 @@ uint setCpuLoadLevel(CPU MesCPU,uint nb_cpu,string includeListe[],string compone
 
 	/// s'il y a un cpu qui dépasse la limite on enlève un threads puis un autre s'il le faut pour le mettre sur celui qui est le moins charger
 
-// coucou();
-// e();
+ coucou();
 
   for(i=0;i<nb_cpu;i++) {  tabcpuload[i]=cpuload_cur[i];}
 	getMinMaxCpuLoad( tabcpuload,NULL,nb_cpu,0,&MaxCpuload, &MinCpuload,&indice_cpuMax, &indice_cpuMin); /// recherche min et max  
@@ -398,7 +369,7 @@ uint setCpuLoadLevel(CPU MesCPU,uint nb_cpu,string includeListe[],string compone
       sortie=true;
       for(indice=0; indice<nb_cpu && sortie;indice++) 
       {
-	if(cpuload_cur[indice]<=MinTolere){ sortie = false;i=indice;}/// pour les cacahuettes
+	if(cpuload_cur[indice]<=MinTolere){ sortie = false;i=indice;}/// pour les cpu qui ont un taux de chargement trop bas <= 30; ici
       }
       
       indice=i;
@@ -421,8 +392,10 @@ uint setCpuLoadLevel(CPU MesCPU,uint nb_cpu,string includeListe[],string compone
 	}
       }
 
-
-	for(indice=0;indice<nb_cpu && numerodossier<30;indice++) 
+/**
+ * Regularisation de niveau de chargement cpu par cpu
+ * */
+  for(indice=0;indice<nb_cpu && numerodossier<iterMax-10;indice++) 
 	 { 
 		if(cpuload_cur[indice]>LoadMax && frequence[indice]<(AccessToCPU(cpu_access,indice)->end_frequency))
 		  {
@@ -452,11 +425,11 @@ uint setCpuLoadLevel(CPU MesCPU,uint nb_cpu,string includeListe[],string compone
 		  }
 	   
 	  }
-	/*
-		for(indice=0;indice<nb_cpu && numerodossier<20 && sortie;indice++) 
+	/// ce cas est fait s'il n'y a pas de contrainte  de temps : on fixe tout les cpu entre les bornes.
+  for(indice=0;indice<nb_cpu && numerodossier<iterMax-10 && sortie && selected_connections.empty();indice++) 
 	 { 
 
-	      while(notComprisEntre(cpuload_cur[indice],LoadMin,LoadMax) && numerodossier<20 && frequence[indice]<(AccessToCPU(cpu_access,indice)->end_frequency) && frequence[indice]>(AccessToCPU(cpu_access,indice)->start_frequency))
+	      while(notComprisEntre(cpuload_cur[indice],LoadMin,LoadMax) && numerodossier<iterMax-10 && frequence[indice]<(AccessToCPU(cpu_access,indice)->end_frequency) && frequence[indice]>(AccessToCPU(cpu_access,indice)->start_frequency))
 	      {
 		if(cpuload_cur[indice]>LoadMax && frequence[indice]<(AccessToCPU(cpu_access,indice)->end_frequency))
 		  {
@@ -485,23 +458,22 @@ uint setCpuLoadLevel(CPU MesCPU,uint nb_cpu,string includeListe[],string compone
 	      }
 	   
 	  }
-*/
+
 indice=0;
 /// ICI ON NE FAIT QU'UNE DERNIERE VERIFICATION DES CPULOAD 
-// list < list <  double > >::iterator time_cnx_iter=0;;
-// ici:	
 
+/// où l'on a mis des contraintes temps alors on verifies la durée des connections en parallèles 
+/// on augmente la fréquence du cpu en question s'il s'y trouve des threads dont temps de connections est supérieur à la valeur fixée 
 
 quit=true;
-while(quit)
+while(quit && !selected_connections.empty())
 {
-for (list < pair < string, double > >::iterator iter = selected_connections.begin(); iter != selected_connections.end()&& numerodossier<40; iter++) 
+for (list < pair < string, double > >::iterator iter = selected_connections.begin(); iter != selected_connections.end()&& numerodossier<iterMax; iter++) 
 	{
 	  string cnx_name_dat = iter->first + ".dat";
 	    cout<<cnx_name_dat<<endl;
 	    ofstream cnx_dat(cnx_name_dat.c_str(),ios::app);
 	  string name_file = iter->first;
-// 	  cout<<"mon fichier bidulle "<<name_file<<endl;
 	  
 	  double value=0.0;
 	  stop =true;
@@ -515,27 +487,21 @@ for (list < pair < string, double > >::iterator iter = selected_connections.begi
 	    exit(1);
 	    }
 	
-	  while(file_connections>>value && stop && numerodossier<40)
+	  while(file_connections>>value && stop && numerodossier<iterMax)
 	  {
-	    if(value>iter->second && frequence[indice]<(AccessToCPU(cpu_access,indice)->end_frequency))
+	    if(value>(iter->second-.5) && frequence[indice]<(AccessToCPU(cpu_access,indice)->end_frequency))
 	    {
 	      cnx_dat<<value<<endl;
 	      name_file = iter->first;
-	      //iter--;
 	      stop=false;
 	      /// substr; getaffinyof, upfreq cpu_x
 	      name_file=name_file.substr(4,name_file.size());
 	      indice = getAffinityOf(composition_copie,name_file); 
 	      frequence[indice]=AccessToCPU(cpu_access,indice)->work_frequency+25;
 	      AccessToCPU(cpu_access,indice)->work_frequency+=25;
-	      
-// 	      getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
-	      //cout<<name_file<<endl;
 	      quit = true;
 	    }
-	   
-	  //cout<< iter->first <<" "<<iter->second<<endl;
-	  }
+	    }
 	  if(stop)
 	    {
 	       ifstream file_connections2(save_name.c_str());
@@ -545,45 +511,34 @@ for (list < pair < string, double > >::iterator iter = selected_connections.begi
 	       while(file_connections2>>value) mylist_to_sort.push_back(value);
 	       mylist_to_sort.sort();
 	       max_time_connections.push_back(pair < string, double> (iter->first,mylist_to_sort.back()));
-	     
-	      //cout<<"max time for " <<iter->first<< ": "<<mylist_to_sort.back()<<" ms "<<endl;
 	      quit = false;
 	     
-	    }
-	  
-	  
-	  
+	    } 
 	}
 	CalculTBC(ListFerme,cpu_access);
 	getAllCpuLoad(nb_cpu,numerodossier++,cpuload_cur,frequence);
 }
 
+
+/// generation d'un fichier de visualisation des  de l'evolution de connections
 	 ofstream cnx_max_gnu("cnx_all_max.gnu");
 	 string mybuffer;
 	 mybuffer.clear();
-// 	 i=0 ; 
-// 	 cnx_max_gnu<< "plot  ";
 	for (list < pair < string, double > >::iterator iter = selected_connections.begin(); iter != selected_connections.end(); iter++) 
 	{
  	  string name_file = iter->first ;ostringstream oss;
  	  oss << iter->second;
  	  mybuffer +=" '" + name_file +".dat' with linespoints ,  " +  oss.str() + " with lines title \"Max_" + name_file +"\", " ;
 	 oss.str(""); oss.clear(); 
-	 
-
-// 	 cnx_max_gnu<<"'" << iter->first <<".dat' with linespoints ,  " <<  iter->second << " with lines title \"Max_" << iter->first <<"\", " ;
-// 	 else {iter--;cnx_max_gnu<<"'" << iter->first <<".dat' with lines ,  " <<  iter->second << " with lines title \"Max_" << iter->first <<"\", " ;}
-	  
 	}
 
 	mybuffer = mybuffer.substr(0,mybuffer.size()-2);
 	cnx_max_gnu<< "plot  "<<mybuffer<<";\n pause -1" <<endl;
-// 	cnx_max_gnu<< ";\n pause -1" <<endl;
 	/*
-	for(indice=0;indice<nb_cpu && numerodossier<20 && sortie;indice++) 
+	for(indice=0;indice<nb_cpu && numerodossier<iterMax && sortie;indice++) 
 	 { 
 
-	      while(notComprisEntre(cpuload_cur[indice],LoadMin,LoadMax) && numerodossier<20 && frequence[indice]<(AccessToCPU(cpu_access,indice)->end_frequency) && frequence[indice]>(AccessToCPU(cpu_access,indice)->start_frequency))
+	      while(notComprisEntre(cpuload_cur[indice],LoadMin,LoadMax) && numerodossier<iterMax && frequence[indice]<(AccessToCPU(cpu_access,indice)->end_frequency) && frequence[indice]>(AccessToCPU(cpu_access,indice)->start_frequency))
 	      {
 		if(cpuload_cur[indice]>LoadMax && frequence[indice]<(AccessToCPU(cpu_access,indice)->end_frequency))
 		  {

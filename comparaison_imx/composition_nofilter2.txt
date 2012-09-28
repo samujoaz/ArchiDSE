@@ -8,7 +8,7 @@ component_instance slice_behaviour slice2 slice_timing_characs;
 component_instance write_buffer_behaviour write_buffer write_buffer_timing_characs;
 
 component_instance Timer_impl t1 timer;
-configuration t1->configure_timerspec_and_sched_fifo( 0, 10000, 0, 20000000, true, 10 );
+configuration t1->configure_timerspec_and_sched_fifo( 0, 10000, 0, 50000000, true, 10 );
 
 connection( asynchronous ) cnx_main t1.tick main.input_timer;
 configuration cnx_main.configure_priority_and_sched_fifo( 15, true );

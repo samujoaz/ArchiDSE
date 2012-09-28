@@ -11,6 +11,7 @@
 #include "fonctionsUtils.h"
 #include "generatefile.h"
 #include "utils.h"
+/* CETTE METHODE N'EST PLUS UTILISÉE */
 enum {IS_HYPER_LOW,IS_LOW, IS_MEDIUM,IS_HIGH,IS_HYPER_HIGH};
 enum {SEQUENTIEL,MIXTE};
 enum {TYPE1,TYPE2,TYPE3,TYPE4};/// pour le type d'algo qu'on choisira!
@@ -23,12 +24,33 @@ enum {TYPE1,TYPE2,TYPE3,TYPE4};/// pour le type d'algo qu'on choisira!
  * 
  * */
 using namespace std;
+/**
+ * * fonction de sortie d'exécution du programme en mode debug
+ * */
 void e();
+
+/**
+ * pour chercher une chaine de caracterè dans une liste de chaine de caractère 
+ * retour true si la chaine n'est pas trouvée et false si elle s'y trouve
+ * */
 bool notFindName(string listename[] ,string index,int taille);
+/**
+ * pour savoir si une valeur (type double) n'est pas comprise entre x et y
+ * retour false si elle comprise entre x et y 
+ * et true sinon
+ * 
+ * */
 bool notComprisEntre(double valeur,double x, double y);
+
 uint setCpuLoadLevel(CPU MesCPU,uint nb_cpu,string includeListe[],string componentListe[],uint num);
+
+/**
+ * N'est plus utilisé: 
+ * permettait de savoir quelle fréquene de traitement avait le fichier de composition allait lire ce type de ligne avec timer: 
+ * onfiguration t1->configure_timerspec_and_sched_fifo( 0, 100000, 0, 30000000, true, 10 );
+
+ * */
 int getSpeedTickTimer(string intput);
-bool ComprisEntre(double valeur,double x, double y);
 
 
 #endif

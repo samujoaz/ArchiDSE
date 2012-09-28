@@ -1,7 +1,7 @@
-component PU CPU0 inputfile/cortexA9.txt 200
-component PU CPU1 inputfile/cortexA9.txt 200
-component PU CPU2 inputfile/cortexA9.txt 200
-component PU CPU3 inputfile/cortexA9.txt 200
+component PU CPU0 inputfile/cortexA9.txt 800
+component PU CPU1 inputfile/cortexA9.txt 800
+component PU CPU2 inputfile/cortexA9.txt 800
+component PU CPU3 inputfile/cortexA9.txt 800
 component CACHE L1_0 32 32 4
 component CACHE L1_1 32 32 4
 component CACHE L2_0 1024 32 8

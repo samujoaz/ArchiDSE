@@ -1,0 +1,57 @@
+dans le dossier: cpuloadfile0/
+mean CPU0: 77.2235	Frequence du cpu: 200 Mhz
+*****
+dans le dossier: cpuloadfile1/
+mean CPU0: 77.2899	Frequence du cpu: 200 Mhz
+mean CPU1: 95.6835	Frequence du cpu: 200 Mhz
+mean CPU2: 95.6821	Frequence du cpu: 200 Mhz
+mean CPU3: 28.4289	Frequence du cpu: 200 Mhz
+*****
+dans le dossier: cpuloadfile2/
+mean CPU0: 78.1104	Frequence du cpu: 200 Mhz
+mean CPU1: 95.7065	Frequence du cpu: 200 Mhz
+mean CPU2: 95.7068	Frequence du cpu: 200 Mhz
+mean CPU3: 28.2703	Frequence du cpu: 200 Mhz
+*****
+dans le dossier: cpuloadfile3/
+mean CPU0: 95.1632	Frequence du cpu: 175 Mhz
+mean CPU1: 95.6048	Frequence du cpu: 300 Mhz
+mean CPU2: 95.6755	Frequence du cpu: 300 Mhz
+mean CPU3: 57.4454	Frequence du cpu: 150 Mhz
+*****
+dans le dossier: cpuloadfile4/
+mean CPU0: 95.0886	Frequence du cpu: 275 Mhz
+mean CPU1: 95.4661	Frequence du cpu: 400 Mhz
+mean CPU2: 95.532	Frequence du cpu: 400 Mhz
+mean CPU3: 94.9648	Frequence du cpu: 100 Mhz
+*****
+dans le dossier: cpuloadfile5/
+mean CPU0: 99.7327	Frequence du cpu: 375 Mhz
+mean CPU1: 95.1279	Frequence du cpu: 500 Mhz
+mean CPU2: 86.9477	Frequence du cpu: 500 Mhz
+mean CPU3: 95.1243	Frequence du cpu: 150 Mhz
+*****
+dans le dossier: cpuloadfile6/
+mean CPU0: 95.4896	Frequence du cpu: 475 Mhz
+mean CPU1: 85.0762	Frequence du cpu: 600 Mhz
+mean CPU2: 86.7039	Frequence du cpu: 500 Mhz
+mean CPU3: 95.2256	Frequence du cpu: 250 Mhz
+*****
+dans le dossier: cpuloadfile7/
+mean CPU0: 79.9892	Frequence du cpu: 575 Mhz
+mean CPU1: 85.1334	Frequence du cpu: 600 Mhz
+mean CPU2: 86.6182	Frequence du cpu: 500 Mhz
+mean CPU3: 94.2925	Frequence du cpu: 350 Mhz
+*****
+dans le dossier: cpuloadfile8/
+mean CPU0: 83.7077	Frequence du cpu: 550 Mhz
+mean CPU1: 85.2523	Frequence du cpu: 600 Mhz
+mean CPU2: 86.8585	Frequence du cpu: 500 Mhz
+mean CPU3: 83.4294	Frequence du cpu: 400 Mhz
+*****
+dans le dossier: cpuloadfile9/
+mean CPU0: 80.213	Frequence du cpu: 575 Mhz
+mean CPU1: 81.8674	Frequence du cpu: 625 Mhz
+mean CPU2: 82.5318	Frequence du cpu: 525 Mhz
+mean CPU3: 77.6867	Frequence du cpu: 425 Mhz
+*****

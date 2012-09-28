@@ -5,19 +5,130 @@
 #include <utility>
 #include <algorithm>
 #include <vector>
+#include <deque>
 using namespace std;
 
+#include "regression.h"
 bool my_vector_sort(vector < double >i, vector < double >j)
 {
     return i[0] > j[0];
 }
 
-void compute_iL1_cache(fstream * f, double *cur_value, double *prev_time, double cur_time, vector < double >my_vector)
+
+
+vector <double> compute_conso( vector < vector <  double> > polynom , double frequence )
 {
+  vector <  double>  vector_conso;
+  double conso=0.0;
+  int i=0;
+
+  for(vector < vector < double > >::iterator iter1 = polynom.begin(); iter1 != polynom.end(); iter1++)
+  {   
+
+    int j=0; 
+    conso=0.0;
+    for(vector < double  >::iterator iter2 = polynom[i].begin(); iter2 != polynom[i].end(); iter2++)
+    { 
+	switch (j)
+	{
+	  case 0: 
+	  conso+= frequence * frequence * (*iter2); break;
+	  case 1: 
+	  conso+= frequence * (*iter2);break;
+	  case 2: 
+	  conso+= (*iter2); break;
+	}
+    j++;
+    }
+  vector_conso.push_back(conso);
+  i++;
+  }
+  return vector_conso;
+}
+/*void compute_conso(  vector <  double>  polynom , double frequence, double *conso)
+{
+  *conso=0.0;
+  int i=0;
+  for( vector < double >::iterator iter = polynom.begin(); iter != polynom.end(); iter++)  
+  {
+    switch (i)
+      {
+	  case 0: 
+	  *conso+= frequence * frequence * (*iter); break;
+	  case 1: 
+	  *conso+= frequence * (*iter);break;
+	  case 2: 
+	  *conso+= (*iter); break;
+      }
+    i++;
+  }
+}*/
+// focntion origne
+//on va remplacer le  0.0000098 par la valeur extrapoler par la fonction regression.
+// void compute_iL1_cache(fstream * f, double *cur_value, double *prev_time, double cur_time, vector < double >my_vector)
+// {
+//     *cur_value += (cur_time - *prev_time) * (my_vector[1] 
+// 					     + my_vector[4] * ((8 * 64) / 64) //  64 bytes per line, bus line of 64bits
+//         ) * 0.000000098 + (cur_time - *prev_time) * 1.21068; // Powerconsumption
+//     *f << cur_time << " " << *cur_value << endl;// static 0.662431
+// }
+
+/// DEBUT ZONE DE MODIFICATION
+
+void compute_iL1_cache_new(fstream * f, double *cur_value, double *prev_time, double cur_time, vector < double >my_vector,double conso)
+{
+  
     *cur_value += (cur_time - *prev_time) * (my_vector[1] 
 					     + my_vector[4] * ((8 * 64) / 64) //  64 bytes per line, bus line of 64bits
-        ) * 0.000000098 + (cur_time - *prev_time) * 1.21068; // Powerconsumption
-    *f << cur_time << " " << *cur_value << endl;// static 0.662431
+        )* conso  ;
+	//+ (cur_time - *prev_time) * 1.21068; // Powerconsumption
+    *f << cur_time << " " << *cur_value << endl;// static 0.662431 ecriture dans le fichier;
+}
+
+void compute_dL1_cache_new(fstream * f, double *cur_value, double *prev_time, double cur_time, vector < double >my_vector,double conso)
+{
+    *cur_value += (cur_time - *prev_time) * (my_vector[2]  // nb_load
+                                             + my_vector[5] * ((8 * 64) / 64)  // nb load miss
+                                             + (my_vector[3] - my_vector[6])    // nb write hit -> write through
+        ) *conso; 
+    *f << cur_time << " " << *cur_value << endl;//254437
+}
+
+void compute_L2_cache_new(fstream * f, double *cur_value, double *prev_time, double cur_time, vector < double >my_vector,double conso)
+{
+    *cur_value += (cur_time - *prev_time) * (my_vector[4] * ((8 * 64) / 64) // write to iL1
+					     + my_vector[7] * ((8 * 128) / 64) // iL2 miss (come from mainMem)
+                                             + my_vector[5] * ((8 * 64) / 64)  // nb load dataL1 miss
+                                             + my_vector[3]    // all data write (because L1cache = write through
+					     + my_vector[8] * ((8 * 128) / 64) // data load L2 miss (come from mainMem)
+					     + my_vector[9] * ((8 * 128) / 64) // data write L2 miss (come from mainMem)
+        ) * conso  ;
+    *f << cur_time << " " << *cur_value << endl; //376 461
+}
+
+
+
+void compute_leackage(fstream * f, double *cur_value, double *prev_time, double cur_time, vector < double >my_vector,double conso)
+{
+    *cur_value += (cur_time - *prev_time) *  conso;
+    *f << cur_time << " " << *cur_value << endl; //376 461
+}
+
+void compute_cpu(fstream * f, double *cur_value, double *prev_time, double cur_time, vector < double >my_vector,double conso)
+{
+    *cur_value += (cur_time - *prev_time) * my_vector[1] *  conso;
+    *f << cur_time << " " << *cur_value << endl; //376 461
+}
+
+
+/// FIN ZONE DE MODIFICATION ////
+void compute_iL1_cache(fstream * f, double *cur_value, double *prev_time, double cur_time, vector < double >my_vector)
+{
+  
+    *cur_value += (cur_time - *prev_time) * (my_vector[1] 
+					     + my_vector[4] * ((8 * 64) / 64) //  64 bytes per line, bus line of 64bits
+        )* 0.000000098 + (cur_time - *prev_time) * 1.21068; // Powerconsumption
+    *f << cur_time << " " << *cur_value << endl;// static 0.662431 ecriture dans le fichier;
 }
 
 void compute_dL1_cache(fstream * f, double *cur_value, double *prev_time, double cur_time, vector < double >my_vector)
@@ -37,7 +148,7 @@ void compute_L2_cache(fstream * f, double *cur_value, double *prev_time, double 
                                              + my_vector[3]    // all data write (because L1cache = write through
 					     + my_vector[8] * ((8 * 128) / 64) // data load L2 miss (come from mainMem)
 					     + my_vector[9] * ((8 * 128) / 64) // data write L2 miss (come from mainMem)
-        ) * 0.000000125 + (cur_time - *prev_time) * 20.0304; // Powerconsumption
+        ) *   0.000000125 + (cur_time - *prev_time) * 20.0304; // Powerconsumption
     *f << cur_time << " " << *cur_value << endl; //376 461
 }
 
@@ -47,7 +158,7 @@ void compute_MMem(fstream * f, double *cur_value, double *prev_time, double cur_
     *cur_value += (cur_time - *prev_time) * (my_vector[7] * ((8 * 128) / 64) // iL2 miss (come from mainMem)
                                              + my_vector[8] * ((8 * 128) / 64) // data load L2 miss (come from mainMem)
                                              + my_vector[9] * ((8 * 128) / 64) // data write L2 miss (come from mainMem)
-        ) * 0.000000822966149321 + (cur_time - *prev_time) * (4 * 36.412473852);// Powerconsumption
+        ) *   0.000000822966149321 ;//+ (cur_time - *prev_time) * (4 * 36.412473852);// Powerconsumption
     //*cur_value += 0;
     *f << cur_time << " " << *cur_value << endl;
 }
@@ -64,14 +175,25 @@ int main(int argc, char **argv)
     map < string, list < double > >used_time;
 
     map < string, vector < vector < double > > >slope_memory_trace;
-
+// vector < double > ma_liste_v;
 
 
     list < string > selected_connections;
     list < string > selected_cpus;
     vector < string > cpus_list (8, "Generic CPU");                            
     vector < int > cpus_number;                             
-
+    vector <double> vector_conso;
+    vector_conso = compute_conso(compute_regression("consoleak.txt"), 1000);
+    /// Pour l'instant sont rangés dans vector_conso dans l'ordre
+    /// vector_conso[0] conso cache L2
+    /// vector_conso[1] conso cache L1
+    /// vector_conso[2] conso cpu
+    /// vector_conso[3] conso Leackage
+    /// si on rajoute d'autres conso au modèle ils seront à la suite. voir/modifier aussi les fichiers (regression.cpp et consoleak.txt
+    ///  si on veut rajouter d'autres conso 
+//     for(vector <double> ::iterator iter=vector_conso.begin();iter != vector_conso.end(); iter++)
+//       cout<<*iter<< " == "<<vector_conso[pppp++]<<endl;
+//     exit(0);
     if (argc <= 2) {
         cerr << "Usage : " << argv[0]
             << " [trace_file_name.txt] selected_connection1 ... selected_connection_n -cpu selected_cpu1 name_cpu1 ... selected_cpu_n name_cpu_n" << endl;
@@ -345,14 +467,17 @@ int main(int argc, char **argv)
                     time
                 };
                 slope_memory_trace[cpu_name].push_back(vector < double >(mydoubles, mydoubles + sizeof(mydoubles) / sizeof(double)));
-
+// 		ma_liste_v.push.back(2);
                 waiting_memory_trace[cpu_name].pop_front();
             }
 
 
         }
+        
+      
 
-
+// for (list < string >::iterator iter = selected_cpus.begin(); iter != selected_cpus.end(); iter++) 
+//  nb_ligne_par_fichier.push_back (double(slope_memory_trace[*iter].size()));
 
         infile >> s;
         if (s != ")") {
@@ -431,6 +556,7 @@ int main(int argc, char **argv)
 
 
 
+
     /* For MEMORY activity */
 
     fstream gnu_file_mem((string(argv[1]) + string("_all_mem.gnu")).c_str(), ios::out);
@@ -438,16 +564,15 @@ int main(int argc, char **argv)
     gnu_file_mem << "plot ";
 
     double current_time = 0.0;
-    vector < double >current_value(4, 0.0);
+    vector < double >current_value(6, 0.0);
     list < vector < double > >slope_list;
     list < vector < double > >temp_list;
 
     slope_list.push_front(vector < double >(11, 0.0));
 
     for (list < string >::iterator iter = selected_cpus.begin(); iter != selected_cpus.end(); iter++) {
-
         current_time = 0.0;
-        current_value = vector < double >(4, 0.0);
+        current_value = vector < double >(6, 0.0);
 
         string individual_file_mem = string(argv[1]) + string("_") + *iter + string("_iL1_power.gnu");
         fstream outfileiL1(individual_file_mem.c_str(), ios::out);
@@ -463,19 +588,38 @@ int main(int argc, char **argv)
 
         individual_file_mem = string(argv[1]) + string("_") + *iter + string("_allmem_power.gnu");
         fstream outfileallmempower(individual_file_mem.c_str(), ios::out);
+	
+	 individual_file_mem = string(argv[1]) + string("_") + *iter + string("_cpu_power.gnu");
+        fstream outfilecpu(individual_file_mem.c_str(), ios::out);
+	
+	 individual_file_mem = string(argv[1]) + string("_") + *iter + string("_leackage_power.gnu");
+        fstream outfileleackage(individual_file_mem.c_str(), ios::out);
+	
+// 	individual_file_mem = string(argv[1]) + string("_") + *iter + string("_all_leackage_power.gnu");
+//         fstream outfileallleackage(individual_file_mem.c_str(), ios::out);
+// 	
+// 	individual_file_mem = string(argv[1]) + string("_") + *iter + string("_all_cpu_power.gnu");
+//         fstream outfileallcpuconso(individual_file_mem.c_str(), ios::out);
+// 	
 
         outfileiL1 << "0.0 " << "0.0" << endl;
         outfiledL1 << "0.0 " << "0.0" << endl;
         outfileL2 << "0.0 " << "0.0" << endl;
         outfileMMEM << "0.0 " << "0.0" << endl;
         outfileallmempower << "0.0 " << "0.0" << endl;
+	outfilecpu << "0.0 " << "0.0" << endl;
+	outfileleackage << "0.0 " << "0.0" << endl;
+// 	outfileallleackage << "0.0 " << "0.0" << endl;
+// 	outfileallcpuconso << "0.0 " << "0.0" << endl;
 
         while (!slope_memory_trace[*iter].empty()) {
-            compute_iL1_cache(&outfileiL1, &current_value[0], &current_time, slope_memory_trace[*iter].back()[0], slope_list.front());
-            compute_dL1_cache(&outfiledL1, &current_value[1], &current_time, slope_memory_trace[*iter].back()[0], slope_list.front());
-            compute_L2_cache(&outfileL2, &current_value[2], &current_time, slope_memory_trace[*iter].back()[0], slope_list.front());
+            compute_iL1_cache_new(&outfileiL1, &current_value[0], &current_time, slope_memory_trace[*iter].back()[0], slope_list.front(),vector_conso[1]);
+            compute_dL1_cache_new(&outfiledL1, &current_value[1], &current_time, slope_memory_trace[*iter].back()[0], slope_list.front(),vector_conso[1]);
+            compute_L2_cache_new(&outfileL2, &current_value[2], &current_time, slope_memory_trace[*iter].back()[0], slope_list.front(),vector_conso[0]);
             compute_MMem(&outfileMMEM, &current_value[3], &current_time, slope_memory_trace[*iter].back()[0], slope_list.front());
-            outfileallmempower << slope_memory_trace[*iter].back()[0] << " " << current_value[0]+current_value[1]+current_value[2]+current_value[3] << endl;
+	    compute_cpu(&outfilecpu, &current_value[4], &current_time, slope_memory_trace[*iter].back()[0], slope_list.front(),vector_conso[2]);
+	    compute_leackage(&outfileleackage, &current_value[5], &current_time, slope_memory_trace[*iter].back()[0], slope_list.front(),vector_conso[3]);
+            outfileallmempower << slope_memory_trace[*iter].back()[0] << " " << current_value[0]+current_value[1]+current_value[2]+current_value[3] + current_value[4] + current_value[5] << endl;
 
             current_time = slope_memory_trace[*iter].back()[0]; // Update current time
 
@@ -486,11 +630,13 @@ int main(int argc, char **argv)
 
 
             if (slope_memory_trace[*iter].size() == 1) {   // This is the last
-                compute_iL1_cache(&outfileiL1, &current_value[0], &current_time, slope_memory_trace[*iter].back()[10], slope_list.front());
-                compute_dL1_cache(&outfiledL1, &current_value[1], &current_time, slope_memory_trace[*iter].back()[10], slope_list.front());
-                compute_L2_cache(&outfileL2, &current_value[2], &current_time, slope_memory_trace[*iter].back()[10], slope_list.front());
-                compute_MMem(&outfileMMEM, &current_value[3], &current_time, slope_memory_trace[*iter].back()[10], slope_list.front());
-                outfileallmempower << slope_memory_trace[*iter].back()[10] << " " << current_value[0]+current_value[1]+current_value[2]+current_value[3] << endl;
+                compute_iL1_cache_new(&outfileiL1, &current_value[0], &current_time, slope_memory_trace[*iter].back()[10], slope_list.front(),vector_conso[1]);
+                compute_dL1_cache_new(&outfiledL1, &current_value[1], &current_time, slope_memory_trace[*iter].back()[10], slope_list.front(),vector_conso[1]);
+                compute_L2_cache_new(&outfileL2, &current_value[2], &current_time, slope_memory_trace[*iter].back()[10], slope_list.front(),vector_conso[0]);
+		compute_MMem(&outfileMMEM, &current_value[3], &current_time, slope_memory_trace[*iter].back()[0], slope_list.front());
+		compute_cpu(&outfilecpu, &current_value[4], &current_time, slope_memory_trace[*iter].back()[0], slope_list.front(),vector_conso[2]);
+		compute_leackage(&outfileleackage, &current_value[5], &current_time, slope_memory_trace[*iter].back()[0], slope_list.front(),vector_conso[3]);
+                outfileallmempower << slope_memory_trace[*iter].back()[10] << " " << current_value[0]+current_value[1]+current_value[2]+current_value[3] + current_value[4] + current_value[5] << endl;
 
                 current_time = slope_memory_trace[*iter].back()[10];    // Update current time
 
@@ -499,11 +645,13 @@ int main(int argc, char **argv)
 
                 while (!temp_list.empty()) {
                     //cout << "enter while end" << endl;
-                    compute_iL1_cache(&outfileiL1, &current_value[0], &current_time, temp_list.front()[10], slope_list.front());
-                    compute_dL1_cache(&outfiledL1, &current_value[1], &current_time, temp_list.front()[10], slope_list.front());
-                    compute_L2_cache(&outfileL2, &current_value[2], &current_time, temp_list.front()[10], slope_list.front());
-                    compute_MMem(&outfileMMEM, &current_value[3], &current_time, temp_list.front()[10], slope_list.front());
-                    outfileallmempower << temp_list.front()[10] << " " << current_value[0]+current_value[1]+current_value[2]+current_value[3] << endl;
+                    compute_iL1_cache_new(&outfileiL1, &current_value[0], &current_time, temp_list.front()[10], slope_list.front(),vector_conso[1]);
+                    compute_dL1_cache_new(&outfiledL1, &current_value[1], &current_time, temp_list.front()[10], slope_list.front(),vector_conso[1]);
+                    compute_L2_cache_new(&outfileL2, &current_value[2], &current_time, temp_list.front()[10], slope_list.front(),vector_conso[0]);
+		    compute_MMem(&outfileMMEM, &current_value[3], &current_time, temp_list.front()[10], slope_list.front());
+		    compute_cpu(&outfilecpu, &current_value[4], &current_time, temp_list.front()[10], slope_list.front(),vector_conso[2]);
+		    compute_leackage(&outfileleackage, &current_value[5], &current_time, temp_list.front()[10], slope_list.front(),vector_conso[3]);
+		    outfileallmempower << temp_list.front()[10] << " " << current_value[0]+current_value[1]+current_value[2]+current_value[3] + current_value[4] + current_value[5] << endl;
 
                     current_time = temp_list.front()[10];  // Update current time
 
@@ -521,11 +669,13 @@ int main(int argc, char **argv)
                 if (slope_memory_trace[*iter].back()[0] < temp_list.front()[10]) {      // overlap
                     //slope_memory_trace[*iter].back()[0] - current_time;
                 } else {
-                    compute_iL1_cache(&outfileiL1, &current_value[0], &current_time, temp_list.front()[10], slope_list.front());
-                    compute_dL1_cache(&outfiledL1, &current_value[1], &current_time, temp_list.front()[10], slope_list.front());
-                    compute_L2_cache(&outfileL2, &current_value[2], &current_time, temp_list.front()[10], slope_list.front());
-                    compute_MMem(&outfileMMEM, &current_value[3], &current_time, temp_list.front()[10], slope_list.front());
-                    outfileallmempower << temp_list.front()[10] << " " << current_value[0]+current_value[1]+current_value[2]+current_value[3] << endl;
+                    compute_iL1_cache_new(&outfileiL1, &current_value[0], &current_time, temp_list.front()[10], slope_list.front(),vector_conso[1]);
+                    compute_dL1_cache_new(&outfiledL1, &current_value[1], &current_time, temp_list.front()[10], slope_list.front(),vector_conso[1]);
+		    compute_L2_cache_new(&outfileL2, &current_value[2], &current_time, temp_list.front()[10], slope_list.front(),vector_conso[0]);
+		    compute_MMem(&outfileMMEM, &current_value[3], &current_time, temp_list.front()[10], slope_list.front());
+		    compute_cpu(&outfilecpu, &current_value[4], &current_time, temp_list.front()[10], slope_list.front(),vector_conso[2]);
+		    compute_leackage(&outfileleackage, &current_value[5], &current_time, temp_list.front()[10], slope_list.front(),vector_conso[3]);
+                    outfileallmempower << temp_list.front()[10] << " " << current_value[0]+current_value[1]+current_value[2]+current_value[3] + current_value[4] + current_value[5] << endl;
 
                     current_time = temp_list.front()[10];  // Update current time
 
@@ -539,11 +689,13 @@ int main(int argc, char **argv)
                             overlap = true;
                             //cout << "overlap" << slope_memory_trace[*iter].back()[0] << " " << temp_list.front()[10] << endl;
                         } else {
-                            compute_iL1_cache(&outfileiL1, &current_value[0], &current_time, temp_list.front()[10], slope_list.front());
-                            compute_dL1_cache(&outfiledL1, &current_value[1], &current_time, temp_list.front()[10], slope_list.front());
-                            compute_L2_cache(&outfileL2, &current_value[2], &current_time, temp_list.front()[10], slope_list.front());
-                            compute_MMem(&outfileMMEM, &current_value[3], &current_time, temp_list.front()[10], slope_list.front());
-                            outfileallmempower << temp_list.front()[10] << " " << current_value[0]+current_value[1]+current_value[2]+current_value[3] << endl;
+                            compute_iL1_cache_new(&outfileiL1, &current_value[0], &current_time, temp_list.front()[10], slope_list.front(),vector_conso[1]);
+                            compute_dL1_cache_new(&outfiledL1, &current_value[1], &current_time, temp_list.front()[10], slope_list.front(),vector_conso[1]);
+                            compute_L2_cache_new(&outfileL2, &current_value[2], &current_time, temp_list.front()[10], slope_list.front(),vector_conso[0]);
+			    compute_MMem(&outfileMMEM, &current_value[3], &current_time, temp_list.front()[10], slope_list.front());
+			    compute_cpu(&outfilecpu, &current_value[4], &current_time, temp_list.front()[10], slope_list.front(),vector_conso[2]);
+			    compute_leackage(&outfileleackage, &current_value[5], &current_time, temp_list.front()[10], slope_list.front(),vector_conso[3]);
+                            outfileallmempower << temp_list.front()[10] << " " << current_value[0]+current_value[1]+current_value[2]+current_value[3] + current_value[4] + current_value[5]  << endl;
 
                             current_time = temp_list.front()[10];       // Update current time
 
@@ -553,12 +705,104 @@ int main(int argc, char **argv)
                     }
                 }
             }
+              
         }
         outfileiL1.close();
         outfiledL1.close();
         outfileL2.close();
+	outfileleackage.close();
+	outfilecpu.close();
         outfileMMEM.close();
     }
+    
+    cout <<"coiucou"<<endl;
+    list <double> head_leackage;
+    list <double> head_cpu;
+    double * SUM_leackage;
+    double * SUM_cpu;
+    int jj=0;
+    string line;
+    bool first_time=true;
+    int taille_leackage =0,taille_cpu=0; 
+        for (list < string >::iterator iter = selected_cpus.begin(); iter != selected_cpus.end(); iter++) {
+	  /// ouvrir tout les fichiers 
+	  double val=0.0;
+	  string individual_file_mem;
+	  individual_file_mem = string(argv[1]) + string("_") + *iter + string("_cpu_power.gnu");
+        fstream infilecpu(individual_file_mem.c_str(), ios::in);
+	 
+	individual_file_mem = string(argv[1]) + string("_") + *iter + string("_leackage_power.gnu");
+        fstream infileleackage(individual_file_mem.c_str(), ios::in);
+	deque <double> machaine_cpu; 
+	deque <double> machaine_leackage; 
+	 // taille_leackage =0;taille_cpu=0; 
+	while(infilecpu>>line)
+	{ 
+	  infilecpu>>line;
+	  machaine_cpu.push_back(atof(line.c_str()));
+ 	  if(first_time) 
+	    taille_cpu++;
+	}
+	while(infileleackage>>line)
+	{
+	  infileleackage>>line;
+	  machaine_leackage.push_back(atof(line.c_str()));
+ 	  if(first_time) 
+	    taille_leackage++;
+	}
+	
+	if(first_time)
+	{
+	SUM_cpu = new double[taille_cpu]; 
+	SUM_leackage = new double[taille_leackage];
+	for(int y=0; y<taille_cpu;y++) SUM_cpu[y]=0.0;
+	for(int y=0; y<taille_leackage;y++) SUM_leackage[y]=0.0;
+	first_time=false;
+	}
+	int i=0;
+	while (!machaine_cpu.empty())
+	{
+	  if(i<taille_cpu){
+	  SUM_cpu[i++] += machaine_cpu.front();
+// 	  cout<<SUM_cpu[i-1]<<endl;
+	  machaine_cpu.pop_front();
+	}
+	  
+	}
+	i=0;
+	while (!machaine_leackage.empty())
+	{
+	  if(i<taille_leackage){
+	  SUM_leackage[i++] += machaine_leackage.front();
+// 	  cout<<SUM_leackage[i-1]<<endl;
+	  machaine_leackage.pop_front();
+	}
+	}
+	 	
+// 	  
+// 	  	
+// 	individual_file_mem = string(argv[1]) + string("_") + *iter + string("_all_leackage_power.gnu");
+//         fstream outfileallleackage(individual_file_mem.c_str(), ios::out);
+// 	individual_file_mem = string(argv[1]) + string("_") + *iter + string("_all_cpu_power.gnu");
+//         fstream outfileallcpuconso(individual_file_mem.c_str(), ios::out);
+// 	
+//
+// 
+// 	outfileallleackage << "0.0 " << "0.0" << endl;
+// 	outfileallcpuconso << "0.0 " << "0.0" << endl;
+	}
+	cout <<taille_leackage << " et " << taille_cpu<< endl;
+	string individual_file_mem;
+	individual_file_mem = string(argv[1]) + string("_all_leackage_power.gnu");
+        fstream outfileallleackage(individual_file_mem.c_str(), ios::out);
+	individual_file_mem = string(argv[1]) + string("_all_cpu_power.gnu");
+        fstream outfileallcpuconso(individual_file_mem.c_str(), ios::out);
+// 	outfileallleackage << "0.0 " << "0.0" << endl;
+// 	outfileallcpuconso << "0.0 " << "0.0" << endl;
+	for(int i=0; i<taille_leackage;i++)
+	outfileallleackage << SUM_leackage[i++] << endl;
+	for(int i=0; i<taille_cpu;i++)
+	outfileallcpuconso << SUM_cpu[i++] << endl;
 
 
 

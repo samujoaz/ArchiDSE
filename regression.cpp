@@ -84,6 +84,7 @@ int	matrix_lu_double (double* M,size_t* idx,double* d,size_t n)
 	free (v);
 	return 1;
 }
+
 void matrix_lub_double (double* b,double* M,size_t *idx,size_t n)
 {
 	int i,ii=-1,ip,j;
@@ -139,7 +140,7 @@ int matrix_inv_double (double* Y,double* M,size_t n)
 }
 
 /**
- * On utlise une matrice 3x3
+ * On utlise des matrices 3x3
  * Voici la forme de la matrice : 
  * 		On fait une somme (SUM) sur N: i allant de 0 à N-1
  * 		|SUM[Xi^4]  SUM[Xi^3]  SUM[Xi^2] |
@@ -153,6 +154,11 @@ int matrix_inv_double (double* Y,double* M,size_t n)
  * 		| SUM[Xi*Yi]	 |		
  * 		|	|
  * 		| SUM[Yi]	 |
+ * 
+ * */
+
+/**
+ * calcul des coefficients pour  avoir une matrice 3X3 
  * 
  * */
 void compute_coeff(double *Tab_Freq, double *Tab_Conso, int nb_points, double coeff[3])
@@ -200,6 +206,12 @@ void compute_coeff(double *Tab_Freq, double *Tab_Conso, int nb_points, double co
 	  }
 	}
 }
+/**
+ * *cette fonction lit le fichier d'entrée contenant les valeurs pour les différentes fréquences de consommation anisi que des colonnnes de valeurs des consos. 
+ * * on a deux pointeurs indiquants le nombre de colonnes et nombre de points de mesure
+ * * 
+ * *
+ * */
 
 void ReadFileConso(string inputname, int *nb_points, int *nb_col)
 {
@@ -340,9 +352,7 @@ int i=0;
     if(j==2)
       cout<<"("<<*iter2<<")"<<endl;
     j++;
-//     cout<<vector_coeff[0][0]<<endl;
-//     cout<<vector_coeff[1][0]<<endl;
-//     cout<<vector_coeff[2][0];
+
   }
   i++;
   }
@@ -350,6 +360,8 @@ int i=0;
 }
  */
 
+
+/// pour l'affichage des résultats
 void affiche_regression(vector < vector <  double> > myvector)
 {
 int i=0;
